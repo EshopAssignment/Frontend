@@ -1,0 +1,61 @@
+
+
+  :root{
+    --background: #212121;
+    --foreground: #ebe8e0;
+    --card: #292929;
+    --popover: #292929;
+    --popover-foreground: #ebe8e0;
+    --primary: #40bf6a;
+    --primary-hover: #99a2f5;
+    --primary-foreground: #000;
+    --secondary: #333;
+    --muted: #333;
+    --muted-foreground: #999;
+    --accent: #40bf6a;
+    --accent-foreground: #40bf6a;
+    --destructive: #d92626;
+    --destructive-foreground: #fff;
+    --border: #4d4d4d;
+    --input: #4d4d4d;
+    --ring: #40bf6a;
+
+    --chart-1: #818cf8;
+    --chart-2: #395;
+    --chart-3: #4f46e5;
+    --chart-4: #4338ca;
+    --chart-5: #3730a3;
+
+    --sidebar: #333;
+
+    --sidebar-foreground: #ebe8e0;
+    --sidebar-primary: #818cf8;
+    --sidebar-primary-foreground: #212121;
+    --sidebar-accent: #333;
+    --sidebar-accent-foreground: #bfbfbf;
+    --sidebar-border: #4b5563;
+    --sidebar-ring: #818cf8;
+
+    --font-primary: "Zalando Sans SemiExpanded", sans-serif;
+    --font-secondary: "Electrolize", sans-serif;
+    --font-comp: sans-serif;
+
+    --radius2: .2rem;
+    --radius4: .4rem;
+    --radius6: .6rem;
+    --radius8: .8rem;
+    --radius100: 100%;
+
+    --shadow-2xs: 0px 4px 8px -1px #0000000d;
+    --shadow-xs: 0px 4px 8px -1px #0000000d;
+    --shadow-sm: 0px 4px 8px -1px #0000001a,0px 1px 2px -2px #0000001a;
+    --shadow: 0px 4px 8px -1px #0000001a,0px 1px 2px -2px #0000001a;
+    --shadow-md: 0px 4px 8px -1px #0000001a,0px 2px 4px -2px #0000001a;
+    --shadow-lg: 0px 4px 8px -1px #0000001a,0px 4px 6px -2px #0000001a;
+    --shadow-xl: 0px 4px 8px -1px #0000001a,0px 8px 10px -2px #0000001a;
+    --shadow-2xl: 0px 4px 8px -1px #00000040;
+
+    --gradient-primary: linear-gradient(135deg,var(--primary),var(--chart-5));
+    --gradient-accent: linear-gradient(135deg,var(--accent),var(--muted));
+    --gradient-hero: linear-gradient(135deg,var(--secondary),var(--primary));
+  }

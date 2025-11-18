@@ -1,0 +1,119 @@
+.divider{
+    border: var(--border) 2px solid;
+    margin:2rem 0;
+}
+
+.cart{
+    background: var(--popover);
+    padding: 2rem 1.5rem;
+    border-radius: var(--radius4);
+    max-height: 400px;
+    overflow-x:scroll;
+}
+
+.items{
+    background: var(--popover);
+    padding: 2rem 1.5rem;
+    border-radius: var(--radius4);
+}
+.item-card-container{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap:1rem 2rem;
+}
+
+.item-card{
+    display: flex;
+    align-items: start;
+    justify-content:start;
+    padding:1rem;
+    flex-direction: column;
+    gap:.5rem;
+    width: 250px;
+    height: fit-content;
+    border: var(--border) 1px solid;
+    border-radius:var(--radius6);
+    .divider{
+        width: 100%;
+        margin:.5rem 0rem;
+    }
+    img{
+        width: 215px;
+    }
+
+}
+.item-price{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    button{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.logo{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    width: 80px;
+    border-radius: var(--radius100);
+    overflow:hidden;
+    img{
+        width: inherit;
+        height: inherit;
+    }
+}
+.top-bar{
+    display: grid;
+    grid-template-columns:auto 1fr auto;
+    gap:2rem;
+    align-items: center;
+    justify-content: start;
+}
+.btn-group{
+    display: flex;
+    flex-direction: row;
+    gap:1rem;
+    button{
+        padding:1rem;
+        border-left:var(--border) 1px solid;
+        border-right:var(--border) 1px solid;
+
+    }
+}
+
+.searchbar{
+    display: flex;
+    width: 100%;
+    input{
+        border:var(--border) 1px solid;
+        border-radius: var(--radius2) 0  0 var(--radius2);
+        width: 100%;
+
+    }
+    button{
+        border:var(--border) 1px solid;
+        width: 40px;
+        height: 40px;
+        border-radius:0 var(--radius4) var(--radius4) 0;
+    }
+}
+.search-group{
+    padding:1rem 0;
+    border-bottom:var(--border) 2px solid;
+}
+.search-res{
+    display: none;
+    position: absolute;
+    width: inherit;
+    border: var(--border) 1px solid;
+    width:760px;
+    padding:1rem;
+    border-radius: 0 0  var(--radius2) var(--radius2);
+    background: var(--foreground); 
+}

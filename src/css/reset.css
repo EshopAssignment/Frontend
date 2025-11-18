@@ -1,0 +1,40 @@
+*{
+    padding:0;
+    margin:0;
+    box-sizing: border-box;
+}
+
+a{
+    text-decoration: none;
+    font-style: none;
+
+}
+
+h1,h2,h3,h4,h5,h6,p,a,li,ul,div,button{
+    color:var(--foreground);
+    
+    font-family: var(--font-primary);
+}
+
+body{
+    background: var(--background);
+}
+
+button{
+    border:none;
+    background:transparent;
+}
+
+
+
+button:hover, a:hover{
+    cursor: pointer;
+}
+
+img{
+    display:block;
+}
+
+ul, li{
+    list-style: none;
+}
