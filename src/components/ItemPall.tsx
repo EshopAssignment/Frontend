@@ -1,26 +1,34 @@
-const ItemPall = () => {
+import type { ProductDto } from "../Services/productService";
+import placeholder from "../Images/Placeholder.jpg";
+
+interface Props{
+  product: ProductDto
+}
+
+const ItemPall = ({product}: Props) => {
   return (
-            <div className="item-card">
+      <div className="item-card">
 
-              <div>
-                <img src="./src/images/Placeholder.jpg" alt="bild på pall" />
-              </div>
+        <div>
+          <img src={product.imgUrl} alt={product.name}
+          onError={(e) => (e.currentTarget.src = placeholder)} />
+        </div>
 
-              <div className="divider"></div>
+        <div className="divider"></div>
 
-              <div>
-                <span>Pall 1</span>
-                <p>pall som man kan ställa pall på</p>  
-              </div>
+        <div>
+          <span>{product.name}</span>
+          <p>{product.description}</p>  
+        </div>
 
-              <div className="item-price">
-                <p>100-pall-Sek</p>
-                <button>
-                  <i className="fa-solid fa-cart-plus"></i>
-                </button>
-              </div>
+        <div className="item-price">
+          <p>{product.price} kr</p>
+          <button>
+            <i className="fa-solid fa-cart-plus"></i>
+          </button>
+        </div>
 
-            </div>
+      </div>
   );
 };
 

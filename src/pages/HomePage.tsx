@@ -1,6 +1,20 @@
+import { useEffect, useState } from "react";
 import ItemPall from "../components/ItemPall";
+import { getProducts, type ProductDto } from "../Services/productService";
 
 const HomePage = () => {
+  const [products, setProducts] = useState<ProductDto[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getProducts()
+    .then(setProducts)
+    .finally(() => setLoading(false))
+  }, [])
+  
+
+  if(loading) return <p>Hold on, pallets are stacking</p>
+
   return (
     <section>
       <div className="container">
@@ -8,12 +22,10 @@ const HomePage = () => {
           
           <div className="item-card-container">
 
-              <ItemPall />
-              <ItemPall />
-              <ItemPall />
-              <ItemPall />
-              <ItemPall />
-
+              {products.map(p => (
+                <ItemPall key={p.id} product={p} />
+              ))}
+              
 
           </div>
 

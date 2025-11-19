@@ -18,7 +18,7 @@
 }
 .item-card-container{
     display: flex;
-    justify-content: center;
+    justify-content: start;
     flex-wrap: wrap;
     gap:1rem 2rem;
 }
@@ -117,3 +117,10 @@
     border-radius: 0 0  var(--radius2) var(--radius2);
     background: var(--foreground); 
 }
+
+/*#region buttons */ 
+button:hover{
+    transition: .4s;
+    color:var(--primary-hover)
+}
+/*#endregion */ 

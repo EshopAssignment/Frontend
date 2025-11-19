@@ -9,3 +9,15 @@ font-family: "Zalando Sans SemiExpanded", sans-serif;
 
 
 */ 
+.fa-cart-plus{
+    color: var(--accent);
+}
+.fa-cart-plus:hover{
+    transition: .4s;
+    opacity: 70%;
+    
+}
+
+i{
+    font-size: 1.5rem;
+}
