@@ -1,11 +1,13 @@
 import type { ProductDto } from "../Services/productService";
 import placeholder from "../Images/Placeholder.jpg";
+import { useCart } from "../context/CartContext";
 
 interface Props{
   product: ProductDto
 }
 
 const ItemPall = ({product}: Props) => {
+  const {addItem} = useCart();
   return (
       <div className="item-card">
 
@@ -23,7 +25,8 @@ const ItemPall = ({product}: Props) => {
 
         <div className="item-price">
           <p>{product.price} kr</p>
-          <button>
+          
+          <button onClick={() => addItem(product)}>
             <i className="fa-solid fa-cart-plus"></i>
           </button>
         </div>
