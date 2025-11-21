@@ -1,5 +1,5 @@
 import TopBarGroup from "../components/Buttons/TopBarGroup";
-import Searchbar from "../components/searchbar";
+import Searchbar from "../components/Searchbar";
 
 const Header = () => {
   return (
@@ -16,6 +16,7 @@ const Header = () => {
           <Searchbar />
 
           <TopBarGroup />
+
 
         </div>
 

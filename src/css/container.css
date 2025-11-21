@@ -10,19 +10,12 @@
     .container {
         max-width: 1600px;
     }
-    .layout{
-        display: grid;
-        grid-template-rows: auto 1fr auto;
-    }
 }
 
 /* 1080p / Standard Desktop */
 @media (max-width: 1919px) {
     .container {
         max-width: 1200px;
-    }
-    .layout{
-        grid-template-rows: auto 1fr auto;
     }
 }
 
@@ -31,10 +24,7 @@
     .container {
         max-width: 960px;
     }
-    .layout{
-        display: grid;
-        grid-template-rows: auto 1fr auto;
-    }
+
 }
 
 /* Tablet portrait */
@@ -42,19 +32,11 @@
     .container {
         max-width: 720px;
     }
-    .layout{
-        display: grid;
-        grid-template-rows: auto 1fr auto;
-    }
 }
 
 /* Phone */
 @media (max-width: 767px) {
     .container {
         max-width: 100%;
-    }
-    .layout{
-        display: grid;
-        grid-template-rows: auto 1fr auto;
     }
 }
