@@ -6,7 +6,7 @@ interface Props{
   product: ProductDto
 }
 
-const ItemPall = ({product}: Props) => {
+const ItemCard = ({product}: Props) => {
   const {addItem} = useCart();
   return (
       <div className="item-card">
@@ -35,5 +35,5 @@ const ItemPall = ({product}: Props) => {
   );
 };
 
-export default ItemPall;
+export default ItemCard;
 

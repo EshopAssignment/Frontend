@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import ItemPall from "../components/ItemPall";
+import ItemCard from "../components/ItemCard";
 import { getProducts, type ProductDto } from "../Services/productService";
 import { useCart } from "../context/CartContext";
 
@@ -26,7 +26,7 @@ const HomePage = () => {
           <div className="item-card-container">
 
               {products.map(p => (
-                <ItemPall key={p.id} product={p} />
+                <ItemCard key={p.id} product={p} />
               ))}
               
 
