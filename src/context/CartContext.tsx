@@ -1,7 +1,7 @@
 import { createContext, useContext, useMemo, useReducer, type ReactNode } from "react";
 import type { ProductDto } from "../Services/productService";
 
-type CartItem = {
+export type CartItem = {
     productId: number;
     name: string;
     price: number;
@@ -9,8 +9,9 @@ type CartItem = {
 };
 
 type CartState = {
-    items: CartItem[];
+  items: CartItem[];
 };
+
 
 type CartAction = 
 | {type: "ADD_ITEM"; payload:{product: ProductDto} }
@@ -18,7 +19,7 @@ type CartAction =
 | {type: "REMOVE_ONE"; payload:{productId: number}}
 | {type: "CLEAR"};
 
-const cartContext = createContext<{
+const CartContext = createContext<{
     state: CartState;
     addItem: (product: ProductDto) => void;
     removeOne: (productId: number) => void;
@@ -125,9 +126,9 @@ export function CartProvider({children}: {children: ReactNode }) {
         total,
     };
 
-    return <cartContext.Provider value={value}>{children}</cartContext.Provider>
+    return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }
 
 export function useCart() {
-    return useContext(cartContext);
+  return useContext(CartContext);
 }
