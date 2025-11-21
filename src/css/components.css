@@ -2,13 +2,17 @@
     border: var(--border) 2px solid;
     margin:2rem 0;
 }
+.divider-s{
+    border: var(--border) 1px solid;
+    margin:.5rem 0;
+}
 
 .cart{
     background: var(--popover);
     padding: 2rem 1.5rem;
     border-radius: var(--radius4);
     max-height: 400px;
-    overflow-x:scroll;
+    max-width:400px;
 }
 
 .items{
@@ -117,8 +121,59 @@
     border-radius: 0 0  var(--radius2) var(--radius2);
     background: var(--foreground); 
 }
+.cart-row{
+    display:grid;
+    padding:1rem 0;
+    gap:1rem;
+    align-items: center;
+    grid-template-columns: 25% 15% 30% 25%;
+    border-bottom: var(--border) 1px solid
+
+}
+.cart-btn{
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+}
+.cart-total{
+    margin: 1rem 0;
+}
+
+.checkout{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
 /*#region buttons */ 
+.btn-subtract{
+    font-size:1rem;
+    border:var(--destructive) 1px solid;
+    border-radius: var(--radius4);
+    padding:.3rem .5rem;
+    p{
+        font-size:1rem;
+    }
+}
+.btn-subtract:hover{
+    border:var(--destructive) 1px solid;
+
+}
+.btn-trash{
+    font-size:1rem;
+    color:var(--destructive)
+}
+.btn-clear{
+    color:var(--destructive);
+    font-size:1rem;
+    margin-top:1rem;
+}
+.btn-checkout{
+    color:var(--accent);
+    i{
+        font-size:2rem;
+    }
+}
 button:hover{
     transition: .4s;
     color:var(--primary-hover)
