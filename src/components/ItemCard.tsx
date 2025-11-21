@@ -24,7 +24,7 @@ const ItemCard = ({product}: Props) => {
         </div>
 
         <div className="item-price">
-          <p>{product.price} kr</p>
+          <p>{product.price} kr/st</p>
           
           <button onClick={() => addItem(product)}>
             <i className="fa-solid fa-cart-plus"></i>

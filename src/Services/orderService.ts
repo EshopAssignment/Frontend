@@ -23,7 +23,7 @@ export interface CreateOrderRequest {
 export interface OrderCreatedDto {
     orderId: string;
     orderNumber: string;
-    dateOrderDate: string;
+    orderDate: string;
     total: number;
 }
 
