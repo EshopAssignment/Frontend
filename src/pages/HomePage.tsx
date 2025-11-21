@@ -2,20 +2,43 @@ import { useEffect, useState } from "react";
 import ItemCard from "../components/ItemCard";
 import { getProducts, type ProductDto } from "../Services/productService";
 import { useCart } from "../context/CartContext";
+import { CreateOrderFromCart } from "../Services/orderService";
 
 const HomePage = () => {
   const [products, setProducts] = useState<ProductDto[]>([])
   const [loading, setLoading] = useState(true)
   const {state, total, removeOne, removeAll, clear} = useCart();
   
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
 
   useEffect(() => {
     getProducts()
     .then(setProducts)
     .finally(() => setLoading(false))
   }, [])
-  
 
+  const handleCheckout = async () => {
+    if (state.items.length === 0 || submitting) return;
+
+    setSubmitting(true);
+    setError(null);
+    setOrderNumber(null);
+
+    try {
+      const result = await CreateOrderFromCart(state.items);
+      setOrderNumber(result.orderNumber)
+      clear();
+    } catch (err) {
+      console.error(err);
+      setError("Could not create order.")
+    } finally {
+      setSubmitting(false);
+    }
+
+  };
+  
   if(loading) return <p>Hold on, pallets are stacking</p>
 
   return (
@@ -66,11 +89,23 @@ const HomePage = () => {
                 <p className="cart-total">
                   Totalt: {total} kr
                 </p>
-                <button className="btn-checkout"><i className="fa-regular fa-credit-card"></i></button>
+                <button className="btn-checkout"
+                  onClick={handleCheckout}
+                  disabled={submitting}>
+                  {submitting ? "Skickar order..." : <i className="fa-regular fa-credit-card"></i>}
+                  </button>
               </div>
 
             </>
           )}
+
+        {orderNumber && (
+          <p>
+            orderNumber: {orderNumber}
+          </p>
+        )}
+
+        {error && <p>{error}</p>}
             
           </div>
       </div>
