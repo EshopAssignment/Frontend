@@ -10,6 +10,14 @@ export interface ProductDto{
     isActive: boolean
 }
 
+export interface PagedResult<T> {
+    page: number;
+    pageSize: number;
+    totalItems: number;
+    totalPages: number;
+    items: T[];
+}
+
 const API_URL = "https://localhost:7152/api/Products"
 
 export async function getProducts(): Promise<ProductDto[]> {
@@ -24,4 +32,10 @@ export async function getProduct(id: number): Promise<ProductDto> {
 
     const data: ProductDto = await res.json();
         return data;
+}
+
+export async function getProductsPaged(page: number, pageSize: number): Promise<PagedResult<ProductDto>> {
+    const res = await fetch(`${API_URL}?page=${page}&pageSize=${pageSize}`);
+    if (!res.ok) throw new Error("Failed to fetch paged products");
+    return res.json();
 }
