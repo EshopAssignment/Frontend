@@ -1,0 +1,94 @@
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { getProduct, type ProductDto } from "../Services/productService";
+import { useCart } from "../context/CartContext";
+import placeholder from "../images/placeholder.jpg";
+import Breadcrumbs from "../components/Breadcrumbs";
+
+const DetailsPage = () => {
+
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { addItem } = useCart();
+
+  const [product, setProduct] = useState<ProductDto | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const pid = Number(id);
+    if (!pid || Number.isNaN(pid)) {
+      navigate("/", { replace: true });
+      return;
+    }
+
+    getProduct(pid)
+      .then(setProduct)
+      .catch(() => setProduct(null))
+      .finally(() => setLoading(false));
+  }, [id, navigate]);
+
+  if (loading) {
+    return (
+      <section className="container product-details">
+        <div className="product-skeleton" />
+      </section>
+    );
+  }
+  if (!product) {
+    return (
+      <section className="container product-details">
+        <p>Error Error WEEEEEEEEEEEEEEEEEEEEEEE</p>
+        <button onClick={() => navigate(-1)}>Return</button>
+      </section>
+    );
+  }
+
+
+
+    return (
+
+    <div className="container">
+        <Breadcrumbs
+            trail={[
+            { label: "Hem", to: "/" },
+            { label: "Produkter", to: "/" }, 
+            { label: product.name }          
+        ]}
+        />
+        <div className="details-content">
+            <div className="details-hero">
+                <div className="details-name">
+                    <h2>{product.name}</h2>
+                    <p>Type: {product.palletType}</p>
+                    <p>Condition: {product.condition}</p>
+                </div>
+
+                <div className="details-desc">
+                    <span>{product.description}</span>
+                </div>
+
+                <div className="details-price">
+                    <p>Lager: {product.stockQuantity}</p>
+                    <p>Pris/st: {product.price}</p>
+                </div>
+
+                <button className="btn-add-wide" onClick={() => addItem(product)}>
+                    <i className="fa-solid fa-cart-plus"></i>
+                </button>
+            </div>
+
+            <div className="divider"></div>
+
+            <div className="details-img">
+                <img
+                src={product.imgUrl}
+                alt={product.name}
+                onError={(e) => (e.currentTarget.src = placeholder)}
+                />
+            </div>
+        </div>          
+    </div>
+    )
+  
+}
+export default DetailsPage;
