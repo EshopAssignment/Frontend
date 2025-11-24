@@ -51,7 +51,7 @@ const DetailsPage = () => {
         <Breadcrumbs
             trail={[
             { label: "Hem", to: "/" },
-            { label: "Produkter", to: "/" }, 
+            { label: "Produkter", to: "/product" }, 
             { label: product.name }          
         ]}
         />

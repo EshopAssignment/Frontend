@@ -34,8 +34,36 @@ export async function getProduct(id: number): Promise<ProductDto> {
         return data;
 }
 
-export async function getProductsPaged(page: number, pageSize: number): Promise<PagedResult<ProductDto>> {
-    const res = await fetch(`${API_URL}?page=${page}&pageSize=${pageSize}`);
-    if (!res.ok) throw new Error("Failed to fetch paged products");
+export async function getProductsPaged(
+    page: number,
+    pageSize: number,
+    init?: RequestInit & {
+        query?: string;
+        sort?: string;
+        type? : string[];
+        condition?: string[];
+        minPrice?: number;
+        maxPrice?: number;
+        }
+): Promise<PagedResult<ProductDto>> {
+    const params = new URLSearchParams({
+        page: page.toString(),
+        pageSize: pageSize.toString(),
+    });
+
+    if (init?.query) params.set("query", init.query);
+      if (init?.sort) params.set("sort", init.sort);
+        init?.type?.forEach(t => params.append("type", t));
+        init?.condition?.forEach(c => params.append("condition", c));
+        if (typeof init?.minPrice === "number") params.set("minPrice", String(init.minPrice));
+        if (typeof init?.maxPrice === "number") params.set("maxPrice", String(init.maxPrice));
+
+
+    const res = await fetch(`${API_URL}?${params.toString()}`, {
+        ...init,
+        headers: {"Content-Type": "application/json",...(init?.headers || {})},
+    });
+    if(!res.ok) throw new Error("Failed to fetch paged products");
     return res.json();
+
 }

@@ -40,7 +40,7 @@ const Breadcrumbs = ({trail, className}: Props) => {
  * <Breadcrumbs
  *   trail={[
  *     { label: "Hem", to: "/" },
- *     { label: "Produkter", to: "/" },
+ *     { label: "Produkter", to: "/product" },
  *     { label: product.name }   // sista noden saknar 'to' → markeras som aktiv
  *   ]}
  * />

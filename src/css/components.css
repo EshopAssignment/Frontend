@@ -60,7 +60,7 @@
     border-bottom:var(--border) 2px solid;
 }
 .search-res{
-    display: none;
+    display: block;
     position: absolute;
     width: inherit;
     border: var(--border) 1px solid;
@@ -68,6 +68,9 @@
     padding:1rem;
     border-radius: 0 0  var(--radius2) var(--radius2);
     background: var(--foreground); 
+    .muted,p{
+        color:var(--muted);
+    }
 }
 
 
@@ -128,9 +131,11 @@
         padding: .5rem;
         border-radius: var(--radius2);
     }
-    span{
+    button:hover{
+        border:var(--primary-hover) 1px solid;
 
     }
+
 }
 /*#region item */ 
 .items{
@@ -277,9 +282,7 @@ button:hover{
 .details-desc{
     font-size:28px;
 }
-.details-price{
 
-}
 
 
 
