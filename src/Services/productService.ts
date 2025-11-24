@@ -18,8 +18,10 @@ export async function getProducts(): Promise<ProductDto[]> {
         return res.json()
 }
 
-export async function getProduct(id: number): Promise<ProductDto[]> {
+export async function getProduct(id: number): Promise<ProductDto> {
     const res = await fetch(`${API_URL}/${id}`)
-    if (!res.ok) throw new Error("Product Not Found")
-        return res.json()
+    if (!res.ok) throw new Error("Product Not Found");
+
+    const data: ProductDto = await res.json();
+        return data;
 }

@@ -1,6 +1,7 @@
 import type { ProductDto } from "../Services/productService";
 import placeholder from "../Images/Placeholder.jpg";
 import { useCart } from "../context/CartContext";
+import { Link } from "react-router-dom";
 
 interface Props{
   product: ProductDto
@@ -9,19 +10,20 @@ interface Props{
 const ItemCard = ({product}: Props) => {
   const {addItem} = useCart();
   return (
-      <div className="item-card">
-
-        <div>
-          <img src={product.imgUrl} alt={product.name}
-          onError={(e) => (e.currentTarget.src = placeholder)} />
-        </div>
-
+    <div className="item-card">
+        <Link to={`/product/${product.id}`} >
+          <div>
+            <img src={product.imgUrl} alt={product.name}
+            onError={(e) => (e.currentTarget.src = placeholder)} />
+          </div>
+        
         <div className="divider"></div>
 
         <div>
           <span>{product.name}</span>
           <p>{product.description}</p>  
         </div>
+      </Link>
 
         <div className="item-price">
           <p>{product.price} kr/st</p>
