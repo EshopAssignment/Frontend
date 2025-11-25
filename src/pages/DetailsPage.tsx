@@ -4,6 +4,7 @@ import { getProduct, type ProductDto } from "../Services/productService";
 import { useCart } from "../context/CartContext";
 import placeholder from "../images/placeholder.jpg";
 import Breadcrumbs from "../components/Breadcrumbs";
+import { toCartItem } from "../helpers/toCartItem";
 
 const DetailsPage = () => {
 
@@ -72,7 +73,7 @@ const DetailsPage = () => {
                     <p>Pris/st: {product.price}</p>
                 </div>
 
-                <button className="btn-add-wide" onClick={() => addItem(product)}>
+                <button className="btn-add-wide" onClick={() => addItem(toCartItem(product))}>
                     <i className="fa-solid fa-cart-plus"></i>
                 </button>
             </div>

@@ -2,6 +2,7 @@ import type { ProductDto } from "../Services/productService";
 import placeholder from "../Images/Placeholder.jpg";
 import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
+import { toCartItem } from "../helpers/toCartItem";
 
 interface Props{
   product: ProductDto
@@ -28,7 +29,7 @@ const ItemCard = ({product}: Props) => {
         <div className="item-price">
           <p>{product.price} kr/st</p>
           
-          <button onClick={() => addItem(product)}>
+          <button onClick={() => addItem(toCartItem(product))}>
             <i className="fa-solid fa-cart-plus"></i>
           </button>
         </div>
