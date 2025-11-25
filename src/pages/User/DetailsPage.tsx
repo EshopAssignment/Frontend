@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getProduct, type ProductDto } from "../Services/productService";
-import { useCart } from "../context/CartContext";
-import placeholder from "../images/placeholder.jpg";
-import Breadcrumbs from "../components/Breadcrumbs";
-import { toCartItem } from "../helpers/toCartItem";
+
+import placeholder from "../../images/placeholder.jpg";
+import { useCart } from "../../context/CartContext";
+import { getProduct, type ProductDto } from "../../Services/productService";
+import Breadcrumbs from "../../components/Breadcrumbs";
+import { toCartItem } from "../../helpers/toCartItem";
+
 
 const DetailsPage = () => {
 

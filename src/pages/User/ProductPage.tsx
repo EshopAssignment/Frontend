@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import ItemCard from "../components/ItemCard";
-import { getProductsPaged, type ProductDto } from "../Services/productService";
-import loadingIcon from "../images/loading.png";
+import loadingIcon from "../../images/loading.png";
 import { useSearchParams } from "react-router-dom";
-import FilterBar from "../components/FilterBar";
+import { getProductsPaged, type ProductDto } from "../../Services/productService";
+import FilterBar from "../../components/FilterBar";
+import ItemCard from "../../components/ItemCard";
+import RequestOrder from "../../components/Orders/RequestOrder";
+
 
 const PAGE_SIZE = 15;
 
@@ -80,6 +82,7 @@ useEffect(() => {
   }
 
   return (
+    <>
     <section>
       <div className="container">
         
@@ -109,6 +112,11 @@ useEffect(() => {
         <div className="divider"></div>
       </div>
     </section>
+    <section>
+        <RequestOrder />
+    </section>
+    </>
+
   );
 };
 

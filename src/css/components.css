@@ -68,7 +68,7 @@
     padding:1rem;
     border-radius: 0 0  var(--radius2) var(--radius2);
     background: var(--foreground); 
-    .muted,p{
+    .muted,p,span,button{
         color:var(--muted);
     }
 }
@@ -212,6 +212,7 @@
     color:var(--destructive)
 }
 .btn-clear{
+    display: none;
     color:var(--destructive);
     font-size:1rem;
     margin-top:1rem;
@@ -226,6 +227,11 @@
     background: var(--accent);
     padding:2rem;
     border-radius: var(--radius4);
+}
+.btn-submit{
+    background: var(--accent) !important;
+    grid-column: 1/3;
+    text-align: center;
 }
 button:hover{
     transition: .4s;
@@ -257,6 +263,58 @@ button:hover{
   box-shadow: var(--shadow-md);
 }
 /*#endregion */ 
+
+/*#region form */
+.form{
+    margin:0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap:2rem;
+    background: var(--popover);
+    margin-top:2rem;
+    padding:2rem;
+    border-radius: var(--radius4);
+}
+.input{
+    border:var(--input) 1px solid;
+    padding: .5rem;
+    border-radius: var(--radius4);
+    background-color: transparent;
+    color: var(--foreground);
+}
+.lable{
+
+}
+.input-group{
+    display: flex;
+    flex-direction: column;
+    gap:.5rem;
+}
+.form-group{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto 1fr;
+    gap:1rem 2rem;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+}
+.rte{
+    grid-column: 1/3;
+    text-align: center;
+}
+.from-head{
+ 
+}
+.request-info{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap:.5rem;
+}
+/*#endregion */
 /*#region details*/
 .details-content{
     display: grid;

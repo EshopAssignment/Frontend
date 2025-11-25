@@ -38,3 +38,8 @@ img{
 ul, li{
     list-style: none;
 }
+
+input{
+    color:var(--foreground);
+    background: transparent;
+}

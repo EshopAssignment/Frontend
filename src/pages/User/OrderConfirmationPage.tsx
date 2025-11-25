@@ -38,7 +38,7 @@ const OrderConfirmationPage = () => {
             </div>
 
             <div className="btn-return">
-                <Link to="/">Fortsätt handla</Link>     
+                <Link to="/products">Fortsätt handla</Link>     
             </div>
 
           </div>
