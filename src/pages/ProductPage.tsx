@@ -5,7 +5,7 @@ import loadingIcon from "../images/loading.png";
 import { useSearchParams } from "react-router-dom";
 import FilterBar from "../components/FilterBar";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 15;
 
 const ProductPage = () => {
     const [products, setProducts] = useState<ProductDto[]>([]);

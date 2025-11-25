@@ -13,8 +13,8 @@ const SORT_OPTIONS = [
   { value: "name_desc", label: "Namn: Ö–A" },
 ];
 
-const PALLET_TYPES = ["EUR", "FIN", "One-Way", "Special"];
-const CONDITIONS = ["New", "Used", "Refurbished"];
+const PALLET_TYPES = ["EUR", "PallKrage", "Halvpall", "Spån"];
+const CONDITIONS = ["New", "Refurbished"];
 
 export default function FilterBar() {
   const [searchParams, setSearchParams] = useSearchParams();
