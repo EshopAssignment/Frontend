@@ -1,0 +1,47 @@
+.admin-group{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap:1rem;
+}
+
+.admin-group{
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-product-head{
+    display: grid;
+    grid-template-columns:2rem repeat(9, 1fr);
+    font-size: 12px;
+    gap:.5rem;
+    margin:.5rem;
+    align-items: center;
+    border: var(--border) 1px solid;
+    span, .input-group{
+        border-right: var(--border) 1px solid;
+    }
+    .input{
+        border:none;
+    }
+    
+}
+
+.admin-product-items{
+    display: grid;
+    grid-template-columns:2rem repeat(9, 1fr);
+    font-size: 12px;
+    gap:.5rem;
+    margin:.5rem;
+    align-items: center;
+    border: var(--border) 1px solid;
+    span, .input-group{
+        border-right:var(--border) 1px solid;
+    }
+    .input{
+        border:none;
+    }
+    
+}
+
+

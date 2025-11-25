@@ -7,9 +7,15 @@ const HomePage = () => {
     <section>
       <div className="container">
         <h1>PALLSHOPPEN!</h1>
-        <button className="btn">
-          <Link to="/product">Se produkter</Link>
-        </button>
+
+        <Link to="/products">
+          <button className="btn"> Se produkter</button>
+        </Link>
+        
+        <Link to={"/admin"}>
+            <button className="btn">Admin </button>
+        </Link>
+
       </div>
     </section>
   );
