@@ -1,32 +1,59 @@
-import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useSearchParams } from "react-router-dom";
+
+
+const DEBOUNCE_MS = 300;
 
 const Searchbar = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isPending, startTransition] = useTransition();
   const initial = searchParams.get("q") ?? "";
   const [value, setValue] = useState(initial);
   const [open, setOpen] = useState(Boolean(initial));
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      const q = value.trim();
-      const next = new URLSearchParams(searchParams);
-      if (q) {
-        next.set("q", q);
-        setOpen(true);
-      } else {
-        next.delete("q");
-        setOpen(false);
-      }
-      next.delete("page");
-      setSearchParams(next, { replace: true });
-    }, 300);
+    const current = searchParams.get("q") ?? "";
+    setValue(current);
+    setOpen(Boolean(current));
+  }, [searchParams]);
 
-    return () => clearTimeout(t);
-  }, [value]);
+  const debounced = useRef<number | null>(null);
+  const trimmed = useMemo(() => value.trim(), [value]);
+
+  useEffect(() => {
+    if (debounced.current) window.clearTimeout(debounced.current);
+    debounced.current = window.setTimeout(() => {
+      startTransition(() => {
+        const next = new URLSearchParams(searchParams);
+        const prevQ = next.get("q") ?? "";
+
+        if (trimmed && trimmed !== prevQ) {
+          next.set("q", trimmed);
+          setOpen(true);
+        } else if (!trimmed && prevQ) {
+          next.delete("q");
+          setOpen(false);
+        }
+
+        if (next.has("page")) next.delete("page");
+
+        if (next.toString() !== searchParams.toString()) {
+          setSearchParams(next, { replace: true });
+        }
+      });
+    }, DEBOUNCE_MS);
+
+    return () => {
+      if (debounced.current) window.clearTimeout(debounced.current);
+    };
+  }, [trimmed, searchParams, setSearchParams, startTransition]);
 
   const onSubmit = (e: React.FormEvent) => e.preventDefault();
-  const clear = () => setValue("");
+
+  const clear = () => {
+    setValue("");
+    setOpen(false);
+  };
 
   return (
     <div className="search-group">
@@ -51,18 +78,16 @@ const Searchbar = () => {
             ×
           </button>
         )}
-        <Link to="/product">
-          <button type="button" aria-label="Sök">
+          <button type="button" aria-label="Sök" disabled={isPending}>
             <i className="fa-solid fa-magnifying-glass"></i>
           </button>
-        </Link>
 
       </form>
 
       {open && (
         <div className="search-res">
           <p>Söker efter: <strong>{value.trim()}</strong></p>
-          <p className="muted">Träffarna laddas i listan nedan. Tryck ESC för att stänga.</p>
+          <p className="muted">laddar...</p>
         </div>
       )}
     </div>
