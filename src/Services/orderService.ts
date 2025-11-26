@@ -1,65 +1,32 @@
-
 import type { CartItem } from "../context/CartContext";
+import {
+  createOrder as apiCreateOrder,
+  getOrderById as apiGetOrderById,
+  type CreateOrderRequest,
+  type OrderCreatedDto
+} from "../api/orderApi";
 
-const API_URL = "https://localhost:7152/api/order";
+export type { CreateOrderRequest, OrderCreatedDto };
 
-export interface CreateOrderItemRequest  {
-    productId: number;
-    quantity: number;
-}
-
-export interface CreateOrderRequest {
-    customerFirstName: string;
-    customerLastName: string;
-    customerEmail: string;
-    customerPhoneNumber: string;
-    shippingCity: string;
-    shippingStreet: string;
-    shippingPostalCode: string;
-    shippingCountry: string;
-    items: CreateOrderItemRequest[];
-}
-
-export interface OrderCreatedDto {
-    orderId: string;
-    orderNumber: string;
-    orderDate: string;
-    total: number;
-}
-
-export async function CreateOrderFromCart(
-    cartItems: CartItem[]
-
-): Promise<OrderCreatedDto> {
-    const request: CreateOrderRequest  = {
-
+// tempdata for creating orders.
+export async function CreateOrderFromCart(cartItems: CartItem[]): Promise<OrderCreatedDto> {
+  const request: CreateOrderRequest = {
     customerFirstName: "Pall",
     customerLastName: "McPall",
-    customerEmail: "Pall McPall@Pall.Pall",
+    customerEmail: "pall.mcpall@pall.pall",
     customerPhoneNumber: "0809090901",
     shippingCity: "Pallkenberg",
     shippingStreet: "Pallgatan",
     shippingPostalCode: "12345",
     shippingCountry: "Pallaland",
-    items: cartItems.map((item)=> ({
-        productId: item.productId,
-        quantity: item.quantity
-     })),
-    };
+    items: cartItems.map((item) => ({
+      productId: item.productId,
+      quantity: item.quantity
+    })),
+  };
 
-    const res = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-
-        },
-        body: JSON.stringify(request),
-    });
-
-    if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Order failed: ${res.status} ${text}`);
-    }
-
-    return res.json();
+  return apiCreateOrder(request);
 }
+
+export const getOrderById = (id: number, opts?: { signal?: AbortSignal }) =>
+  apiGetOrderById(id, opts);

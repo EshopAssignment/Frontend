@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
 import placeholder from "../../images/placeholder.jpg";
 import { useCart } from "../../context/CartContext";
-import { getProduct, type ProductDto } from "../../Services/productService";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import { toCartItem } from "../../helpers/toCartItem";
+import { useProduct } from "../../hooks/useProducts";
 
 
 const DetailsPage = () => {
@@ -14,30 +12,24 @@ const DetailsPage = () => {
   const navigate = useNavigate();
   const { addItem } = useCart();
 
-  const [product, setProduct] = useState<ProductDto | null>(null);
-  const [loading, setLoading] = useState(true);
+  const pid = Number(id);
+  if (!pid || Number.isNaN(pid)) {
+    navigate("/", {replace: true});
+    return null;
+  }
 
-  useEffect(() => {
-    const pid = Number(id);
-    if (!pid || Number.isNaN(pid)) {
-      navigate("/", { replace: true });
-      return;
-    }
+const {data: product, isLoading, isError} = useProduct(pid);
 
-    getProduct(pid)
-      .then(setProduct)
-      .catch(() => setProduct(null))
-      .finally(() => setLoading(false));
-  }, [id, navigate]);
 
-  if (loading) {
+
+  if (isLoading) {
     return (
       <section className="container product-details">
         <div className="product-skeleton" />
       </section>
     );
   }
-  if (!product) {
+  if (isError || !product) {
     return (
       <section className="container product-details">
         <p>Error Error WEEEEEEEEEEEEEEEEEEEEEEE</p>
@@ -45,10 +37,7 @@ const DetailsPage = () => {
       </section>
     );
   }
-
-
-
-    return (
+  return (
 
     <div className="container">
         <Breadcrumbs
@@ -91,7 +80,7 @@ const DetailsPage = () => {
             </div>
         </div>          
     </div>
-    )
+  )
   
 }
 export default DetailsPage;
