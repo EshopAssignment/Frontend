@@ -31,7 +31,7 @@ const OrderConfirmationPage = () => {
           <div className="confirmation-view">
             <div className="confirmation-content">
               <h2>Hoppsan</h2>
-              <p>Kunde inte hitta ett giltigt ordernummer i länken.</p>
+              <p>Kunde inte hitta ett giltigt ordernummer.</p>
               <div className="btn-return">
                 <Link to="/products">Till produkter</Link>
               </div>
