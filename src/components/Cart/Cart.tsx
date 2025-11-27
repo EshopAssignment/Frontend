@@ -10,15 +10,12 @@ const Cart = () => {
     const [error, setError] = useState<string | null>(null);
     const [orderNumber, setOrderNumber] = useState<string | null>(null);
     const handleCheckout = async () => {
-    if (state.items.length === 0 || submitting) return;
-
-    setSubmitting(true);
-    setError(null);
-    setOrderNumber(null);
-
-    try {
+      if (state.items.length === 0 || submitting) return;
+      setSubmitting(true);
+      setError(null);
+      setOrderNumber(null);
+      try {
       const result = await CreateOrderFromCart(state.items);
-
       clear();
       navigate(`/order/thank-you/${result.orderNumber}`, {
       state: result,

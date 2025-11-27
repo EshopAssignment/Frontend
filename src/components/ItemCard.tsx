@@ -16,7 +16,6 @@ const {addItem} = useCart();
 const img = buildImageUrl(product.imgUrl);
 const imgSrc = img || placeholder;
 
-console.debug("imgUrl raw:", product.imgUrl, "=> computed:", imgSrc);
   return (
     <div className="item-card">
         <Link to={`/product/${product.id}`} >
