@@ -1,10 +1,13 @@
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
 
 const AdminLayout = () => {
   return (
     <>
-      <header>Någon typ av header för admins</header>
+      <header>            
+        <Link className="btn" to="/">
+              Back to start
+          </Link></header>
         <Outlet />
     </>
   );
