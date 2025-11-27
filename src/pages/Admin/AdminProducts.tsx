@@ -56,11 +56,12 @@ const AdminProducts = () => {
   return (
     <section>
       <div className="container">
-        <h1>Produkter</h1>
-        <div className="admin-actions">
-          <button className="btn" onClick={() => setCreating(true)}>Ny produkt</button>
+        <div className="center-content">
+          <h1>Produkter</h1>
+          <div className="admin-actions">
+            <button className="btn" onClick={() => setCreating(true)}>Ny produkt</button>
+          </div>
         </div>
-
       </div>
 
       {list.isLoading && <p>Laddar…</p>}
