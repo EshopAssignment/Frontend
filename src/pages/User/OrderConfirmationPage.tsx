@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import type { OrderCreatedDto } from "../../Services/orderService";
 import { getOrderById } from "../../Services/orderService";
@@ -9,16 +9,23 @@ const ORDERS = {
 
 const OrderConfirmationPage = () => {
   const { orderNumber } = useParams<{ orderNumber: string }>();
+  const location = useLocation();
+  const state = (location.state as OrderCreatedDto | null) ?? null;
 
-  const state: OrderCreatedDto | null = history.state?.usr ?? null;
+  const rawId = state?.orderId as unknown;
+  const id =
+    typeof rawId === "number"
+      ? rawId
+      : typeof rawId === "string"
+      ? Number(rawId)
+      : NaN;
 
-  const id = orderNumber ? Number(orderNumber) : NaN;
-  const validId = !Number.isNaN(id);
+  const validId = Number.isFinite(id);
 
   const { data, isFetching, isError, error } = useQuery<OrderCreatedDto, Error>({
-    queryKey: validId ? ORDERS.byId(id) : ["orders", "invalid"],
-    enabled: validId,
-    queryFn: ({ signal }) => getOrderById(id, { signal }),
+    queryKey: validId ? ORDERS.byId(id as number) : ["orders", "invalid"],
+    enabled: validId, 
+    queryFn: ({ signal }) => getOrderById(id as number, { signal }),
     initialData: state ?? undefined,
     placeholderData: keepPreviousData,
     staleTime: 5_000
@@ -31,7 +38,8 @@ const OrderConfirmationPage = () => {
           <div className="confirmation-view">
             <div className="confirmation-content">
               <h2>Hoppsan</h2>
-              <p>Kunde inte hitta ett giltigt ordernummer.</p>
+              <p>Den här sidan måste öppnas direkt efter en genomförd checkout.</p>
+              <p>Ordernummer i URL:en är korrekt (<strong>{orderNumber}</strong>), men vi saknar order-ID.</p>
               <div className="btn-return">
                 <Link to="/products">Till produkter</Link>
               </div>
