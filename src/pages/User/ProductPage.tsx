@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import loadingIcon from "../../images/loading.png";
 import { useSearchParams } from "react-router-dom";
-import { getProductsPaged, type ProductDto } from "../../Services/productService";
+import { getProductsPaged, type PagedResult, type ProductDto } from "../../Services/productService";
 import FilterBar from "../../components/FilterBar";
 import ItemCard from "../../components/ItemCard";
 import RequestOrder from "../../components/Orders/RequestOrder";
 import { useQuery } from "@tanstack/react-query";
-import type { PagedResult } from "../../Services/productService";
 
 const PAGE_SIZE = 15;
 

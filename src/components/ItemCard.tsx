@@ -3,18 +3,25 @@ import placeholder from "../Images/Placeholder.jpg";
 import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
 import { toCartItem } from "../helpers/toCartItem";
+import { buildImageUrl } from "../helper/url";
 
 interface Props{
   product: ProductDto
 }
 
+
 const ItemCard = ({product}: Props) => {
-  const {addItem} = useCart();
+const {addItem} = useCart();
+
+const img = buildImageUrl(product.imgUrl);
+const imgSrc = img || placeholder;
+
+console.debug("imgUrl raw:", product.imgUrl, "=> computed:", imgSrc);
   return (
     <div className="item-card">
         <Link to={`/product/${product.id}`} >
           <div>
-            <img src={product.imgUrl} alt={product.name}
+            <img src={imgSrc} alt={product.name}
             onError={(e) => (e.currentTarget.src = placeholder)} />
           </div>
         

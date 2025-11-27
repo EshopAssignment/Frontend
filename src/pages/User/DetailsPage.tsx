@@ -4,6 +4,7 @@ import { useCart } from "../../context/CartContext";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import { toCartItem } from "../../helpers/toCartItem";
 import { useProduct } from "../../hooks/useProducts";
+import { buildImageUrl } from "../../helper/url";
 
 
 const DetailsPage = () => {
@@ -43,7 +44,7 @@ const {data: product, isLoading, isError} = useProduct(pid);
         <Breadcrumbs
             trail={[
             { label: "Hem", to: "/" },
-            { label: "Produkter", to: "/product" }, 
+            { label: "Produkter", to: "/products" }, 
             { label: product.name }          
         ]}
         />
@@ -72,11 +73,11 @@ const {data: product, isLoading, isError} = useProduct(pid);
             <div className="divider"></div>
 
             <div className="details-img">
-                <img
-                src={product.imgUrl}
-                alt={product.name}
-                onError={(e) => (e.currentTarget.src = placeholder)}
-                />
+            <img
+              src={buildImageUrl(product.imgUrl) || placeholder}
+              alt={product.name}
+              onError={(e) => { e.currentTarget.src = placeholder; }}
+            />
             </div>
         </div>          
     </div>

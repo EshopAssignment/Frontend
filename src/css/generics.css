@@ -59,3 +59,11 @@
     --gradient-accent: linear-gradient(135deg,var(--accent),var(--muted));
     --gradient-hero: linear-gradient(135deg,var(--secondary),var(--primary));
   }
+  /*#region Helper classes */
+  .center-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
