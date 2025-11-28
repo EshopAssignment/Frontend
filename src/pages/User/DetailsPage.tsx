@@ -4,7 +4,7 @@ import { useCart } from "../../context/CartContext";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import { toCartItem } from "../../helpers/toCartItem";
 import { useProduct } from "../../hooks/useProducts";
-import { buildImageUrl } from "../../helper/url";
+import { buildImageUrl } from "../../helpers/url";
 
 
 const DetailsPage = () => {

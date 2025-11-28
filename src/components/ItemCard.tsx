@@ -3,7 +3,7 @@ import placeholder from "../Images/Placeholder.jpg";
 import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
 import { toCartItem } from "../helpers/toCartItem";
-import { buildImageUrl } from "../helper/url";
+import { buildImageUrl } from "../helpers/url";
 
 interface Props{
   product: ProductDto
