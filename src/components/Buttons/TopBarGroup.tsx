@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Cart from "../Cart/Cart";
 import { useCart } from "../../context/CartContext";
+import { Link } from "react-router-dom";
+import { Popover, PopoverButton, PopoverPanel} from '@headlessui/react'
 
 const TopBarGroup = () => {
     const [isCartOpen, setIsCartOpen] = useState(false);
@@ -39,17 +41,26 @@ const TopBarGroup = () => {
           </div>
 
           <div>
-            <button>
-              <i className="fa-regular fa-user"></i>
-            </button>
+            <Link to="/profile">
+            
+              <button>
+                <i className="fa-regular fa-user"></i>
+              </button>
+            
+            </Link>
           </div>
 
-          <div>
-            <button>
-              <i className="fa-solid fa-phone"></i>
-            </button>     
-          </div>
-
+        <Popover>
+          <PopoverButton>                
+            <i className="fa-solid fa-phone"></i>
+          </PopoverButton>
+          <PopoverPanel anchor="bottom" className="help-menu">
+            <span>Behöver du hjälp?</span>
+            <a href="/#">070123132</a>
+            <a href="/#">help@pall.se</a>
+            <a href="/#">Online-Hjälp</a>
+          </PopoverPanel>
+        </Popover>
       </div>
     
       {(

@@ -12,6 +12,7 @@
   "dependencies": {
     "@headlessui/react": "^0.0.0-insiders.5ef7395",
     "@tanstack/react-query": "^5.90.11",
+    "animate.css": "^4.1.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.6"
