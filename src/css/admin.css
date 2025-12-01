@@ -47,7 +47,7 @@
 /* Clanker(chatGPt5.1 made css for the temp admin view parts) */
 
 
-.admin-table { width:100%; border-collapse: collapse; margin-top:1rem }
+.admin-table { width:100%; border-collapse: collapse;}
 .admin-table th, .admin-table td { border-bottom:1px solid var(--border); padding:.6rem .5rem; text-align:left }
 .switch { position: relative; display:inline-block; width:40px; height:22px }
 .switch input { display:none }

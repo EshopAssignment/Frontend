@@ -12,7 +12,7 @@ type Props = {
 };
 //clanker(ChatGpt5.1) made table to outline the fields for testing. 
 
-export default function ProductTable({ data, page, totalPages, onPrev, onNext, onEdit, onToggle, onUpload }: Props) {
+export default function ProductTable({ data, page, totalPages, onPrev, onNext, onEdit, onToggle }: Props) {
   return (
     <>
       <table className="admin-table">
@@ -23,7 +23,6 @@ export default function ProductTable({ data, page, totalPages, onPrev, onNext, o
             <th>Aktiv</th>
             <th>Pris</th>
             <th>Lager</th>
-            <th>Bild</th>
             <th>Meny</th>
           </tr>
         </thead>
@@ -40,17 +39,6 @@ export default function ProductTable({ data, page, totalPages, onPrev, onNext, o
               </td>
               <td>{p.price}</td>
               <td>{p.stockQuantity}</td>
-              <td>
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={e => {
-                      const file = e.target.files?.[0]; 
-                      if (file) onUpload(p.id, file);
-                      e.currentTarget.value = "";
-                    }}
-                  />
-              </td>
               <td>
                 <button className="btn" onClick={() => onEdit(p.id)}>Redigera</button>
               </td>

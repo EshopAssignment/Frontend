@@ -11,7 +11,7 @@ const Header = () => {
         <div className="top-bar">
 
           <div className="logo">
-            <Link to="/">
+            <Link to="/products">
               <img src="./src/images/pallet-logo-placeholder.png" alt="Logga" />
             </Link>
           </div>
