@@ -57,7 +57,7 @@ const AdminProducts = () => {
     <section>
       <div className="container">
         <div className="center-content">
-          <h1>Produkter</h1>
+          <h1 className="header-text">Produkter</h1>
           <div className="admin-actions">
             <button className="btn" onClick={() => setCreating(true)}>Ny produkt</button>
           </div>

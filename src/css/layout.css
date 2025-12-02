@@ -11,11 +11,11 @@
     justify-content: center;
     padding: 2rem;
 }
-.layout{
+/* .layout{
         display: grid;
         grid-template-rows: auto minmax(75svh, 1fr) auto;
         min-height: 100vh;
-}
+} */
 
 .confirmation-view{
     display: flex;
