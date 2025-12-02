@@ -11,7 +11,7 @@ const AdminDash = () => {
 
                 <Link to={"/admin"} className="btn">Users</Link>
 
-                <Link to={"/admin"} className="btn">Orders</Link>
+                <Link to={"admin-orders"} className="btn">Orders</Link>
 
                 <Link  className="btn" to={"/admin"}>Inventory</Link>
 

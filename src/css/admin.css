@@ -61,4 +61,16 @@
 .form-grid{ display:grid; gap:.75rem }
 .form-grid label{ display:flex; flex-direction:column; gap:.25rem }
 .form-grid .row.actions{ display:flex; justify-content:flex-end; gap:.5rem; margin-top:.5rem }
+.selector {
+  transform-origin: top;
+  transition-property: opacity, transform;
+  transition-duration: 200ms;
+  transition-timing-function: ease-out;
+}
+
+/* När data-closed är satt */
+.selector[data-closed] {
+  transform: translateY(-1.5rem); /* -translate-y-6 */
+  opacity: 0;
+}
 

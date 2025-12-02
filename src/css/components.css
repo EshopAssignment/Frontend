@@ -10,6 +10,14 @@
     max-width: 100svw;
 
 }
+.header-text{
+    margin:0 auto;
+    text-align: center;
+}
+.options{
+    background: transparent;
+    color:black;
+}
 .home-img-container{
     display: flex;
     flex-direction: column;
@@ -42,7 +50,11 @@
         font-size: 24px;
 
     }
-
+}
+.total{
+    font-size: 20px;
+    margin-bottom: 1rem;
+    margin-left:.5rem;
 }
 .help{
     display: flex;
@@ -102,6 +114,18 @@
 .search-group{
     padding:1rem 0;
     border-bottom:var(--border) 2px solid;
+}
+.filter-bar{
+    border: var(--border) 1px solid;
+    padding: 0.5rem 2rem;
+    width: 20%;
+    margin-left:2rem;
+    border-right:0;
+    border-radius: var(--radius6) 0 0 var(--radius6); 
+}
+.filter-picker{
+    border-radius: 0 var(--radius6) var(--radius6) 0 !important;
+    border-left:none !important;
 }
 .search-res{
     display: block;
@@ -507,7 +531,20 @@ button:hover{
     color: var(--destructive);
 }
 /*#endregion */
+/*#region tables */
+.admin-table{
+    margin: 1rem 0;
+}
+/*#endregion */
+/*#region admin */
+.admin-order-details{
+    display: flex;
+    flex-direction: column;
+    gap:.5rem;
+    margin-left:.5rem;
 
+}
+/*#endregion */
 /*#region auth */
 .auth-form-container{
     margin:4rem auto 0 auto;

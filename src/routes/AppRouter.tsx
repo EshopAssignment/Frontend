@@ -18,6 +18,7 @@ import SignUpForm from "../pages/SignUp/SignUpForm";
 import SignInForm from "../pages/SignUp/SignInForm";
 import Auth from "../pages/SignUp/Auth";
 import CompanyForm from "../pages/SignUp/CompanyForm";
+import AdminOrders from "../pages/Admin/AdminOrders";
 
 
 
@@ -36,6 +37,7 @@ const AppRouter = () => {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDash />} /> 
         <Route path="adminproducts" element={<AdminProducts />} />
+        <Route path="admin-orders" element={<AdminOrders />} />
       </Route>
 
       <Route path="/profile" element={<ProfileLayout />}>
