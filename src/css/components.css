@@ -255,7 +255,8 @@
 
 }
 .item-price{
-    display:flex;
+    display:grid;
+    grid-template-columns: 1fr auto auto;
     justify-content: space-between;
     align-items: center;
     width: 100%;
@@ -565,4 +566,17 @@ button:hover{
     justify-content: center;
     gap:2rem;
 }
+/*#endregion */
+
+/*#region badge */
+.badge-high{
+     background-color: var(--accent); } 
+.badge-low{
+    background-color: var(--mustardonthebeathoe);
+    }
+    
+.badge-oos{
+    background-color: var(--destructive);
+}
+
 /*#endregion */
