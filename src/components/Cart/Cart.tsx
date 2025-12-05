@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useCart } from "../../context/CartContext";
-import { CreateOrderFromCart } from "../../Services/orderService";
+import { createOrderFromCart } from "../../Services/orderService";
 import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
@@ -15,7 +15,7 @@ const Cart = () => {
       setError(null);
       setOrderNumber(null);
       try {
-      const result = await CreateOrderFromCart(state.items);
+      const result = await createOrderFromCart(state.items);
       clear();
       navigate(`/order/thank-you/${result.orderNumber}`, {
       state: result,
@@ -49,7 +49,7 @@ const Cart = () => {
                   <li key={item.productId} className="cart-row">
                     <span>{item.name}</span>
                     <span>x {item.quantity}</span>
-                    <span>{item.price * item.quantity} kr</span>
+                    <span>{item.priceExVat * item.quantity} kr</span>
                     <div className="cart-btn">
                       <button className="btn-subtract" onClick={() => removeOne(item.productId)}>-1</button>
                       <button className="btn-trash" onClick={() => removeAll(item.productId)}><i className="fa-solid fa-trash-can"></i></button>

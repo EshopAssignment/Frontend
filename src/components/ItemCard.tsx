@@ -33,7 +33,7 @@ const imgSrc = img || placeholder;
       </Link>
 
         <div className="item-price">
-          <p>{product.price} kr/st</p>
+          <p>{product.priceExVat} kr/st</p>
           
           <button onClick={() => addItem(toCartItem(product))}>
             <i className="fa-solid fa-cart-plus"></i>

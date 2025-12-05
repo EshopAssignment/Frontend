@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "api:gen": "openapi-ts",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@hey-api/openapi-ts": "^0.88.0",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",

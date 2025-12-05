@@ -2,8 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel, Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition, TransitionChild } from "@headlessui/react";
 
-/*Deiscaimer. 
-100% clanker made copy-paste from chatGPT 5.1*/
+/*100% clanker made copy-paste from chatGPT 5.1*/
 
 const SORT_OPTIONS = [
   { value: "", label: "Relevans" },
@@ -13,8 +12,8 @@ const SORT_OPTIONS = [
   { value: "name_desc", label: "Namn: Ö–A" },
 ];
 
-const PALLET_TYPES = ["EUR", "PallKrage", "Halvpall", "Spån"];
-const CONDITIONS = ["New", "Refurbished"];
+const PALLET_TYPES = ["EuroPallet", "HalfPallet", "IndustrialPallet", "CustomPallet", "SpecialPallet", "Other"];
+const CONDITIONS = ["New", "Used" ,"Refurbished"];
 
 export default function FilterBar() {
   const [searchParams, setSearchParams] = useSearchParams();

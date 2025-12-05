@@ -1,69 +1,80 @@
-export interface ProductDto{
-    id: number
-    name: string
-    description: string
-    palletType: string
-    condition: string
-    price: number
-    stockQuantity: number
-    imgUrl: string
-    isActive: boolean
-}
+import { api } from '@/lib/http';
+import * as sdk from '@/api/sdk.gen';
 
-export interface PagedResult<T> {
-    page: number;
-    pageSize: number;
-    totalItems: number;
-    totalPages: number;
-    items: T[];
-}
+export type PagedProducts = NonNullable<
+  Awaited<ReturnType<typeof sdk.getApiProducts>>['data']
+>;
+export type ProductDto = NonNullable<PagedProducts['items']>[number];
+export type ProductSuggestionDto =
+  NonNullable<Awaited<ReturnType<typeof sdk.getApiProductsSuggest>>['data']>[number];
+type SortUi = 'price_asc' | 'price_desc' | 'name_asc' | 'name_desc' | undefined;
 
-const API_URL = "https://localhost:7152/api/Products"
 
-export async function getProducts(): Promise<ProductDto[]> {
-    const res = await fetch(API_URL)
-    if (!res.ok) throw new Error("Failed to fetch")
-        return res.json()
-}
 
-export async function getProduct(id: number): Promise<ProductDto> {
-    const res = await fetch(`${API_URL}/${id}`)
-    if (!res.ok) throw new Error("Product Not Found");
 
-    const data: ProductDto = await res.json();
-        return data;
+function defined<T extends object>(o: T): Partial<T> {
+  const out: any = {};
+  for (const [k, v] of Object.entries(o)) {
+    if (v === undefined || v === null) continue;
+    if (typeof v === 'string' && v.trim() === '') continue;
+    if (Array.isArray(v) && v.length === 0) continue;
+    if (Number.isNaN(v)) continue;
+    out[k] = v;
+  }
+  return out;
 }
 
 export async function getProductsPaged(
-    page: number,
-    pageSize: number,
-    init?: RequestInit & {
-        query?: string;
-        sort?: string;
-        type? : string[];
-        condition?: string[];
-        minPrice?: number;
-        maxPrice?: number;
-        }
-): Promise<PagedResult<ProductDto>> {
-    const params = new URLSearchParams({
-        page: page.toString(),
-        pageSize: pageSize.toString(),
-    });
+  page: number,
+  pageSize: number,
+  opts: {
+    signal?: AbortSignal;
+    query?: string;
+    sort?: SortUi;
+    type?: string[];
+    condition?: string[];
+    minPrice?: number;
+    maxPrice?: number;
+  } = {}
+): Promise<PagedProducts> {
+  const { signal, sort, ...rest } = opts;
 
-    if (init?.query) params.set("query", init.query);
-      if (init?.sort) params.set("sort", init.sort);
-        init?.type?.forEach(t => params.append("type", t));
-        init?.condition?.forEach(c => params.append("condition", c));
-        if (typeof init?.minPrice === "number") params.set("minPrice", String(init.minPrice));
-        if (typeof init?.maxPrice === "number") params.set("maxPrice", String(init.maxPrice));
+  const query = defined({
+    page,
+    pageSize,
+    query: rest.query,
+    sort,
+    type: rest.type,
+    condition: rest.condition,
+    minPrice: rest.minPrice,
+    maxPrice: rest.maxPrice,
+  });
 
+  const res = await sdk.getApiProducts({ client: api, query, signal });
 
-    const res = await fetch(`${API_URL}?${params.toString()}`, {
-        ...init,
-        headers: {"Content-Type": "application/json",...(init?.headers || {})},
-    });
-    if(!res.ok) throw new Error("Failed to fetch paged products");
-    return res.json();
+  if ('response' in res && !res.response.ok) {
+    const text = await res.response.text().catch(() => '');
+    throw new Error(`Failed to fetch products: ${res.response.status} ${text}`);
+  }
+  return res.data!;
+}
 
+export async function getProductById(id: number): Promise<ProductDto> {
+  const res = await sdk.getApiProductsById({ client: api, path: { id } });
+  if ('response' in res && !res.response.ok) {
+    const text = await res.response.text().catch(() => '');
+    throw new Error(`Not Found: ${res.response.status} ${text}`);
+  }
+  return res.data!;
+}
+
+export async function suggestProducts(q: string, take = 8): Promise<ProductSuggestionDto[]> {
+  const qq = q.trim();
+  if (!qq) return [];
+  const res = await sdk.getApiProductsSuggest({ client: api, query: { q: qq, take } });
+  if ('response' in res && !res.response.ok) {
+    const text = await res.response.text().catch(() => '');
+    throw new Error(`Suggest failed: ${res.response.status} ${text}`);
+  }
+  return res.data ?? [];
 }

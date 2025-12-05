@@ -1,12 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useDebounce } from "../hooks/useDebounce";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { suggestProducts, type ProductSuggestion } from "../Services/searchService";
+import { useProductSuggest } from "@/queries/useProducts";
 import { buildImageUrl } from "../helpers/url";
 
 const Searchbar = () => {
-  const [query, setQuery] = useState("");
+ const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const debounced = useDebounce(query, 250);
@@ -15,24 +14,18 @@ const Searchbar = () => {
 
   const enabled = debounced.trim().length >= 2;
 
-  const { data = [], isFetching, isError} = useQuery({
-    queryKey: ["suggestion", debounced],
-    queryFn: () => suggestProducts(debounced),
-    enabled, 
-    staleTime: 30_000
-  });
-  
+  const { data = [], isFetching, isError } = useProductSuggest(debounced, 8); // <— NY
 
-  const items: ProductSuggestion[] = useMemo(() => data, [data]);
+  const items = useMemo(() => data, [data]);
 
-    useEffect(() => {
+  useEffect(() => {
     const onDown = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false); };
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-  function goto(it: ProductSuggestion) {
-    const slugOrId = it.slug && it.slug.length > 0 ? it.slug : String(it.id);
+  function goto(it: any) {
+    const slugOrId = it?.slug && it.slug.length > 0 ? it.slug : String(it.id);
     setOpen(false);
     setQuery("");
     nav(`/product/${slugOrId}`);
@@ -78,11 +71,11 @@ const Searchbar = () => {
                       onMouseEnter={() => setActive(i)} onMouseDown={e => e.preventDefault()}
                       onClick={() => goto(item)}
                       className={` ${i === active ? "search-item" : ""}`}>
-                    <img src={buildImageUrl(item.imgUrl)} alt="" className="" />
+                    <img src={buildImageUrl(item.imgUrl)} alt="1"/>
                     <div className="search-info">
-                      <p className="">Produkt:{item.name}</p>
-                      <p className="">Produkt nummer{item.sku ?? item.slug ?? `#${item.id}`}</p>
-                      <p className="">Pris:{Math.round(item.price)} kr</p>
+                      <p>Produkt:{item.name}</p>
+                      <p>Produkt nummer{item.sku ?? item.slug ?? `#${item.id}`}</p>
+                      <p>Pris: {Number.isFinite(item.price)} kr</p>
                     </div>
                   </li>
                 ))}
