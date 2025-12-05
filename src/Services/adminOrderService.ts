@@ -1,64 +1,53 @@
-import { apiClient } from "../api/client";
+import { api } from "@/lib/http";
+import * as sdk from "@/api/sdk.gen";
 
-export type AdminOrderListItem = {
-    id:number;
-    orderNumber: string;
-    orderDate: string;
-    customerName: string;
-    customerEmail: string;
-    orderStatus: string;
-    total: number;
-};
+export type AdminPagedOrders =
+  NonNullable<Awaited<ReturnType<typeof sdk.getApiAdminOrders>>["data"]>;
 
-export type AdminOrderDetails = {
-    id: number;
-    orderNumber: string;
-    orderDate: string;
-    customerFirstName: string;
-    customerLastName: string;
-    customerEmail: string;
-    customerPhoneNumber: string;
-    shippingStreet: string;
-    shippingPostalCode: string;
-    shippingCity: string;
-    shippingCountry: string;
-    orderStatus: string;
-    productsTotal: number;
-    shippingCost: number;
-    total: number;
-    items: { productId: number; productName: string; price: number; quantity: number; lineTotal: number; }[];
+export type AdminOrderListItem =
+  NonNullable<AdminPagedOrders["items"]>[number];
+
+export type AdminOrderDetails =
+  NonNullable<Awaited<ReturnType<typeof sdk.getApiAdminOrdersById>>["data"]>;
+
+type PatchArgs = Parameters<typeof sdk.patchApiAdminOrdersByIdStatus>[0];
+type PatchBody = NonNullable<PatchArgs>["body"];
+export type AdminOrderStatus = PatchBody extends { orderStatus: infer S } ? S : never;
+
+
+export async function listOrders(opts: {
+  page: number;
+  pageSize: number;
+  query?: string;
+  status?: string; 
+}): Promise<AdminPagedOrders> {
+  const res = await sdk.getApiAdminOrders({
+    client: api,
+    query: {
+      page: opts.page,
+      pageSize: opts.pageSize,
+      query: opts.query,
+      status: opts.status,
+    },
+  });
+  if (res.error) throw res.error;
+  return res.data!;
 }
 
-export type Paged<T> = { page: number; pageSize: number; totalItems: number; totalPages: number; items: T[]; };
-
-const base = "/api/admin/orders"
-
-export function listOrders(params: {
-    page:number;
-    pageSize: number;
-    query?: string;
-    orderStatus?: string;
-    from?: string;
-    to?: string;
-}){
-    const qs = new URLSearchParams({
-        page: String(params.page),
-        pageSize: String(params.pageSize),
-        ...(params.query? {query: params.query} : {}),
-        ...(params.orderStatus? {query: params.orderStatus} : {}),
-        ...(params.from? {query: params.from} : {}),
-        ...(params.to? {query: params.to} : {}),
-    }).toString();
-    return apiClient(`${base}?${qs}`) as Promise<Paged<AdminOrderListItem>>;
+export async function getOrderById(id: number): Promise<AdminOrderDetails> {
+  const res = await sdk.getApiAdminOrdersById({
+    client: api,
+    path: { id },
+  });
+  if (res.error) throw res.error;
+  return res.data!;
 }
 
-export function getOrderById(id: number){
-    return apiClient(`${base}/${id}`) as Promise<AdminOrderDetails>;
-}
-
-export function updateOrderStatus(id: number, orderStatus: string) {
-  return apiClient(`${base}/${id}/status`, {
-    method: "PATCH",
-    body: JSON.stringify({ orderStatus }),
-  }) as Promise<void>;
+export async function updateOrderStatus(id: number, next: AdminOrderStatus): Promise<void> {
+  const res = await sdk.patchApiAdminOrdersByIdStatus({
+    client: api,
+    path: { id },
+    body: { orderStatus: next },
+  });
+  if (res.error) throw res.error;
 }

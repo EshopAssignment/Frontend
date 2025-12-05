@@ -3,7 +3,7 @@ import placeholder from "../../images/placeholder.jpg";
 import { useCart } from "../../context/CartContext";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import { toCartItem } from "../../helpers/toCartItem";
-import { useProduct } from "../../hooks/useProducts";
+import { useProduct } from "../../queries/useProducts";
 import { buildImageUrl } from "../../helpers/url";
 
 
@@ -61,8 +61,8 @@ const {data: product, isLoading, isError} = useProduct(pid);
                 </div>
 
                 <div className="details-price">
-                    <p>Lager: {product.stockQuantity}</p>
-                    <p>Pris/st: {product.price}</p>
+                    <p>Lager: {product.available}</p>
+                    <p>Pris/st: {product.priceExVat}</p>
                 </div>
 
                 <button className="btn-add-wide" onClick={() => addItem(toCartItem(product))}>

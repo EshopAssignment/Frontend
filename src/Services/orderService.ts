@@ -1,16 +1,19 @@
-import type { CartItem } from "../context/CartContext";
-import {
-  createOrder as apiCreateOrder,
-  getOrderById as apiGetOrderById,
-  type CreateOrderRequest,
-  type OrderCreatedDto
-} from "../api/orderApi";
+import { api } from '@/lib/http';
+import * as sdk from '@/api/sdk.gen';
+import type { CartItem } from '@/context/CartContext';
 
-export type { CreateOrderRequest, OrderCreatedDto };
+export type CreateOrderRequest = Parameters<typeof sdk.postApiOrder>[0]['body'];
+export type OrderCreatedDto = NonNullable<Awaited<ReturnType<typeof sdk.postApiOrder>>['data']>;
+export type OrderDto = NonNullable<Awaited<ReturnType<typeof sdk.getApiOrderById>>['data']>;
 
-// tempdata for creating orders.
-export async function CreateOrderFromCart(cartItems: CartItem[]): Promise<OrderCreatedDto> {
-  const request: CreateOrderRequest = {
+export async function createOrder(body: CreateOrderRequest): Promise<OrderCreatedDto> {
+  const res = await sdk.postApiOrder({ client: api, body });
+  if (res.error) throw res.error;
+  return res.data!;
+}
+
+export async function createOrderFromCart(cartItems: CartItem[]): Promise<OrderCreatedDto> {
+  const body: CreateOrderRequest = {
     customerFirstName: "Pall",
     customerLastName: "McPall",
     customerEmail: "pall.mcpall@pall.pall",
@@ -19,14 +22,13 @@ export async function CreateOrderFromCart(cartItems: CartItem[]): Promise<OrderC
     shippingStreet: "Pallgatan",
     shippingPostalCode: "12345",
     shippingCountry: "Pallaland",
-    items: cartItems.map((item) => ({
-      productId: item.productId,
-      quantity: item.quantity
-    })),
+    items: cartItems.map(x => ({ productId: x.productId, quantity: x.quantity }))
   };
-
-  return apiCreateOrder(request);
+  return createOrder(body);
 }
 
-export const getOrderById = (id: number, opts?: { signal?: AbortSignal }) =>
-  apiGetOrderById(id, opts);
+export async function getOrderById(id: number, opts?: { signal?: AbortSignal }): Promise<OrderDto> {
+  const res = await sdk.getApiOrderById({ client: api, path: { id }, signal: opts?.signal });
+  if (res.error) throw res.error;
+  return res.data!;
+}

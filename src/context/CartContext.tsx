@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useMemo, useReducer } from "react
 export type CartItem = {
   productId: number;
   name: string;
-  price: number;
+  priceExVat: number;
   quantity: number;
   imgUrl?: string;
 };
@@ -30,7 +30,7 @@ function isValidState(maybe: unknown): maybe is CartState {
       x &&
       typeof x.productId === "number" &&
       typeof x.name === "string" &&
-      typeof x.price === "number" &&
+      typeof x.priceExVat === "number" &&
       typeof x.quantity === "number"
   );
 }
@@ -46,16 +46,30 @@ function loadInitialState(): CartState {
   return { items: [] };
 }
 
+function coerceItem(i: Omit<CartItem, "quantity">): Omit<CartItem, "quantity"> {
+  const productId = Number(i.productId);
+  const priceExVat = Number(i.priceExVat);
+  return {
+    productId: Number.isFinite(productId) ? productId : 0,
+    name: String(i.name ?? ""),
+    priceExVat: Number.isFinite(priceExVat) ? priceExVat : 0,
+    imgUrl: i.imgUrl ? String(i.imgUrl) : undefined,
+  };
+}
+
 function reducer(state: CartState, action: Action): CartState {
   switch (action.type) {
     case "ADD_ITEM": {
       const { item, qty = 1 } = action.payload;
-      const i = state.items.findIndex(x => x.productId === item.productId);
+      const safe = coerceItem(item);
+      const add = Math.max(1, Number(qty) || 1);
+
+      const i = state.items.findIndex(x => x.productId === safe.productId);
       if (i === -1) {
-        return { items: [...state.items, { ...item, quantity: Math.max(1, qty) }] };
+        return { items: [...state.items, { ...safe, quantity: add }] };
       }
       const next = [...state.items];
-      next[i] = { ...next[i], quantity: next[i].quantity + Math.max(1, qty) };
+      next[i] = { ...next[i], quantity: next[i].quantity + add };
       return { items: next };
     }
     case "REMOVE_ONE": {
@@ -111,7 +125,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const total = useMemo(
-    () => state.items.reduce((sum, x) => sum + x.price * x.quantity, 0),
+    () => state.items.reduce((sum, x) => sum + x.priceExVat * x.quantity, 0),
     [state.items]
   );
 
@@ -133,7 +147,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 export function useCart() {
   const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart must be used within CartProvider");
+  if (!ctx) throw new Error("wrappaa med cartprovidertack...");
   return ctx;
 }
 

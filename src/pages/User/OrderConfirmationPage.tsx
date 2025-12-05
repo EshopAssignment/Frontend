@@ -22,14 +22,19 @@ const OrderConfirmationPage = () => {
 
   const validId = Number.isFinite(id);
 
-  const { data, isFetching, isError, error } = useQuery<OrderCreatedDto, Error>({
-    queryKey: validId ? ORDERS.byId(id as number) : ["orders", "invalid"],
-    enabled: validId, 
-    queryFn: ({ signal }) => getOrderById(id as number, { signal }),
-    initialData: state ?? undefined,
-    placeholderData: keepPreviousData,
-    staleTime: 5_000
-  });
+const { data, isFetching, isError, error } = useQuery<OrderCreatedDto, Error, OrderCreatedDto>({
+  queryKey: validId ? ORDERS.byId(id as number) : ["orders", "invalid"],
+  enabled: validId,
+  queryFn: ({ signal }) => getOrderById(id as number, { signal }),
+  initialData: state ?? undefined,
+  placeholderData: keepPreviousData,
+  staleTime: 5_000,
+  select: (d) => ({
+    ...d,
+    total: Number.isFinite(Number(d.total)) ? Number(d.total) : 0,
+  }),
+});
+
 
   if (!validId) {
     return (
@@ -37,9 +42,7 @@ const OrderConfirmationPage = () => {
         <div className="container">
           <div className="confirmation-view">
             <div className="confirmation-content">
-              <h2>Hoppsan</h2>
-              <p>Den här sidan måste öppnas direkt efter en genomförd checkout.</p>
-              <p>Ordernummer i URL:en är korrekt (<strong>{orderNumber}</strong>), men vi saknar order-ID.</p>
+                <h2>Hoppsan något gick fel</h2>
               <div className="btn-return">
                 <Link to="/products">Till produkter</Link>
               </div>
@@ -68,9 +71,7 @@ const OrderConfirmationPage = () => {
     );
   }
 
-  const dto = data ?? state ?? undefined;
-  const total = dto?.total ?? 0;
-  const dateStr = dto?.orderDate ? new Date(dto.orderDate).toLocaleString("sv-SE") : "";
+
 
   return (
     <section>
@@ -83,13 +84,13 @@ const OrderConfirmationPage = () => {
             <p>
               Totalt:{" "}
               <strong>
-                {new Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK" }).format(total)}
+                {data?.total} SEK
               </strong>
               {isFetching ? " (verifierar…)" : ""}
             </p>
 
             <p>
-              Orderdatum: <strong>{dateStr}</strong>
+              Orderdatum: <strong>{data?.orderDate.toString().split('T')[0]}</strong>
             </p>
 
             <div className="support">

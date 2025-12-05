@@ -12,6 +12,17 @@ type Props = {
 };
 //clanker(ChatGpt5.1) made table to outline the fields for testing. 
 
+function toNumId(v: unknown): number | null {
+  const n = typeof v === "number" ? v : typeof v === "string" ? Number(v) : NaN;
+  return Number.isFinite(n) ? n : null;
+}
+
+function toMoney(v: unknown): string {
+  const n = typeof v === "number" ? v : Number(v);
+  const safe = Number.isFinite(n) ? n : 0;
+  return new Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK" }).format(safe);
+}
+
 export default function ProductTable({ data, page, totalPages, onPrev, onNext, onEdit, onToggle }: Props) {
   return (
     <>
@@ -27,23 +38,35 @@ export default function ProductTable({ data, page, totalPages, onPrev, onNext, o
           </tr>
         </thead>
         <tbody>
-          {data.map(p => (
-            <tr key={p.id}>
-              <td>{p.id}</td>
-              <td>{p.name}</td>
-              <td>
-                <label className="switch">
-                  <input type="checkbox" checked={p.isActive} onChange={() => onToggle(p.id, p.isActive)} />
-                  <span className="slider" />
-                </label>
-              </td>
-              <td>{p.price}</td>
-              <td>{p.stockQuantity}</td>
-              <td>
-                <button className="btn" onClick={() => onEdit(p.id)}>Redigera</button>
-              </td>
-            </tr>
-          ))}
+          {data.map(p => {
+            const idNum = toNumId((p as any).id);
+            const price = toMoney((p as any).priceExVat);
+
+            return (
+              <tr key={String((p as any).id)}>
+                <td>{String((p as any).id)}</td>
+                <td>{p.name}</td>
+                <td>
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      checked={p.isActive}
+                      onChange={() => idNum !== null && onToggle(idNum, p.isActive)}
+                      disabled={idNum === null}
+                    />
+                    <span className="slider" />
+                  </label>
+                </td>
+                <td>{price}</td>
+                <td>{p.available}</td>
+                <td>
+                  <button className="btn" onClick={() => idNum !== null && onEdit(idNum)} disabled={idNum === null}>
+                    Redigera
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 

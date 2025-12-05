@@ -1,15 +1,6 @@
-// src/pages/Admin/AdminProducts.tsx
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import {
-  adminCreateProduct,
-  AdminListProducts,
-  adminToggleActive,
-  adminUpdateProduct,
-  adminUploadImage,
-  type AdminCreateReq,
-  type AdminUpdateReq
-} from "../../Services/adminProductService";
+import {  adminCreateProduct, adminListProducts, adminToggleActive,    adminUpdateProduct,  adminUploadImage,  type AdminCreateReq,  type AdminUpdateReq} from "../../Services/adminProductService";                 
 import ProductTable from "../../components/Admin/ProductTable";
 import ProductForm from "../../components/Admin/ProductFrom";
 
@@ -23,7 +14,7 @@ const AdminProducts = () => {
 
   const list = useQuery({
     queryKey: ["admin-products", page],
-    queryFn: () => AdminListProducts(page, PAGE_SIZE),
+    queryFn: () => adminListProducts(page, PAGE_SIZE),
     placeholderData: keepPreviousData,
   });
 
@@ -59,7 +50,9 @@ const AdminProducts = () => {
         <div className="center-content">
           <h1 className="header-text">Produkter</h1>
           <div className="admin-actions">
-            <button className="btn" onClick={() => setCreating(true)}>Ny produkt</button>
+            <button className="btn" onClick={() => setCreating(true)}>
+              Ny produkt
+            </button>
           </div>
         </div>
       </div>
@@ -69,22 +62,22 @@ const AdminProducts = () => {
 
       {list.data && (
         <>
-          <ProductTable
-            data={list.data.items}
-            page={page}
-            totalPages={list.data.totalPages}
-            onPrev={() => setPage(p => Math.max(1, p - 1))}
-            onNext={() => setPage(p => Math.min(list.data!.totalPages, p + 1))}
-            onEdit={(id) => setEditing(id)}
-            onToggle={(id, current) => toggleMut.mutate({ id, isActive: !current })}
-            onUpload={(id, file) => uploadMut.mutate({ id, file })}
-          />
+      <ProductTable
+        data={list.data?.items ?? []}
+        page={page}
+        totalPages={list.data?.totalPages ?? 1}
+        onPrev={() => setPage(p => Math.max(1, p - 1))}
+        onNext={() => setPage(p => Math.min((list.data?.totalPages ?? 1), p + 1))}
+        onEdit={(id) => setEditing(Number(id))}           
+        onToggle={(id, current) => toggleMut.mutate({ id, isActive: !current })}
+        onUpload={(id, file) => uploadMut.mutate({ id, file })}
+      />
 
           {creating && (
             <ProductForm
               title="Skapa produkt"
               onCancel={() => setCreating(false)}
-              onSubmit={(body) => createMut.mutate(body)}  
+              onSubmit={(body) => createMut.mutate(body)}
               loading={createMut.isPending}
             />
           )}
@@ -93,14 +86,11 @@ const AdminProducts = () => {
             <ProductForm
               title="Uppdatera produkt"
               productId={editing}
+              
               onCancel={() => setEditing(null)}
               onSubmit={(body, file) => {
-                
-                updateMut.mutate({ id: editing!, body });
-                
-                if (file) {
-                  uploadMut.mutate({ id: editing!, file });
-                }
+                updateMut.mutate({ id: editing!, body: body as AdminUpdateReq });
+                if (file) uploadMut.mutate({ id: editing!, file });
               }}
               loading={updateMut.isPending || uploadMut.isPending}
             />
