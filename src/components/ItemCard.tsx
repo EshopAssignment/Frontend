@@ -16,6 +16,20 @@ const {addItem} = useCart();
 const img = buildImageUrl(product.imgUrl);
 const imgSrc = img || placeholder;
 
+const available = Number(product.available) || 0;
+
+const getBadgeClass = (qty:number) => {
+  if (qty == 0 ) return "badge badge-oos"
+  if (qty <= 20) return "badge badge-low" 
+  return "badge badge-high"
+}
+
+const getBadgeText = (qty: number) => {
+    if (qty == 0 ) return "Slut i lager"
+  if (qty <= 20) return `Lågt saldo (${qty})`;
+  return `(${qty} st)`
+}
+
   return (
     <div className="item-card">
         <Link to={`/product/${product.id}`} >
@@ -35,6 +49,10 @@ const imgSrc = img || placeholder;
         <div className="item-price">
           <p>{product.priceExVat} kr/st</p>
           
+          <div className={getBadgeClass(available)} aria-label={`Lagersaldo: ${available}`}>
+            {getBadgeText(available)}
+          </div>
+
           <button onClick={() => addItem(toCartItem(product))}>
             <i className="fa-solid fa-cart-plus"></i>
           </button>

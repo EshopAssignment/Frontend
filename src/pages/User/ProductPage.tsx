@@ -87,7 +87,6 @@ const ProductPage = () => {
   const prevPage = () => {
     if (!isFetching && page > 1) setPage((p) => p - 1);
   };
-
   if (isLoading && !data) {
     return (
       <section className="container loading-msg">
