@@ -8,20 +8,17 @@ import { buildImageUrl } from "../../helpers/url";
 
 
 const DetailsPage = () => {
-
   const { id } = useParams();
   const navigate = useNavigate();
   const { addItem } = useCart();
 
   const pid = Number(id);
   if (!pid || Number.isNaN(pid)) {
-    navigate("/", {replace: true});
+    navigate("/", { replace: true });
     return null;
   }
 
-const {data: product, isLoading, isError} = useProduct(pid);
-
-
+  const { data: product, isLoading, isError } = useProduct(pid);
 
   if (isLoading) {
     return (
@@ -38,6 +35,24 @@ const {data: product, isLoading, isError} = useProduct(pid);
       </section>
     );
   }
+
+  const imgSrc = buildImageUrl(product.imgUrl) || placeholder;
+  const available = Number(product.available) || 0;
+
+  const getBadgeClass = (qty: number) => {
+    if (qty === 0) return "badge badge-oos";
+    if (qty <= 20) return "badge badge-low";
+    return "badge badge-high";
+  };
+
+  const getBadgeText = (qty: number) => {
+    if (qty === 0) return "Slut i lager";
+    if (qty <= 20) return `Lågt saldo (${qty})`;
+    return `(${qty} st)`;
+  };
+
+  const disabled = available === 0;
+
   return (
 
     <div className="container">
@@ -60,12 +75,25 @@ const {data: product, isLoading, isError} = useProduct(pid);
                     <span>{product.description}</span>
                 </div>
 
+
                 <div className="details-price">
-                    <p>Lager: {product.available}</p>
+
                     <p>Pris/st: {product.priceExVat}</p>
+                    <div className={getBadgeClass(available)} aria-label={`Lagersaldo: ${available}`}> Tillgängliga:
+                        {getBadgeText(available)}
+                    </div>
+
                 </div>
 
-                <button className="btn-add-wide" onClick={() => addItem(toCartItem(product))}>
+                <button
+                  className={`btn-add-wide${disabled ? " is-disabled" : ""}`}
+                  disabled={disabled}
+                  aria-disabled={disabled}
+                  title={disabled ? "Produkten är slut i lager" : "Lägg i kundvagn"}
+                  onClick={() => {
+                    if (!disabled) addItem(toCartItem(product));
+                  }}
+                >
                     <i className="fa-solid fa-cart-plus"></i>
                 </button>
             </div>
@@ -74,9 +102,11 @@ const {data: product, isLoading, isError} = useProduct(pid);
 
             <div className="details-img">
             <img
-              src={buildImageUrl(product.imgUrl) || placeholder}
+              src={imgSrc}
               alt={product.name}
-              onError={(e) => { e.currentTarget.src = placeholder; }}
+              onError={(e) => {
+                e.currentTarget.src = placeholder;
+              }}
             />
             </div>
         </div>          
