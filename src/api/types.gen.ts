@@ -361,6 +361,20 @@ export type PatchApiAdminProductsByIdActivateResponses = {
     200: unknown;
 };
 
+export type GetApiAdminProductsOptionsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/products/options';
+};
+
+export type GetApiAdminProductsOptionsResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PostApiOrderData = {
     body: CreateOrderRequestDto;
     path?: never;

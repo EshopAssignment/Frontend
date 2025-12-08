@@ -26,7 +26,11 @@ export type AdminPagedProducts = {
   totalItems: number;
   totalPages: number;
 };
-
+export type EnumOption = { value: string; label: string; intValue: number };
+export type AdminProductOptions = {
+  productTypes: EnumOption[];
+  productConditions: EnumOption[];
+};
 
 export type AdminCreateReq =
   NonNullable<Parameters<typeof sdk.postApiAdminProducts>[0]>["body"];
@@ -58,7 +62,6 @@ function mapProduct(raw: any): AdminProduct {
   };
 }
 
-
 export async function adminListProductsQuery(params: {
   page?: number;
   pageSize?: number;
@@ -85,7 +88,6 @@ export async function adminListProductsQuery(params: {
   return { items, page, pageSize, totalItems, totalPages };
 }
 
-
 export async function adminListProducts(page: number, pageSize: number): Promise<AdminPagedProducts> {
   return adminListProductsQuery({ page, pageSize });
 }
@@ -107,7 +109,6 @@ export async function adminUpdateProduct(id: number, body: AdminUpdateReq): Prom
   if (res.error) throw res.error;
   return mapProduct(res.data);
 }
-
 
 export async function adminToggleActive(id: number, isActive: boolean): Promise<void> {
 
@@ -135,7 +136,6 @@ export async function adminToggleActive(id: number, isActive: boolean): Promise<
   throw new Error("Toggle endpoint saknas i SDK. Kontrollera OpenAPI och regenerera.");
 }
 
-
 export async function adminUploadImage(id: number, file: File): Promise<{ imgUrl: string }> {
   const form = new FormData();
   form.append("file", file);
@@ -155,4 +155,36 @@ export async function adminUploadImage(id: number, file: File): Promise<{ imgUrl
   }
 
   throw new Error("Image-upload endpoint saknas i SDK. Kontrollera OpenAPI och regenerera.");
+}
+
+export async function adminGetProductOptions(): Promise<AdminProductOptions> {
+  const res = await sdk.getApiAdminProductsOptions({ client: api });
+  if (res.error) throw res.error;
+
+
+  const data = (res.data ?? {}) as {
+    productTypes?: unknown[];
+    productConditions?: unknown[];
+  };
+
+  const sanitize = (xs: unknown[] | undefined): EnumOption[] =>
+    Array.isArray(xs)
+      ? xs.map((x) => {
+          const anyx = x as any;
+          const intV =
+            typeof anyx?.intValue === "number" && Number.isFinite(anyx.intValue)
+              ? anyx.intValue
+              : Number(anyx?.intValue ?? 0) || 0;
+          return {
+            value: String(anyx?.value ?? ""),
+            label: String(anyx?.label ?? ""),
+            intValue: intV,
+          };
+        })
+      : [];
+
+  return {
+    productTypes: sanitize(data.productTypes),         
+    productConditions: sanitize(data.productConditions)
+  };
 }
