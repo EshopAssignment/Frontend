@@ -2,7 +2,7 @@
 
 import { type Client, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
 import { client } from './client.gen';
-import type { GetApiAdminOrdersByIdData, GetApiAdminOrdersByIdErrors, GetApiAdminOrdersByIdResponses, GetApiAdminOrdersData, GetApiAdminOrdersResponses, GetApiAdminProductsData, GetApiAdminProductsResponses, GetApiOrderByIdData, GetApiOrderByIdErrors, GetApiOrderByIdResponses, GetApiProductsByIdData, GetApiProductsByIdErrors, GetApiProductsByIdResponses, GetApiProductsData, GetApiProductsResponses, GetApiProductsSuggestData, GetApiProductsSuggestResponses, GetProductByIdAdminData, GetProductByIdAdminErrors, GetProductByIdAdminResponses, PatchApiAdminOrdersByIdStatusData, PatchApiAdminOrdersByIdStatusErrors, PatchApiAdminOrdersByIdStatusResponses, PatchApiAdminProductsByIdActivateData, PatchApiAdminProductsByIdActivateResponses, PostApiAdminProductsData, PostApiAdminProductsResponses, PostApiOrderData, PostApiOrderErrors, PostApiOrderResponses, PutApiAdminProductsByIdData, PutApiAdminProductsByIdImageData, PutApiAdminProductsByIdImageResponses, PutApiAdminProductsByIdResponses } from './types.gen';
+import type { GetApiAdminOrdersByIdData, GetApiAdminOrdersByIdErrors, GetApiAdminOrdersByIdResponses, GetApiAdminOrdersData, GetApiAdminOrdersResponses, GetApiAdminProductsData, GetApiAdminProductsOptionsData, GetApiAdminProductsOptionsResponses, GetApiAdminProductsResponses, GetApiOrderByIdData, GetApiOrderByIdErrors, GetApiOrderByIdResponses, GetApiProductsByIdData, GetApiProductsByIdErrors, GetApiProductsByIdResponses, GetApiProductsData, GetApiProductsResponses, GetApiProductsSuggestData, GetApiProductsSuggestResponses, GetProductByIdAdminData, GetProductByIdAdminErrors, GetProductByIdAdminResponses, PatchApiAdminOrdersByIdStatusData, PatchApiAdminOrdersByIdStatusErrors, PatchApiAdminOrdersByIdStatusResponses, PatchApiAdminProductsByIdActivateData, PatchApiAdminProductsByIdActivateResponses, PostApiAdminProductsData, PostApiAdminProductsResponses, PostApiOrderData, PostApiOrderErrors, PostApiOrderResponses, PutApiAdminProductsByIdData, PutApiAdminProductsByIdImageData, PutApiAdminProductsByIdImageResponses, PutApiAdminProductsByIdResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -71,6 +71,8 @@ export const patchApiAdminProductsByIdActivate = <ThrowOnError extends boolean =
         ...options.headers
     }
 });
+
+export const getApiAdminProductsOptions = <ThrowOnError extends boolean = false>(options?: Options<GetApiAdminProductsOptionsData, ThrowOnError>) => (options?.client ?? client).get<GetApiAdminProductsOptionsResponses, unknown, ThrowOnError>({ url: '/api/admin/products/options', ...options });
 
 export const postApiOrder = <ThrowOnError extends boolean = false>(options: Options<PostApiOrderData, ThrowOnError>) => (options.client ?? client).post<PostApiOrderResponses, PostApiOrderErrors, ThrowOnError>({
     url: '/api/Order',

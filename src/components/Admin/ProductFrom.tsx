@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { adminGetProduct,type AdminCreateReq,type AdminUpdateReq,} from "../../Services/adminProductService";
+import { adminGetProduct, adminGetProductOptions, type AdminCreateReq,type AdminProductOptions,type AdminUpdateReq,} from "../../Services/adminProductService";
 
 type Props = {
   title: string;
@@ -21,7 +21,11 @@ const { data } = useQuery({
   enabled: isEdit,
   staleTime: 10_000,
 });
-
+  const { data: options } = useQuery<AdminProductOptions>({
+    queryKey: ["admin-product-options"],
+    queryFn: () => adminGetProductOptions(),
+    staleTime: 60 * 60 * 1000,
+  });
   const [form, setForm] = useState<AdminCreateReq>({
     name: "",
     description: "",
@@ -48,6 +52,14 @@ useEffect(() => {
     isActive: data.isActive,
   });
 }, [isEdit, data]);
+useEffect(() => {
+  if (!options) return;
+  setForm(prev => ({
+    ...prev,
+    palletType: prev.palletType || options.productTypes[0]?.value || "",
+    condition: prev.condition || options.productConditions[0]?.value || "",
+  }));
+}, [options]);
 
   const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : undefined), [file]);
 
@@ -90,32 +102,32 @@ useEffect(() => {
 
           <label>
             Palltyp
-            <input
-            formNoValidate
+            <select
               className="input"
               value={form.palletType}
               onChange={(e) => setForm({ ...form, palletType: e.target.value })}
-            />
+              disabled={!options}
+              required
+            >
+              {options?.productTypes.map(o => (
+                <option className="options" key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
           </label>
 
           <label>
             Skick
-            <input
-            formNoValidate
+            <select
               className="input"
               value={form.condition}
               onChange={(e) => setForm({ ...form, condition: e.target.value })}
-            />
-          </label>
-
-          <label>
-            Bild-URL
-            <input
-            formNoValidate
-              className="input"
-              value={form.imgUrl}
-              onChange={(e) => setForm({ ...form, imgUrl: e.target.value })}
-            />
+              disabled={!options}
+              required
+            >
+              {options?.productConditions.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
           </label>
 
           <label>
