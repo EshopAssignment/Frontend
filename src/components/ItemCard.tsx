@@ -29,6 +29,7 @@ const getBadgeText = (qty: number) => {
   if (qty <= 20) return `Lågt saldo (${qty})`;
   return `(${qty} st)`
 }
+  const disabled = available === 0;
 
   return (
     <div className="item-card">
@@ -53,7 +54,15 @@ const getBadgeText = (qty: number) => {
             {getBadgeText(available)}
           </div>
 
-          <button onClick={() => addItem(toCartItem(product))}>
+            <button
+              disabled={disabled}
+              aria-disabled={disabled}
+              className={disabled ? "is-disabled" : ""}
+              title={disabled ? "Produkten är slut i lager" : "Lägg i kundvagn"}
+              onClick={() => {
+                if (!disabled) addItem(toCartItem(product));
+              }}
+            >
             <i className="fa-solid fa-cart-plus"></i>
           </button>
         </div>

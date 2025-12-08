@@ -144,7 +144,7 @@ export type ProductDto = {
 export type ProductSuggestionDto = {
     id: number | string;
     name: string;
-    price: number | string;
+    priceExVat: number | string;
     imgUrl: string;
     slug: null | string;
     sku: null | string;

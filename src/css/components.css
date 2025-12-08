@@ -346,6 +346,14 @@ button:hover{
   justify-content: center;
   box-shadow: var(--shadow-md);
 }
+.is-disabled{
+    color:var(--destructive);
+    opacity: 0.5;
+    cursor:not-allowed;
+}
+.is-disabled:active {
+     transform: none;
+}
 /*#endregion */ 
 /*#region form */
 .form{
@@ -418,7 +426,18 @@ button:hover{
 .details-desc{
     font-size:28px;
 }
-
+.details-price{
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    gap:.5rem;
+    width: 30%;
+    flex-direction: column;
+    .badge{
+        border-radius: var(--radius2);
+        border:none;
+    }
+}
 
 
 
