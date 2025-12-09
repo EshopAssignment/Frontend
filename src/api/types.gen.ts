@@ -85,6 +85,11 @@ export type CreateOrderRequestDto = {
     items: Array<CreateOrderItemRequestDto>;
 };
 
+export type LoginDto = {
+    email: string;
+    password: string;
+};
+
 export type OrderCreatedDto = {
     orderId: number | string;
     orderNumber: string;
@@ -148,6 +153,12 @@ export type ProductSuggestionDto = {
     imgUrl: string;
     slug: null | string;
     sku: null | string;
+};
+
+export type RegisterDto = {
+    email: string;
+    password: string;
+    displayName: string;
 };
 
 export type ToggleActiveRequest = {
@@ -375,6 +386,48 @@ export type GetApiAdminProductsOptionsResponses = {
     200: unknown;
 };
 
+export type PostAuthRegisterData = {
+    body: RegisterDto;
+    path?: never;
+    query?: never;
+    url: '/auth/register';
+};
+
+export type PostAuthRegisterResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PostAuthLoginData = {
+    body: LoginDto;
+    path?: never;
+    query?: never;
+    url: '/auth/login';
+};
+
+export type PostAuthLoginResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PostAuthLogoutData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/logout';
+};
+
+export type PostAuthLogoutResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PostApiOrderData = {
     body: CreateOrderRequestDto;
     path?: never;
@@ -497,3 +550,17 @@ export type GetApiProductsSuggestResponses = {
 };
 
 export type GetApiProductsSuggestResponse = GetApiProductsSuggestResponses[keyof GetApiProductsSuggestResponses];
+
+export type GetUsersMeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/users/me';
+};
+
+export type GetUsersMeResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
