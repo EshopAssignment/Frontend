@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import Cart from "../Cart/Cart";
 import { useCart } from "../../context/CartContext";
-import { Link } from "react-router-dom";
-import { Popover, PopoverButton, PopoverPanel} from '@headlessui/react'
+import ProfileBtn from "./ProfileBtn";
+import HelpBtn from "./HelpBtn";
 
 const TopBarGroup = () => {
     const [isCartOpen, setIsCartOpen] = useState(false);
@@ -27,7 +27,6 @@ const TopBarGroup = () => {
   return (
     <>
       <div className="btn-group">
-
           <div className="cart-btn-wrapper">
             <button
               onClick={() => setIsCartOpen((prev) => !prev)}>
@@ -39,30 +38,9 @@ const TopBarGroup = () => {
                 </span>
               )}
           </div>
-
-          <div>
-            <Link to="/profile">
-            
-              <button>
-                <i className="fa-regular fa-user"></i>
-              </button>
-            
-            </Link>
-          </div>
-
-        <Popover>
-          <PopoverButton>                
-            <i className="fa-solid fa-phone"></i>
-          </PopoverButton>
-          <PopoverPanel anchor="bottom" className="help-menu">
-            <span>Behöver du hjälp?</span>
-            <a href="/#">070123132</a>
-            <a href="/#">help@pall.se</a>
-            <a href="/#">Online-Hjälp</a>
-          </PopoverPanel>
-        </Popover>
+          <ProfileBtn />
+          <HelpBtn />
       </div>
-    
       {(
         <div className={`cart-overlay ${isCartOpen ? "open" : ""}`}>
           <div

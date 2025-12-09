@@ -19,6 +19,8 @@ import SignInForm from "../pages/SignUp/SignInForm";
 import Auth from "../pages/SignUp/Auth";
 import CompanyForm from "../pages/SignUp/CompanyForm";
 import AdminOrders from "../pages/Admin/AdminOrders";
+import RequireAdmin from "./RequireAdmin";
+import RequireAuth from "./RequiresAuth";
 
 
 
@@ -35,16 +37,20 @@ const AppRouter = () => {
       </Route>
 
       <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<AdminDash />} /> 
-        <Route path="adminproducts" element={<AdminProducts />} />
-        <Route path="admin-orders" element={<AdminOrders />} />
+        <Route element={<RequireAdmin />}> 
+          <Route index element={<AdminDash />} /> 
+          <Route path="adminproducts" element={<AdminProducts />} />
+          <Route path="admin-orders" element={<AdminOrders />} />
+        </Route> 
       </Route>
 
       <Route path="/profile" element={<ProfileLayout />}>
-        <Route index element={<MyProfile />} />
-        <Route path="orders" element={<Orders />} />
-        <Route path="help" element={<Help />} />
-        <Route path="gdpr" element={<Gdpr />} />
+        <Route element={<RequireAuth/>}>
+          <Route index element={<MyProfile />} />
+          <Route path="orders" element={<Orders />} />
+          <Route path="help" element={<Help />} />
+          <Route path="gdpr" element={<Gdpr />} />
+        </Route>
       </Route>
 
       <Route path="/auth" element={<SignupLayout />}>

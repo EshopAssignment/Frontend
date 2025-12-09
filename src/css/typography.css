@@ -26,6 +26,14 @@ i{
     font-size:26px;
     text-align: center;
 }
+.form-error{
+    padding:.3rem;
+    border-radius: var(--radius4);
+    background-color:var(--destructive);
+    font-size: 14px;
+    color:white !important;
+    
+}
 
 .loading-msg{
     margin: 0 auto;

@@ -1,8 +1,9 @@
+@import "./typography.css";
 @import "./reset.css";
 @import "./container.css";
 @import "./generics.css";
 @import "./layout.css";
-@import "./typography.css";
 @import "./components.css";
 @import "./headless.css";
 @import "./admin.css";
+@import "tailwindcss";
