@@ -14,15 +14,22 @@ export async function createOrder(body: CreateOrderRequest): Promise<OrderCreate
 
 export async function createOrderFromCart(cartItems: CartItem[]): Promise<OrderCreatedDto> {
   const body: CreateOrderRequest = {
-    customerFirstName: "Pall",
-    customerLastName: "McPall",
-    customerEmail: "pall.mcpall@pall.pall",
-    customerPhoneNumber: "0809090901",
-    shippingCity: "Pallkenberg",
-    shippingStreet: "Pallgatan",
-    shippingPostalCode: "12345",
-    shippingCountry: "Pallaland",
-    items: cartItems.map(x => ({ productId: x.productId, quantity: x.quantity }))
+    customerFirstName: 'Pall',
+    customerLastName: 'McPall',
+    customerEmail: 'pall.mcpall@pall.pall',
+    customerPhoneNumber: '0809090901',
+    shippingAddress: {
+      street: 'Pallgatan',
+      city: 'Pallkenberg',
+      postalCode: '12345',
+      country: 'SE',
+    },
+    items: cartItems.map(x => ({
+      productId: x.productId,
+      quantity: x.quantity,
+    })),
+    currency: 'SEK',
+    shippingCost: 0,
   };
   return createOrder(body);
 }
@@ -32,3 +39,10 @@ export async function getOrderById(id: number, opts?: { signal?: AbortSignal }):
   if (res.error) throw res.error;
   return res.data!;
 }
+
+export async function getApiOrderByNumberByOrderNumber(orderNumber: string, opts?: { signal?: AbortSignal }): Promise<OrderDto> {
+  const res = await sdk.getApiOrderByNumberByOrderNumber({ client: api, path: { orderNumber }, signal: opts?.signal });
+  if (res.error) throw res.error;
+  return res.data!;
+}
+
