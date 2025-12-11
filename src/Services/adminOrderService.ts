@@ -19,7 +19,9 @@ export async function listOrders(opts: {
   page: number;
   pageSize: number;
   query?: string;
-  status?: string; 
+  status?: string;       
+  from?: Date | string;
+  to?: Date | string;
 }): Promise<AdminPagedOrders> {
   const res = await sdk.getApiAdminOrders({
     client: api,
@@ -28,6 +30,8 @@ export async function listOrders(opts: {
       pageSize: opts.pageSize,
       query: opts.query,
       status: opts.status,
+      from: opts.from ? new Date(opts.from).toISOString() : undefined,
+      to: opts.to ? new Date(opts.to).toISOString() : undefined,
     },
   });
   if (res.error) throw res.error;

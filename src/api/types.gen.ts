@@ -18,7 +18,7 @@ export type AdminCreateProductRequestDto = {
 export type AdminOrderDetailsDto = {
     id: number | string;
     orderNumber: string;
-    orderDate: string;
+    createdAtUtc: string;
     customerFirstName: string;
     customerLastName: string;
     customerEmail: string;
@@ -27,17 +27,24 @@ export type AdminOrderDetailsDto = {
     shippingPostalCode: string;
     shippingCity: string;
     shippingCountry: string;
-    orderStatus: string;
-    productsTotal: number | string;
+    orderStatus: OrderStatus;
+    paymentStatus: PaymentStatus;
+    paymentMethod: string;
+    paymentIntentId: null | string;
+    currency: string;
+    productsSubtotal: number | string;
     shippingCost: number | string;
-    total: number | string;
+    taxTotal: number | string;
+    grandTotal: number | string;
     items: Array<AdminOrderItemDto>;
 };
 
 export type AdminOrderItemDto = {
     productId: number | string;
+    sku: string;
     productName: string;
-    price: number | string;
+    unitPrice: number | string;
+    vatRate: number | string;
     quantity: number | string;
     lineTotal: number | string;
 };
@@ -45,15 +52,17 @@ export type AdminOrderItemDto = {
 export type AdminOrderListItemDto = {
     id: number | string;
     orderNumber: string;
-    orderDate: string;
+    createdAtUtc: string;
     customerName: string;
     customerEmail: string;
-    orderStatus: string;
-    total: number | string;
+    orderStatus: OrderStatus;
+    paymentStatus: PaymentStatus;
+    grandTotal: number | string;
+    paymentMethod: string;
 };
 
 export type AdminUpdateOrderStatusRequest = {
-    orderStatus: string;
+    orderStatus: OrderStatus;
 };
 
 export type AdminUpdateProductRequestDto = {
@@ -68,6 +77,15 @@ export type AdminUpdateProductRequestDto = {
     isActive: boolean;
 };
 
+export type CreateIntentRequest = {
+    orderNumber: string;
+    cartId: string;
+};
+
+export type CreateIntentResponse = {
+    clientSecret: string;
+};
+
 export type CreateOrderItemRequestDto = {
     productId: number | string;
     quantity: number | string;
@@ -78,11 +96,10 @@ export type CreateOrderRequestDto = {
     customerLastName: string;
     customerEmail: string;
     customerPhoneNumber: string;
-    shippingCity: string;
-    shippingStreet: string;
-    shippingPostalCode: string;
-    shippingCountry: string;
+    shippingAddress: ShippingAddressDto;
     items: Array<CreateOrderItemRequestDto>;
+    currency?: string;
+    shippingCost?: null | number | string;
 };
 
 export type LoginDto = {
@@ -93,9 +110,17 @@ export type LoginDto = {
 export type OrderCreatedDto = {
     orderId: number | string;
     orderNumber: string;
-    orderDate: string;
-    total: number | string;
+    createdAtUtc: string;
+    currency: string;
+    productsSubtotal: number | string;
+    shippingCost: number | string;
+    taxTotal: number | string;
+    grandTotal: number | string;
+    orderStatus: OrderStatus;
+    paymentStatus: PaymentStatus;
 };
+
+export type OrderStatus = number;
 
 export type PagedResultOfAdminOrderDetailsDto = {
     page?: number | string;
@@ -120,6 +145,8 @@ export type PagedResultOfProductDto = {
     totalPages?: number | string;
     items?: Array<ProductDto>;
 };
+
+export type PaymentStatus = number;
 
 export type ProblemDetails = {
     type?: null | string;
@@ -159,6 +186,13 @@ export type RegisterDto = {
     email: string;
     password: string;
     displayName: string;
+};
+
+export type ShippingAddressDto = {
+    street: string;
+    city: string;
+    postalCode: string;
+    country: string;
 };
 
 export type ToggleActiveRequest = {
@@ -428,6 +462,20 @@ export type PostAuthLogoutResponses = {
     200: unknown;
 };
 
+export type PostAuthRefreshData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/refresh';
+};
+
+export type PostAuthRefreshResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PostApiOrderData = {
     body: CreateOrderRequestDto;
     path?: never;
@@ -479,6 +527,63 @@ export type GetApiOrderByIdResponses = {
 };
 
 export type GetApiOrderByIdResponse = GetApiOrderByIdResponses[keyof GetApiOrderByIdResponses];
+
+export type GetApiOrderByNumberByOrderNumberData = {
+    body?: never;
+    path: {
+        orderNumber: string;
+    };
+    query?: never;
+    url: '/api/Order/by-number/{orderNumber}';
+};
+
+export type GetApiOrderByNumberByOrderNumberErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetApiOrderByNumberByOrderNumberError = GetApiOrderByNumberByOrderNumberErrors[keyof GetApiOrderByNumberByOrderNumberErrors];
+
+export type GetApiOrderByNumberByOrderNumberResponses = {
+    /**
+     * OK
+     */
+    200: OrderCreatedDto;
+};
+
+export type GetApiOrderByNumberByOrderNumberResponse = GetApiOrderByNumberByOrderNumberResponses[keyof GetApiOrderByNumberByOrderNumberResponses];
+
+export type PostApiPaymentsCreateIntentData = {
+    body: CreateIntentRequest;
+    path?: never;
+    query?: never;
+    url: '/api/payments/create-intent';
+};
+
+export type PostApiPaymentsCreateIntentResponses = {
+    /**
+     * OK
+     */
+    200: CreateIntentResponse;
+};
+
+export type PostApiPaymentsCreateIntentResponse = PostApiPaymentsCreateIntentResponses[keyof PostApiPaymentsCreateIntentResponses];
+
+export type PostApiPaymentsWebhookData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/payments/webhook';
+};
+
+export type PostApiPaymentsWebhookResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type GetApiProductsData = {
     body?: never;
