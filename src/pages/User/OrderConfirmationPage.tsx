@@ -31,7 +31,7 @@ const { data, isFetching, isError, error } = useQuery<OrderCreatedDto, Error, Or
   staleTime: 5_000,
   select: (d) => ({
     ...d,
-    total: Number.isFinite(Number(d.total)) ? Number(d.total) : 0,
+    total: Number.isFinite(Number(d.grandTotal)) ? Number(d.grandTotal) : 0,
   }),
 });
 
@@ -84,13 +84,13 @@ const { data, isFetching, isError, error } = useQuery<OrderCreatedDto, Error, Or
             <p>
               Totalt:{" "}
               <strong>
-                {data?.total} SEK
+                {data?.grandTotal} SEK
               </strong>
               {isFetching ? " (verifierar…)" : ""}
             </p>
 
             <p>
-              Orderdatum: <strong>{data?.orderDate.toString().split('T')[0]}</strong>
+              Orderdatum: <strong>{data?.createdAtUtc.toString().split('T')[0]}</strong>
             </p>
 
             <div className="support">
