@@ -7,3 +7,4 @@
 @import "./headless.css";
 @import "./admin.css";
 @import "tailwindcss";
+@import "./stripe.css"

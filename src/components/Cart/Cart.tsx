@@ -4,22 +4,23 @@ import { createOrderFromCart } from "../../Services/orderService";
 import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
-    const {state, totalExVat, removeOne, removeAll, clear} = useCart();
+    const {state, cartId, totalExVat, removeOne, removeAll, clear} = useCart();
     const navigate = useNavigate();
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [orderNumber, setOrderNumber] = useState<string | null>(null);
+    
     const handleCheckout = async () => {
       if (state.items.length === 0 || submitting) return;
       setSubmitting(true);
       setError(null);
       setOrderNumber(null);
-      try {
-      const result = await createOrderFromCart(state.items);
-      clear();
-      navigate(`/order/thank-you/${result.orderNumber}`, {
-      state: result,
-      });
+  try {
+    const result = await createOrderFromCart(state.items, cartId);
+
+    navigate(`/checkout/${result.orderNumber}`, {
+      state: result 
+    });
 
     } catch (err) {
       console.error(err);

@@ -12,7 +12,7 @@ export async function createOrder(body: CreateOrderRequest): Promise<OrderCreate
   return res.data!;
 }
 
-export async function createOrderFromCart(cartItems: CartItem[]): Promise<OrderCreatedDto> {
+export async function createOrderFromCart(cartItems: CartItem[], cartId: string): Promise<OrderCreatedDto> {
   const body: CreateOrderRequest = {
     customerFirstName: 'Pall',
     customerLastName: 'McPall',
@@ -28,6 +28,9 @@ export async function createOrderFromCart(cartItems: CartItem[]): Promise<OrderC
       productId: x.productId,
       quantity: x.quantity,
     })),
+    
+    reservationTtlMinutes: 60,
+    cartId,
     currency: 'SEK',
     shippingCost: 0,
   };
@@ -40,7 +43,7 @@ export async function getOrderById(id: number, opts?: { signal?: AbortSignal }):
   return res.data!;
 }
 
-export async function getApiOrderByNumberByOrderNumber(orderNumber: string, opts?: { signal?: AbortSignal }): Promise<OrderDto> {
+export async function getOrderByNumber(orderNumber: string, opts?: { signal?: AbortSignal }): Promise<OrderDto> {
   const res = await sdk.getApiOrderByNumberByOrderNumber({ client: api, path: { orderNumber }, signal: opts?.signal });
   if (res.error) throw res.error;
   return res.data!;

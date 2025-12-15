@@ -1,51 +1,73 @@
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import type { OrderCreatedDto } from "../../Services/orderService";
-import { getOrderById } from "../../Services/orderService";
-
-const ORDERS = {
-  byId: (id: number) => ["orders", id] as const,
-};
+import { getOrderById, getOrderByNumber } from "../../Services/orderService";
+import { useCart } from "@/context/CartContext";
+import { useEffect } from "react";
 
 const OrderConfirmationPage = () => {
   const { orderNumber } = useParams<{ orderNumber: string }>();
   const location = useLocation();
   const state = (location.state as OrderCreatedDto | null) ?? null;
+  const [sp] = useSearchParams();
+  const redirectStatus = sp.get("redirect_status");
+  const { clear } = useCart();
 
   const rawId = state?.orderId as unknown;
   const id =
-    typeof rawId === "number"
-      ? rawId
-      : typeof rawId === "string"
-      ? Number(rawId)
-      : NaN;
+    typeof rawId === "number" ? rawId
+    : typeof rawId === "string" ? Number(rawId)
+    : NaN;
 
-  const validId = Number.isFinite(id);
+  const hasId = Number.isFinite(id);
+  const hasNumber = !!orderNumber;
 
-const { data, isFetching, isError, error } = useQuery<OrderCreatedDto, Error, OrderCreatedDto>({
-  queryKey: validId ? ORDERS.byId(id as number) : ["orders", "invalid"],
-  enabled: validId,
-  queryFn: ({ signal }) => getOrderById(id as number, { signal }),
-  initialData: state ?? undefined,
-  placeholderData: keepPreviousData,
-  staleTime: 5_000,
-  select: (d) => ({
-    ...d,
-    total: Number.isFinite(Number(d.grandTotal)) ? Number(d.grandTotal) : 0,
-  }),
-});
+  const { data, isFetching, isError, error } = useQuery<OrderCreatedDto>({
+    queryKey: hasId ? ["orders","byId", id] : ["orders","byNumber", orderNumber],
+    enabled: hasId || hasNumber,
+    queryFn: ({ signal }) =>
+      hasId
+        ? getOrderById(id as number, { signal })
+        : getOrderByNumber(orderNumber!, { signal }),
+    initialData: state ?? undefined,
+    placeholderData: keepPreviousData,
+    staleTime: 5_000,
+    select: (d: any) => ({
+      ...d,
+      grandTotal: Number(d.grandTotal ?? 0),
+      createdAtUtc: d.createdAtUtc ?? d.createdAt ?? d.orderDate ?? null
+    }),
+  });
 
 
-  if (!validId) {
+  useEffect(() => {
+  const ok =
+    redirectStatus === "succeeded" &&
+    data &&
+    (
+      String(data.paymentStatus ?? data.paymentStatus ?? "").toLowerCase() === "authorized" ||
+      String(data.orderStatus ?? "").toLowerCase() === "confirmed" ||
+      true
+    );
+
+  if (!ok) return;
+
+  const key = `cart-cleared:${data.orderNumber ?? orderNumber}`;
+  //make sure we dont doubleclear
+  if (!sessionStorage.getItem(key)) {
+    clear();
+    sessionStorage.setItem(key, "1");
+  }
+}, [redirectStatus, data?.orderNumber, data?.paymentStatus, data?.orderStatus, clear, orderNumber]);
+
+  if (!(hasId || hasNumber)) {
     return (
       <section>
         <div className="container">
           <div className="confirmation-view">
             <div className="confirmation-content">
-                <h2>Hoppsan något gick fel</h2>
-              <div className="btn-return">
-                <Link to="/products">Till produkter</Link>
-              </div>
+              <h2>Hoppsan något gick fel</h2>
+              <div className="btn-return"><Link to="/products">Till produkter</Link></div>
             </div>
           </div>
         </div>
@@ -61,9 +83,7 @@ const { data, isFetching, isError, error } = useQuery<OrderCreatedDto, Error, Or
             <div className="confirmation-content">
               <h2>Ett fel inträffade</h2>
               <p>{error?.message ?? "Kunde inte hämta ordern."}</p>
-              <div className="btn-return">
-                <Link to="/products">Till produkter</Link>
-              </div>
+              <div className="btn-return"><Link to="/products">Till produkter</Link></div>
             </div>
           </div>
         </div>
@@ -71,7 +91,8 @@ const { data, isFetching, isError, error } = useQuery<OrderCreatedDto, Error, Or
     );
   }
 
-
+  const orderDate = data?.createdAtUtc ? new Date(data.createdAtUtc) : null;
+  const dateText = orderDate ? orderDate.toLocaleDateString() : "-";
 
   return (
     <section>
@@ -79,19 +100,14 @@ const { data, isFetching, isError, error } = useQuery<OrderCreatedDto, Error, Or
         <div className="confirmation-view">
           <div className="confirmation-content">
             <h2>Tack för din order</h2>
-            <span>{`Ordernummer: ${orderNumber}`}</span>
+            <span>{`Ordernummer: ${orderNumber ?? data?.orderNumber ?? "-"}`}</span>
 
             <p>
-              Totalt:{" "}
-              <strong>
-                {data?.grandTotal} SEK
-              </strong>
+              Totalt: <strong>{data?.grandTotal} SEK</strong>
               {isFetching ? " (verifierar…)" : ""}
             </p>
 
-            <p>
-              Orderdatum: <strong>{data?.createdAtUtc.toString().split('T')[0]}</strong>
-            </p>
+            <p>Orderdatum: <strong>{dateText}</strong></p>
 
             <div className="support">
               <p>Frågor? Kontakta kundtjänst här.</p>
