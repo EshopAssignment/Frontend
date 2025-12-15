@@ -3,6 +3,7 @@ import { createPaymentIntent } from "@/Services/paymentService";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 const pk = import.meta.env.VITE_STRIPE_PK;
 if (!pk) {
@@ -39,31 +40,45 @@ function Form({ orderNumber }: { orderNumber: string }) {
   );
 }
 
-export default function Checkout({ orderNumber }: { orderNumber: string }) {
+export default function Checkout() {
   const { cartId } = useCart();
   const [clientSecret, setClientSecret] = useState<string | undefined>(undefined);
+  const { orderNumber } = useParams<{ orderNumber: string }>();
+  const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!orderNumber) return;
     let alive = true;
-    createPaymentIntent(orderNumber, cartId).then(r => {
-      if (alive) setClientSecret(r.clientSecret);
-    });
+
+    createPaymentIntent(orderNumber, cartId)
+      .then(r => { if (alive) setClientSecret(r.clientSecret); })
+      .catch(e => { if (alive) setErr(e?.message ?? "Kunde inte initiera betalning."); });
+
     return () => { alive = false; };
   }, [orderNumber, cartId]);
 
-  if (!clientSecret) return <p>Laddar betalning…</p>;
+  if (err) return <p>{err}</p>;
+  if (!clientSecret) return <p className="container">Laddar betalning…</p>;
 
   return (
-      <Elements 
-        stripe={stripePromise} 
-        options={{
-        clientSecret,
-        appearance: {
-            theme: "night",
-        }
-        }}>
-  
-      <Form orderNumber={orderNumber} />
-    </Elements>
+    <>
+    <div className="container">
+          <div>bla bla bla, detta har du beställt bla bla bla</div>  
+          <div>bla bla bla här väljer du postnord eller inget alls bla bla bla</div>  
+      
+      
+        <Elements 
+          stripe={stripePromise} 
+          options={{
+          clientSecret,
+          appearance: {
+              theme: "night",
+          }
+          }}>
+          <Form orderNumber={orderNumber!} />
+        </Elements>
+
+    </div>
+    </>
   );
 }

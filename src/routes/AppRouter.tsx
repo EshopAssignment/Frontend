@@ -21,6 +21,7 @@ import CompanyForm from "../pages/SignUp/CompanyForm";
 import AdminOrders from "../pages/Admin/AdminOrders";
 import RequireAdmin from "./RequireAdmin";
 import RequireAuth from "./RequiresAuth";
+import Checkout from "@/components/Stripe/Checkout";
 
 
 
@@ -34,6 +35,7 @@ const AppRouter = () => {
         <Route path="products" element={<ProductPage />} />
         <Route path="product/:id" element={<DetailsPage />} />
         <Route path="order/thank-you/:orderNumber" element={<OrderConfirmationPage />} />
+        <Route path="checkout/:orderNumber" element={<Checkout />} />
       </Route>
 
       <Route path="/admin" element={<AdminLayout />}>

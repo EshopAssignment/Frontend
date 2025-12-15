@@ -98,8 +98,10 @@ export type CreateOrderRequestDto = {
     customerPhoneNumber: string;
     shippingAddress: ShippingAddressDto;
     items: Array<CreateOrderItemRequestDto>;
+    cartId: string;
     currency?: string;
     shippingCost?: null | number | string;
+    reservationTtlMinutes?: number | string;
 };
 
 export type LoginDto = {
