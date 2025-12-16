@@ -31,9 +31,6 @@ button:hover, a:hover{
     cursor: pointer;
 }
 
-img{
-    display:block;
-}
 
 ul, li{
     list-style: none;

@@ -7,19 +7,41 @@ import {
   type AdminOrderDetails,
   type AdminOrderListItem,
   type AdminPagedOrders,
+  type AdminOrderStatus,
 } from "../../Services/adminOrderService";
 
 const PAGE_SIZE = 20;
-const STATUSES = ["New", "Processing", "Shipped", "Completed", "Cancelled"];
+
+const STATUSES = [
+  "Pending",
+  "Confirmed",
+  "Processing",
+  "Shipped",
+  "Completed",
+  "Refunded",
+  "Failed",
+  "Cancelled",
+] as const;
+
 
 const asNum = (v: unknown, fb = 0) => {
   const n = typeof v === "number" ? v : typeof v === "string" ? Number(v) : NaN;
   return Number.isFinite(n) ? n : fb;
 };
 
-type NextStatus = Parameters<typeof updateOrderStatus>[1];
+function fmtUtc(input: string | Date) {
+  const s = typeof input === "string" ? input : input.toISOString();
+  const safe = s.endsWith("Z") ? s : s + "Z";
+  const d = new Date(safe);
+  return isNaN(d.getTime())
+    ? "-"
+    : d.toLocaleString("sv-SE", { dateStyle: "short", timeStyle: "short" });
+}
 
-const AdminOrders = () => {
+const fmtSEK = (n: number) =>
+  new Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK", maximumFractionDigits: 2 }).format(n);
+
+export default function AdminOrders() {
   const qclient = useQueryClient();
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
@@ -33,7 +55,7 @@ const AdminOrders = () => {
         page,
         pageSize: PAGE_SIZE,
         query: query || undefined,
-        status: status || undefined, 
+        status: status || undefined,
       }),
     placeholderData: keepPreviousData,
     staleTime: 10_000,
@@ -47,9 +69,28 @@ const AdminOrders = () => {
   });
 
   const mutStatus = useMutation({
-    mutationFn: ({ id, next }: { id: number; next: NextStatus }) =>
-      updateOrderStatus(id, next),
-    onSuccess: () => {
+    mutationFn: ({ id, next }: { id: number; next: AdminOrderStatus }) => updateOrderStatus(id, next),
+    onMutate: async (vars) => {
+      await qclient.cancelQueries({ queryKey: ["admin-orders"] });
+      const prev = qclient.getQueriesData({ queryKey: ["admin-orders"] });
+
+      prev.forEach(([key, snapshot]) => {
+        const pageSnap = snapshot as AdminPagedOrders | undefined;
+        if (!pageSnap) return;
+        const items = (pageSnap.items ?? []).map(i =>
+          i.id === vars.id ? { ...i, orderStatus: vars.next } : i
+        );
+        qclient.setQueryData(key, { ...pageSnap, items });
+      });
+
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      ctx?.prev?.forEach(([key, snapshot]: any) => {
+        qclient.setQueryData(key, snapshot);
+      });
+    },
+    onSettled: () => {
       qclient.invalidateQueries({ queryKey: ["admin-orders"] });
       qclient.invalidateQueries({ queryKey: ["admin-order"] });
     },
@@ -100,7 +141,7 @@ const AdminOrders = () => {
             <thead>
               <tr>
                 <th>Ordernr</th>
-                <th>Datum</th>
+                <th>Skapad</th>
                 <th>Kund</th>
                 <th>Email</th>
                 <th>Status</th>
@@ -109,26 +150,26 @@ const AdminOrders = () => {
               </tr>
             </thead>
             <tbody>
-              {items.map((o) => {
-                const id = asNum(o.id, NaN);
-                const total = asNum(o.total, 0);
-                const orderDate = new Date(o.orderDate as unknown as string).toLocaleString("sv-SE");
+              {items.map((row) => {
+                const id = asNum(row.id, NaN);
+                const total = asNum(row.grandTotal, 0);
                 return (
-                  <tr key={String(o.id)}>
-                    <td>{o.orderNumber}</td>
-                    <td>{orderDate}</td>
-                    <td>{o.customerName}</td>
-                    <td>{o.customerEmail}</td>
+                  <tr key={String(row.id)}>
+                    <td>{row.orderNumber}</td>
+                    <td>{fmtUtc(row.createdAtUtc as unknown as string)}</td>
+                    <td>{row.customerName}</td>
+                    <td>{row.customerEmail}</td>
                     <td>
-                      <select
-                        className="input"
-                        value={o.orderStatus}
-                        onChange={(e) =>
-                          Number.isFinite(id) &&
-                          mutStatus.mutate({ id, next: e.target.value as NextStatus })
-                        }
-                        disabled={!Number.isFinite(id)}
-                      >
+                    <select
+                      className="input"
+                      value={row.orderStatus}                         
+                      onChange={(e) => {
+                        if (!Number.isFinite(id)) return;
+                        const next = Number(e.target.value) as AdminOrderStatus;
+                        mutStatus.mutate({ id, next });
+                      }}
+                      disabled={!Number.isFinite(id)}
+                    >
                         {STATUSES.map((s) => (
                           <option className="options" key={s} value={s}>
                             {s}
@@ -136,16 +177,11 @@ const AdminOrders = () => {
                         ))}
                       </select>
                     </td>
-                    <td>
-                      {new Intl.NumberFormat("sv-SE", {
-                        style: "currency",
-                        currency: "SEK",
-                      }).format(total)}
-                    </td>
+                    <td>{fmtSEK(total)}</td>
                     <td>
                       <button
                         className="btn"
-                        onClick={() => setSelectedId(id)}
+                        onClick={() => Number.isFinite(id) && setSelectedId(id)}
                         disabled={!Number.isFinite(id)}
                       >
                         Detaljer
@@ -174,7 +210,7 @@ const AdminOrders = () => {
 
       {selectedId !== null && details.data && (
         <div className="modal">
-          <div className="modal-panel">
+          <div className="modal-panel" role="dialog" aria-modal="true" aria-label={`Order ${details.data.orderNumber}`}>
             <div className="admin-order-details">
               <h3>Order {details.data.orderNumber}</h3>
               <p>Namn: {details.data.customerFirstName} {details.data.customerLastName}</p>
@@ -184,6 +220,7 @@ const AdminOrders = () => {
                 {details.data.shippingCity}, {details.data.shippingCountry}
               </p>
               <p>Status: {details.data.orderStatus}</p>
+              <p>Skapad: {fmtUtc(details.data.createdAtUtc as unknown as string)}</p>
             </div>
 
             <table className="admin-table">
@@ -198,17 +235,14 @@ const AdminOrders = () => {
               <tbody>
                 {(details.data.items ?? []).map((it) => {
                   const qty = asNum(it.quantity, 0);
-                  const price = asNum(it.price, 0);
+                  const price = asNum(it.unitPrice, 0);
+                  const line = asNum(it.lineTotal, price * qty);
                   return (
                     <tr key={`${it.productId}-${it.productName}`}>
                       <td>{it.productName}</td>
                       <td>{qty}</td>
-                      <td>
-                        {new Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK" }).format(price)}
-                      </td>
-                      <td>
-                        {new Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK" }).format(price * qty)}
-                      </td>
+                      <td>{fmtSEK(price)}</td>
+                      <td>{fmtSEK(line)}</td>
                     </tr>
                   );
                 })}
@@ -216,20 +250,18 @@ const AdminOrders = () => {
             </table>
 
             <p className="total">
-              Totalsumma:{" "}
-              {new Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK" }).format(
-                asNum(details.data.total, 0)
-              )}
+              Produkter: {fmtSEK(asNum(details.data.productsSubtotal, 0))} &nbsp;|&nbsp;
+              Frakt: {fmtSEK(asNum(details.data.shippingCost, 0))} &nbsp;|&nbsp;
+              Moms: {fmtSEK(asNum(details.data.taxTotal, 0))} &nbsp;|&nbsp;
+              Totalt: {fmtSEK(asNum(details.data.grandTotal, 0))}
             </p>
 
             <div>
-              <button className="btn" onClick={() => setSelectedId(null)}>Stäng</button>
+              <button className="btn" autoFocus onClick={() => setSelectedId(null)}>Stäng</button>
             </div>
           </div>
         </div>
       )}
     </section>
   );
-};
-
-export default AdminOrders;
+}

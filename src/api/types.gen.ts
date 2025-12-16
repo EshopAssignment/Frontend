@@ -124,14 +124,6 @@ export type OrderCreatedDto = {
 
 export type OrderStatus = number;
 
-export type PagedResultOfAdminOrderDetailsDto = {
-    page?: number | string;
-    pageSize?: number | string;
-    totalItems?: number | string;
-    totalPages?: number | string;
-    items?: Array<AdminOrderDetailsDto>;
-};
-
 export type PagedResultOfAdminOrderListItemDto = {
     page?: number | string;
     pageSize?: number | string;
@@ -246,7 +238,7 @@ export type GetApiAdminOrdersByIdResponses = {
     /**
      * OK
      */
-    200: PagedResultOfAdminOrderDetailsDto;
+    200: AdminOrderDetailsDto;
 };
 
 export type GetApiAdminOrdersByIdResponse = GetApiAdminOrdersByIdResponses[keyof GetApiAdminOrdersByIdResponses];

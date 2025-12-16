@@ -1,32 +1,19 @@
+import HomePageSlide from "@/components/Swipers/HomePageSlide";
 import { Link } from "react-router-dom";
 
-const HomePage = () => {
 
-
-  return (
-    <section>
-      <div className="container">
-        <h1>PALLSHOPPEN!</h1>
-
-        <Link to="/products">
-          <button className="btn"> Se produkter</button>
-        </Link>
+export default function HomePage() {
+return (
+  <section>
+    <div className="home">
+        <div>
+          <h1>Pallar, spån och annat du inte visste att du behövde</h1>
+          <Link to="/products" className="btn btn-primary">Till alla produkter</Link>
+        </div>
         
-        <Link to={"/admin"}>
-            <button className="btn">Admin </button>
-        </Link>
+        <HomePageSlide />
 
-      </div>
-      <div className="home-img-container">
-        <img className="home-img" src="src\images\Home.jpg" alt="" />
-        <img className="home-img" src="src\images\Home2.jpg" alt="" />
-        <img className="home-img" src="src\images\Home3.jpg" alt="" />
-        <img  className="home-img"src="src\images\Home4.jpg" alt="" />
-        <img className="home-img" src="src\images\Home5.jpg" alt="" />
-        <img className="home-img" src="src\images\Home6.jpg" alt="" />
-      </div>
-    </section>
+    </div>
+  </section>
   );
-};
-
-export default HomePage;
+}
