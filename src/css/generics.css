@@ -1,7 +1,7 @@
 
 
   :root{
-    --background: #212121;
+    --background: radial-gradient( circle at top,#262626 0%, #1f1f1f 45%,#1b1b1b 100%  );
     --foreground: #ebe8e0;
     --card: #292929;
     --popover: #292929;
@@ -37,8 +37,10 @@
     --sidebar-border: #4b5563;
     --sidebar-ring: #818cf8;
 
-    --font-primary: "Zalando Sans SemiExpanded", sans-serif;
-    --font-secondary: "Electrolize", sans-serif;
+    --font-primary: 'Zalando Sans SemiExpanded', Courier, monospace;
+        /*<weight>: Use a value from 400 */
+    --font-secondary: 'Electrolize', Courier, monospace;
+        /*<weight>: Use a value from 200 to 900 */
     --font-comp: sans-serif;
 
     --radius2: .2rem;
@@ -59,6 +61,13 @@
     --gradient-primary: linear-gradient(135deg,var(--primary),var(--chart-5));
     --gradient-accent: linear-gradient(135deg,var(--accent),var(--muted));
     --gradient-hero: linear-gradient(135deg,var(--secondary),var(--primary));
+
+    --gradient-1: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.0));
+    --gradient-1-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    --gradient-2: linear-gradient(180deg, #f6f7f9 0%, #eef1f5 100%);
+    --gradient-3: linear-gradient(160deg, #1f2933 0%, #111827 100%);
+    --gradient-4: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+
   }
   /*#region Helper classes */
   .center-content {
