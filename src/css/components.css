@@ -354,6 +354,8 @@ button:hover{
 .is-disabled:active {
      transform: none;
 }
+
+
 /*#endregion */ 
 /*#region form */
 .form{
@@ -637,5 +639,45 @@ button:hover{
 .badge-oos{
     background-color: var(--destructive);
 }
+
+/*#endregion */
+/*#region home */
+.home-cta{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap:1rem;
+    h1{
+        font-family:var(--font-secondary);
+        font-size: 46px;
+        font-weight: 800;
+        border-bottom: 1px solid var(--border);
+    }
+    .cta-btn{
+    position: relative;
+    padding: 1.2rem 5rem;
+    font-size: 28px;
+    border: none;
+    background: var(--gradient-1);
+    overflow: hidden;
+    }
+
+    .cta-btn::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-1-hover);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    }
+
+    .cta-btn:hover::after{
+    opacity: 1;
+    }
+
+
+}
+
 
 /*#endregion */
