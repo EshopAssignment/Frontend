@@ -1,0 +1,74 @@
+.promo-card-slide{
+  width: 100%;
+  height: 100%;
+}
+.promo-card-image{
+    width: 950svh;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    z-index: -1;
+}
+
+.promo-card-media {
+  width: 100svw;
+  height: 700px; 
+}
+.home-promos {
+  display: grid;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+
+.promo-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.promo-card-overlay {
+      pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 2rem;
+  color: #fff;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.65),
+    rgba(0, 0, 0, 0.05)
+  );
+}
+.promo-card-group,
+.promo-card-group .btn {
+  pointer-events: auto;
+}
+
+.promo-card-title {
+  margin: 0;
+}
+
+.promo-card-subtitle {
+  margin: 0;
+  opacity: 0.9;
+  max-width: 46ch;
+}
+
+.promo-card-group{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.home-promo-section-top{
+    padding:2rem 1rem;
+}

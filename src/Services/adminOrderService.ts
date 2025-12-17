@@ -14,12 +14,11 @@ type PatchArgs = Parameters<typeof sdk.patchApiAdminOrdersByIdStatus>[0];
 type PatchBody = NonNullable<PatchArgs>["body"];
 export type AdminOrderStatus = PatchBody extends { orderStatus: infer S } ? S : never;
 
-
 export async function listOrders(opts: {
   page: number;
   pageSize: number;
   query?: string;
-  status?: string;       
+  status?: string;
   from?: Date | string;
   to?: Date | string;
 }): Promise<AdminPagedOrders> {

@@ -6,5 +6,10 @@
 @import "./components.css";
 @import "./headless.css";
 @import "./admin.css";
+@import "./stripe.css";
+@import "./swiper-extra.css";
+
+@import 'swiper/css/bundle';
 @import "tailwindcss";
-@import "./stripe.css"
+
+

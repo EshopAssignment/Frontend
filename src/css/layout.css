@@ -11,11 +11,7 @@
     justify-content: center;
     padding: 2rem;
 }
-/* .layout{
-        display: grid;
-        grid-template-rows: auto minmax(75svh, 1fr) auto;
-        min-height: 100vh;
-} */
+
 
 .confirmation-view{
     display: flex;
@@ -27,3 +23,20 @@
     background: var(--muted);
     border-radius: var(--radius2);
 }
+
+.home-group{
+    display: grid;
+    grid-template-rows: 1fr auto;
+    grid-template-rows:100svw auto ;
+    width: 100svw;
+}
+
+.img-group-3{
+    display: grid;
+    grid-template-columns: auto auto auto;
+    width: 100svw;
+    img{
+        width: 100%;
+    }
+}
+
