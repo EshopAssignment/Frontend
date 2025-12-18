@@ -30,10 +30,11 @@ function PromoSwiper({
               slidesPerView={2}
               autoplay={hasMany ? { delay: 3000, disableOnInteraction: false } : false}
               loop={hasMany}
+              
             >
               {slide.image.map((src, i) => (
                 <SwiperSlide className="promo-card-slide" key={`${slide.title}-${i}`}>
-                  <img className="promo-card-image" src={src} alt={slide.alt} />
+                  <img loading="lazy" className="promo-card-image" src={src} alt={slide.alt} />
                 </SwiperSlide>
               ))}
             </Swiper>

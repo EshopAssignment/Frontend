@@ -591,6 +591,7 @@ export type GetApiProductsData = {
         condition?: Array<string>;
         minPrice?: number | string;
         maxPrice?: number | string;
+        inStock?: boolean;
     };
     url: '/api/Products';
 };

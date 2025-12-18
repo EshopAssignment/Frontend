@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import {  adminCreateProduct, adminListProducts, adminToggleActive,    adminUpdateProduct,  adminUploadImage,  type AdminCreateReq,  type AdminUpdateReq} from "../../Services/adminProductService";                 
+import {  adminCreateProduct, adminListProducts, adminToggleActive, adminUploadImageFetch, adminUpdateProduct,  adminUploadImage,  type AdminCreateReq,  type AdminUpdateReq} from "../../Services/adminProductService";                 
 import ProductTable from "../../components/Admin/ProductTable";
 import ProductForm from "../../components/Admin/ProductFrom";
 
@@ -26,13 +26,18 @@ const AdminProducts = () => {
     }
   });
 
-  const updateMut = useMutation({
-    mutationFn: ({ id, body }: { id: number; body: AdminUpdateReq }) => adminUpdateProduct(id, body),
-    onSuccess: () => {
-      setEditing(null);
-      qc.invalidateQueries({ queryKey: ["admin-products"] }); 
-    }
-  });
+const updateMut = useMutation({
+  mutationFn: async ({ id, body, file }: { id: number; body: AdminUpdateReq; file?: File }) => {
+    const updated = await adminUpdateProduct(id, body);
+    if (file) await adminUploadImageFetch(id, file);
+    return updated;
+  },
+  onSuccess: (_, vars) => {
+    setEditing(null);
+    qc.invalidateQueries({ queryKey: ["admin-products"] });
+    qc.invalidateQueries({ queryKey: ["admin-product", vars.id] });
+  }
+});
 
   const toggleMut = useMutation({
     mutationFn: ({ id, isActive }: { id: number; isActive: boolean }) => adminToggleActive(id, isActive),
@@ -86,13 +91,11 @@ const AdminProducts = () => {
             <ProductForm
               title="Uppdatera produkt"
               productId={editing}
-              
               onCancel={() => setEditing(null)}
               onSubmit={(body, file) => {
-                updateMut.mutate({ id: editing!, body: body as AdminUpdateReq });
-                if (file) uploadMut.mutate({ id: editing!, file });
+                updateMut.mutate({ id: editing!, body: body as AdminUpdateReq, file });
               }}
-              loading={updateMut.isPending || uploadMut.isPending}
+              loading={updateMut.isPending}
             />
           )}
         </>

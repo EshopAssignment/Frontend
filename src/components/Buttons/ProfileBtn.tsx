@@ -26,7 +26,7 @@ export default function ProfileBtn() {
 
   if(!me){
     return(
-            <div className="">
+    <div className="">
         <Menu>
             <MenuButton className="">
             <i className="fa-regular fa-user"></i>

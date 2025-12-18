@@ -58,7 +58,7 @@
 
 .modal{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.45); z-index:1000 }
 .modal-panel{ background:var(--background); border:1px solid var(--border); border-radius:12px; padding:1rem; width:100%; max-width:640px }
-.form-grid{ display:grid; gap:.75rem }
+.form-grid{ display:grid; gap:.75rem; overflow-y: auto; max-height: 100svh; }
 .form-grid label{ display:flex; flex-direction:column; gap:.25rem }
 .form-grid .row.actions{ display:flex; justify-content:flex-end; gap:.5rem; margin-top:.5rem }
 .selector {

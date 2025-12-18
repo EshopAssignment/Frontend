@@ -26,7 +26,7 @@ const getBadgeClass = (qty:number) => {
 
 const getBadgeText = (qty: number) => {
     if (qty == 0 ) return "Slut i lager"
-  if (qty <= 20) return `Lågt saldo (${qty})`;
+  if (qty <= 20) return `Få kvar (${qty})`;
   return `(${qty} st)`
 }
   const disabled = available === 0;
@@ -41,7 +41,7 @@ const getBadgeText = (qty: number) => {
         
         <div className="divider"></div>
 
-        <div>
+        <div className="product-text">
           <span>{product.name}</span>
           <p>{product.description}</p>  
         </div>
@@ -51,7 +51,7 @@ const getBadgeText = (qty: number) => {
           <p>{product.priceExVat} kr/st</p>
           
           <div className={getBadgeClass(available)} aria-label={`Lagersaldo: ${available}`}>
-            {getBadgeText(available)}
+            <p> {getBadgeText(available)}</p>
           </div>
 
             <button

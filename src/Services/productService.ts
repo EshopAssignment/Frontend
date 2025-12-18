@@ -35,6 +35,7 @@ export async function getProductsPaged(
     condition?: string[];
     minPrice?: number;
     maxPrice?: number;
+    inStock?: boolean;
   } = {}
 ): Promise<PagedProducts> {
   const { signal, sort, ...rest } = opts;
@@ -48,6 +49,7 @@ export async function getProductsPaged(
     condition: rest.condition,
     minPrice: rest.minPrice,
     maxPrice: rest.maxPrice,
+    inStock: rest.inStock ? true : undefined,
   });
 
   const res = await sdk.getApiProducts({ client: api, query, signal });

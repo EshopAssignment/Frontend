@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 
 const RequestOrder = () => {
 
@@ -43,7 +44,7 @@ const RequestOrder = () => {
                     </div>
 
                     <div className="btn btn-submit">
-                        <button>Skicka</button>
+                        <Link to="#">Skicka</Link>
                     </div>
 
                 </div>

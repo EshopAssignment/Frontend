@@ -136,6 +136,21 @@ export async function adminToggleActive(id: number, isActive: boolean): Promise<
   throw new Error("Toggle endpoint saknas i SDK. Kontrollera OpenAPI och regenerera.");
 }
 
+export async function adminUploadImageFetch( id: number, file: File) :Promise<{imgUrl: string}> {
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch(`https://localhost:7152/api/admin/products/${id}/image`, {
+    method: "PUT",
+    body: form,
+
+    credentials:"include",
+  });
+
+  if(!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
 export async function adminUploadImage(id: number, file: File): Promise<{ imgUrl: string }> {
   const form = new FormData();
   form.append("file", file);
@@ -148,7 +163,12 @@ export async function adminUploadImage(id: number, file: File): Promise<{ imgUrl
 
   for (const fn of candidates) {
     if (fn in sdk) {
-      const res = await (sdk as any)[fn]({ client: api, path: { id }, body: form });
+      const res = await (sdk as any)[fn]({
+        client: api,
+        path: { id },
+        body: form,
+        mediaType: "multipart/form-data",
+      });
       if (res.error) throw res.error;
       return (res.data ?? { imgUrl: "" }) as { imgUrl: string };
     }

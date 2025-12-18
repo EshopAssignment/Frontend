@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { suggestProducts, type ProductSuggestionDto } from "../Services/productService";
 import { buildImageUrl } from "../helpers/url";
-import placeholder from "../Images/Placeholder.jpg";
+import placeholder from "../Images/placeholder.jpg";
 
 function toNumber(n: unknown): number | null {
   if (typeof n === "number" && Number.isFinite(n)) return n;
@@ -28,6 +28,7 @@ const Searchbar = () => {
   const debounced = useDebounce(query, 250);
   const nav = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
+
 
   const enabled = debounced.trim().length >= 2;
 
@@ -67,10 +68,12 @@ const Searchbar = () => {
     if (e.key === "Escape") setOpen(false);
   }
 
+
+
   return (
     <div
       ref={ref}
-      className="search-group"
+      className="search-group search-wrapper"
       role="combobox"
       aria-expanded={open}
       aria-owns="search-listbox"
@@ -102,7 +105,8 @@ const Searchbar = () => {
             items.length > 0 ? (
               <ul id="search-listbox" role="listbox" className="search-list">
                 {items.map((item, i) => {
-                  const imgSrc = buildImageUrl(item.imgUrl ?? "Placeholder.jpg");
+                  
+                  const imgSrc = buildImageUrl(item.imgUrl) || placeholder;
                   const skuOrSlug = item.sku ?? item.slug ?? `#${item.id}`;
                   return (
                     <li
@@ -115,17 +119,11 @@ const Searchbar = () => {
                       onClick={() => goto(item)}
                       className={`${i === active ? "search-item" : ""}`}
                     >
+                      <div className="search-info">
                       <img
                         src={imgSrc}
                         alt={item.name}
-                        loading="lazy"
-                        onError={e => {
-                          e.currentTarget.src = placeholder;
-                          e.currentTarget.removeAttribute("srcset");
-                          e.currentTarget.src = "/Placeholder.jpg";
-                        }}
                       />
-                      <div className="search-info">
                         <p>Produkt: {item.name}</p>
                         <p>Produktnummer: {skuOrSlug}</p>
                         <p>Pris: {formatSEK(item.priceExVat)}</p>
