@@ -45,13 +45,21 @@ export default function FilterBar() {
 
   function apply() {
     const next = new URLSearchParams(searchParams);
+
     if (localSort) next.set("sort", localSort); else next.delete("sort");
+
     next.delete("type");
     localType.forEach(t => next.append("type", t));
+
     next.delete("condition");
     localCondition.forEach(c => next.append("condition", c));
+
+    if (localInStock) next.set("inStock", "true");
+    else next.delete("inStock");
+
     if (localMinPrice) next.set("minPrice", localMinPrice); else next.delete("minPrice");
     if (localMaxPrice) next.set("maxPrice", localMaxPrice); else next.delete("maxPrice");
+
     next.delete("page");
     setSearchParams(next);
     setOpen(false);

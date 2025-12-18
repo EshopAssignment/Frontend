@@ -1,31 +1,32 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { adminGetProduct, adminGetProductOptions, type AdminCreateReq,type AdminProductOptions,type AdminUpdateReq,} from "../../Services/adminProductService";
+import { adminGetProduct, adminGetProductOptions, type AdminCreateReq, type AdminProductOptions, type AdminUpdateReq } from "../../Services/adminProductService";
 
 type Props = {
   title: string;
-  productId?: number; 
+  productId?: number;
   onSubmit: (body: AdminCreateReq | AdminUpdateReq, file?: File) => void;
   onCancel: () => void;
   loading?: boolean;
 };
 
 export default function ProductForm({ title, productId, onSubmit, onCancel, loading }: Props) {
-const idNum = typeof productId === "number" ? productId : Number(productId);
-const isEdit = Number.isFinite(idNum);
+  const idNum = typeof productId === "number" ? productId : Number(productId);
+  const isEdit = Number.isFinite(idNum);
 
+  const { data } = useQuery({
+    queryKey: ["admin-product", idNum],
+    queryFn: () => adminGetProduct(idNum!),
+    enabled: isEdit,
+    staleTime: 10_000,
+  });
 
-const { data } = useQuery({
-  queryKey: ["admin-product", idNum],
-  queryFn: () => adminGetProduct(idNum!),
-  enabled: isEdit,
-  staleTime: 10_000,
-});
   const { data: options } = useQuery<AdminProductOptions>({
     queryKey: ["admin-product-options"],
     queryFn: () => adminGetProductOptions(),
     staleTime: 60 * 60 * 1000,
   });
+
   const [form, setForm] = useState<AdminCreateReq>({
     name: "",
     description: "",
@@ -39,33 +40,33 @@ const { data } = useQuery({
 
   const [file, setFile] = useState<File | undefined>(undefined);
 
-useEffect(() => {
-  if (!isEdit || !data) return;
-  setForm({
-    name: data.name,
-    description: data.description,
-    palletType: data.palletType,
-    condition: data.condition,
-    imgUrl: data.imgUrl ?? "",
-    priceExVat: data.priceExVat,
-    onHand: data.onHand,
-    isActive: data.isActive,
-  });
-}, [isEdit, data]);
-useEffect(() => {
-  if (!options) return;
-  setForm(prev => ({
-    ...prev,
-    palletType: prev.palletType || options.productTypes[0]?.value || "",
-    condition: prev.condition || options.productConditions[0]?.value || "",
-  }));
-}, [options]);
+  useEffect(() => {
+    if (!isEdit || !data) return;
+    setForm({
+      name: data.name,
+      description: data.description,
+      palletType: data.palletType,
+      condition: data.condition,
+      imgUrl: data.imgUrl ?? "",
+      priceExVat: data.priceExVat,
+      onHand: data.onHand,
+      isActive: data.isActive,
+    });
+  }, [isEdit, data]);
+
+  useEffect(() => {
+    if (!options) return;
+    setForm(prev => ({
+      ...prev,
+      palletType: prev.palletType || options.productTypes[0]?.value || "",
+      condition: prev.condition || options.productConditions[0]?.value || "",
+    }));
+  }, [options]);
 
   const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : undefined), [file]);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-
     if (isEdit) {
       const body: AdminUpdateReq = { id: productId!, ...form };
       onSubmit(body, file);
@@ -73,17 +74,23 @@ useEffect(() => {
       onSubmit(form, file);
     }
   }
+  
+  useEffect(() => {
+  if (!previewUrl) return;
+  return () => URL.revokeObjectURL(previewUrl);
+}, [previewUrl]);
+
+
 
   return (
     <div className="modal">
       <div className="modal-panel">
         <h3>{title}</h3>
-
         <form onSubmit={submit} className="form-grid">
           <label>
             Namn
             <input
-            formNoValidate
+              formNoValidate
               className="input"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -133,7 +140,7 @@ useEffect(() => {
           <label>
             Pris exkl. moms
             <input
-            formNoValidate
+              formNoValidate
               className="input"
               type="number"
               step="0.01"
@@ -149,7 +156,7 @@ useEffect(() => {
           <label>
             Lager (On hand)
             <input
-            formNoValidate
+              formNoValidate
               className="input"
               type="number"
               min={0}
@@ -163,7 +170,7 @@ useEffect(() => {
 
           <label className="check">
             <input
-            formNoValidate
+              formNoValidate
               type="checkbox"
               checked={form.isActive}
               onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
@@ -178,7 +185,7 @@ useEffect(() => {
                 <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0])} />
               </label>
               {(previewUrl || form.imgUrl) && (
-                <div style={{ marginTop: ".5rem" }}>
+                <div>
                   <img
                     src={previewUrl || form.imgUrl}
                     alt="Preview"

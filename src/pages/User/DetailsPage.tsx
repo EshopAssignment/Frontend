@@ -58,7 +58,7 @@ const DetailsPage = () => {
     <div className="container">
         <Breadcrumbs
             trail={[
-            { label: "Hem", to: "/" },
+            { label: "Hem", to: " / " },
             { label: "Produkter", to: "/products" }, 
             { label: product.name }          
         ]}
@@ -78,7 +78,7 @@ const DetailsPage = () => {
 
                 <div className="details-price">
 
-                    <p>Pris/st: {product.priceExVat}</p>
+                    <p>Pris/st: {product.priceExVat} Kr</p>
                     <div className={getBadgeClass(available)} aria-label={`Lagersaldo: ${available}`}> Tillgängliga:
                         {getBadgeText(available)}
                     </div>

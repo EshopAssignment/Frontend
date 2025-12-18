@@ -25,13 +25,13 @@
   position: relative;
   display: block;
   width: 100%;
-  border-radius: 12px;
+  border-radius: var(--radius4);
   overflow: hidden;
   text-decoration: none;
 }
 
 .promo-card-overlay {
-      pointer-events: none;
+  pointer-events: none;
   position: absolute;
   inset: 0;
   z-index: 1000;
@@ -40,12 +40,9 @@
   justify-content: flex-end;
   gap: 1rem;
   padding: 2rem;
-  color: #fff;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.65),
-    rgba(0, 0, 0, 0.05)
-  );
+  color: #ffffff;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.05));
+
 }
 .promo-card-group,
 .promo-card-group .btn {
@@ -59,7 +56,7 @@
 .promo-card-subtitle {
   margin: 0;
   opacity: 0.9;
-  max-width: 46ch;
+  max-width: 50ch;
 }
 
 .promo-card-group{
