@@ -82,3 +82,6 @@
     transition: .4s;
     background-color: var(--sidebar-primary);
 }
+button.active{
+  color: var(--primary-hover);
+}

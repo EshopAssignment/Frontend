@@ -42,8 +42,14 @@ const getBadgeText = (qty: number) => {
         <div className="divider"></div>
 
         <div className="product-text">
-          <span>{product.name}</span>
-          <p>{product.description}</p>  
+          <div>
+            <span>{product.name}</span>
+            <p>{product.condition} | {product.palletType}</p>
+          </div>
+
+          <div>
+            <p className="card-description">{product.description}</p>  
+          </div>
         </div>
       </Link>
 

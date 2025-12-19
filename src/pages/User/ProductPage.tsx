@@ -6,12 +6,21 @@ import FilterBar from "../../components/FilterBar";
 import ItemCard from "../../components/ItemCard";
 import RequestOrder from "../../components/Orders/RequestOrder";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import ViewModeBtn from "@/components/Buttons/ViewModeBtn";
+import ProductListView from "@/components/Product/ProductListView";
 
 const PAGE_SIZE = 15;
+
+type ViewMode = "grid" | "list";
 
 const ProductPage = () => {
   const [page, setPage] = useState(1);
   const [searchParams] = useSearchParams();
+  const [viewMode, setViewMode] = useState<ViewMode>(()=> {
+    const saved = localStorage.getItem("productViewMode")
+    return saved === "list" ? "list" : "grid"
+  }); 
+
 
   const params = useMemo(() => {
     const q = searchParams.get("q") ?? "";
@@ -29,6 +38,10 @@ const ProductPage = () => {
     const min = Number.isFinite(minParsed as number) ? (minParsed as number) : undefined;
     const max = Number.isFinite(maxParsed as number) ? (maxParsed as number) : undefined;
 
+    const inStock = searchParams.get("inStock") === "true";
+
+    
+
     return {
       q: q || undefined,
       sort: sort || undefined,
@@ -36,6 +49,7 @@ const ProductPage = () => {
       condition: condition.length ? condition : undefined,
       min,
       max,
+      inStock,
       keyParts: [
         q || "",
         sort || "",
@@ -43,6 +57,7 @@ const ProductPage = () => {
         condition.join(","),
         minStr ?? "",
         maxStr ?? "",
+        String(inStock),
       ] as const,
     };
   }, [searchParams]);
@@ -57,7 +72,11 @@ const ProductPage = () => {
     JSON.stringify(params.condition),
     params.min,
     params.max,
+    params.inStock,
   ]);
+  useEffect(() => {
+    localStorage.setItem("productViewMode", viewMode);
+  }, [viewMode]);
 
   const { data, isLoading, isError, error, isFetching } = useQuery<PagedProducts>({
     queryKey: ["products", "paged", PAGE_SIZE, page, ...params.keyParts],
@@ -65,11 +84,12 @@ const ProductPage = () => {
       getProductsPaged(page, PAGE_SIZE, {
         signal,
         query: params.q,
-        sort: params.sort as any,        
+        sort: params.sort as any,
         type: params.type,
         condition: params.condition,
         minPrice: params.min,
         maxPrice: params.max,
+        inStock: params.inStock, 
       }),
     placeholderData: keepPreviousData,
     staleTime: 10_000,
@@ -99,7 +119,10 @@ const ProductPage = () => {
   return (
     <section>
       <div className="container">
-        <FilterBar />
+        <div className="product-toolbar">
+          <FilterBar />
+          <ViewModeBtn value={viewMode} onChange={setViewMode} />
+        </div>
 
         <div className="items">
           {isError && (
@@ -108,23 +131,29 @@ const ProductPage = () => {
             </p>
           )}
 
-          {params.q && <p className="search-hint">Sökresultat för: “{params.q}”</p>}
-
-          <div className="item-card-container">
-            {products.length === 0 ? (
-              <p>Inga matchande produkter.</p>
+            {viewMode === "grid" ? (
+              <div className="item-card-container">
+                {products.map(p => (
+                  <ItemCard key={p.id} product={p} />
+                ))}
+              </div>
             ) : (
-              products.map((p) => <ItemCard key={p.id} product={p} />)
+              <div className="product-list">
+                {products.map(p => (
+                  <ProductListView key={p.id} product={p} />
+                ))}
+              </div>
             )}
-          </div>
 
           <div className="pagination">
             <button onClick={prevPage} disabled={page === 1 || isFetching}>
               {"<"}
             </button>
+
             <span>
               Sida {page} av {totalPages} {isFetching ? " (uppdaterar…)" : ""}
             </span>
+
             <button onClick={nextPage} disabled={page === totalPages || isFetching}>
               {">"}
             </button>

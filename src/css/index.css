@@ -8,6 +8,7 @@
 @import "./admin.css";
 @import "./stripe.css";
 @import "./swiper-extra.css";
+@import "./responsive.css";
 
 @import 'swiper/css/bundle';
 @import "tailwindcss";
