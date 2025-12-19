@@ -1,4 +1,20 @@
-.filters-toolbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin:1rem 0}
+
+
+.filters-toolbar{
+  display:grid;
+  justify-content:space-between;
+  align-items:center;
+  gap:1rem;
+  margin:1rem 0;
+  .filters-right{
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .filters-left{
+    grid-column: 1;
+    grid-row:2;
+  }
+}
 .listbox{position:relative}
 .listbox-btn{border:1px solid var(--border);background:var(--popover);padding:.5rem .75rem;border-radius:8px}
 .listbox-options{position:absolute;z-index:50;min-width:220px;margin-top:.25rem;border:1px solid var(--border);background:var(--popover);border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,.2)}
