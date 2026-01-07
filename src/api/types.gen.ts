@@ -120,6 +120,7 @@ export type OrderCreatedDto = {
     grandTotal: number | string;
     orderStatus: OrderStatus;
     paymentStatus: PaymentStatus;
+    shippingAddress: ShippingAddressDto;
 };
 
 export type OrderStatus = number;
@@ -180,6 +181,21 @@ export type RegisterDto = {
     email: string;
     password: string;
     displayName: string;
+};
+
+export type ServicePointDto = {
+    id: string;
+    name: string;
+    street: string;
+    postalCode: string;
+    city: string;
+};
+
+export type SetShippingSelectionDto = {
+    carrier: string;
+    method: string;
+    shippingCost: number | string;
+    servicePointId: null | string;
 };
 
 export type ShippingAddressDto = {
@@ -650,6 +666,41 @@ export type GetApiProductsSuggestResponses = {
 };
 
 export type GetApiProductsSuggestResponse = GetApiProductsSuggestResponses[keyof GetApiProductsSuggestResponses];
+
+export type GetApiShippingServicePointsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        postalCode?: string;
+        city?: string;
+    };
+    url: '/api/Shipping/service-points';
+};
+
+export type GetApiShippingServicePointsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ServicePointDto>;
+};
+
+export type GetApiShippingServicePointsResponse = GetApiShippingServicePointsResponses[keyof GetApiShippingServicePointsResponses];
+
+export type PutApiShippingOrdersByOrderNumberSelectionData = {
+    body: SetShippingSelectionDto;
+    path: {
+        orderNumber: string;
+    };
+    query?: never;
+    url: '/api/Shipping/orders/{orderNumber}/selection';
+};
+
+export type PutApiShippingOrdersByOrderNumberSelectionResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type GetUsersMeData = {
     body?: never;
