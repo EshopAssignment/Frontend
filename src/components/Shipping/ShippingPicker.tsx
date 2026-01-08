@@ -64,32 +64,36 @@ export default function ShippingPicker ({orderNumber, postalCode, city, onSelect
     if(err) return <span className="container error-msg">{err}</span>
 
     return(
-        <div>
-            <span>Välj ombud</span>
+        <>
+            <div className="divider"></div>
+            <div className="shipping-picker">
+                <span>Välj ombud</span>
 
-            {points.length === 0 && <p>Inga ombud Hittades</p>}
+                {points.length === 0 && <p>Inga ombud Hittades</p>}
 
-            <ul>
-                {points.map(p => (
-                <li key={p.id}>
-                    <label>
-                    <input
-                        type="radio"
-                        name="servicePoint"
-                        checked={selected === p.id}
-                        onChange={() => setSelected(p.id)}
-                    />
-                    {p.name} ({p.street}, {p.postalCode} {p.city})
-                    </label>
-                </li>
-                ))}
-            </ul>
+                <ul className="carrier-options">
+                    {points.map(p => (
+                    <li key={p.id}>
+                        <label className="carrier-option">
+                        <input
+                            type="radio"
+                            name="servicePoint"
+                            checked={selected === p.id}
+                            onChange={() => setSelected(p.id)}
+                        />
+                        <img src="/src/images/Postnord.png" alt="postnord" />
+                        {p.name} ({p.street}, {p.postalCode} {p.city} )
+                        </label>
+                    </li>
+                    ))}
+                </ul>
 
-            <p>Frakt: <strong>{shippingCost} kr</strong></p>
+                <p>Frakt: <strong>{shippingCost} kr</strong></p>
 
-            <button onClick={save} disabled={!selected || saving}>
-                {saving ? "Sparar" : "Använder Detta ombud"}
-            </button>
-        </div>
+                <button className="btn btn-submit" onClick={save} disabled={!selected || saving}>
+                    {saving ? "Sparar" : "Bekräfta ombud"}
+                </button>
+            </div>
+        </>
     );
 }

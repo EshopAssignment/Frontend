@@ -7,6 +7,8 @@ import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import PersonalForm from "../Checkout/PersonalForm";
+import DeliveryForm from "../Checkout/DeliveryForm";
 
 const pk = import.meta.env.VITE_STRIPE_PK;
 if (!pk) throw new Error("VITE_STRIPE_PK saknas i .env");
@@ -126,46 +128,48 @@ export default function Checkout() {
   if (orderLoading || !order) return <p className="container">Laddar order…</p>;
 
   return (
-    <div className="container">
-      <div>Här är sammantällning av kundvagnen.</div>
-      <div>Här fyller vi i personuppgifter (dummy just nu)</div>
-      <div>Här fyller vi i Leverans uppgifter (dummy just nu)</div>
+    <section>
+      <div className="container">
 
-      {!shippingReady && (
-        <div style={{ marginTop: "1rem" }}>
-          <h3>Leveransval (ombud)</h3>
+        <div>Här är sammantällning av kundvagnen.</div>
+        
+        <PersonalForm />
+        
+        <DeliveryForm />
 
-          {!postalCode ? (
-            <p>Ingen postkod på ordern.</p>
-          ) : (
-            <ShippingPicker
+        {!shippingReady && (
+          <div>
+            {!postalCode ? (
+              <p>Ingen postkod på ordern.</p>
+            ) : (
+              <ShippingPicker
               orderNumber={orderNumber}
               postalCode={postalCode}
               onSelectionSaved={() => {
                 setShippingReady(true);
               }}
-            />
-          )}
-        </div>
-      )}
+              />
+            )}
+          </div>
+        )}
 
-      {shippingReady && (
-        <div style={{ marginTop: "1rem" }}>
-          {payLoading && !clientSecret && <p>Laddar betalning…</p>}
-
-          {clientSecret && (
-            <Elements
+        {shippingReady && (
+          <div className="stripe-container">
+            {payLoading && !clientSecret && <p>Laddar betalning…</p>}
+            {clientSecret && (
+              <Elements
               stripe={stripePromise}
               options={{
                 clientSecret,
                 appearance: { theme: "night" },
-              }}
-            >
-              <Form orderNumber={orderNumber} />
-            </Elements>
-          )}
-        </div>
-      )}
-    </div>
+                }}
+                >
+                <Form orderNumber={orderNumber} />
+              </Elements>
+            )}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
