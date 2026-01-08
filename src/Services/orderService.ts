@@ -73,8 +73,8 @@ export async function createOrderFromCart(
     customerPhoneNumber: "0809090901",
     shippingAddress: {
       street: "Pallgatan",
-      city: "Falkenberg",
-      postalCode: "31135",
+      city: "Varberg",
+      postalCode: "432 41",
       country: "SE",
     },
     items: cartItems.map((x) => ({
