@@ -228,5 +228,30 @@
         gap:1rem;
         border-bottom: 1px solid var(--border);
     }
-    
+    .details-price{
+        flex-direction: column;
+        width: 100%;
+        .badge{
+            display: flex;
+            flex-direction: row;
+            width: auto;
+            height: auto;
+        }
+    }
+    .cart{
+        padding:2rem;
+    }
+    .listbox-btn{
+        height:42px;
+        font-size: 12px;
+    }
+    .personal-form{
+        display: flex!important;
+        flex-direction: column;
+        max-width: 100svw;
+    }
+    .carrier-option{
+        max-width: 100svw;
+        width: auto;
+    }
 }
