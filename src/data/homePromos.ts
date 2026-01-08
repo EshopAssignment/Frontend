@@ -2,6 +2,7 @@ import type { HomeSlide } from "@/types/HomeSlide";
 import eu1 from "../../src/images/home4.jpg";
 import eu2 from "../../src/images/home5.jpg";
 import eu3 from "../../src/images/home6.jpg";
+import eu4 from "../../src/images/eu4.jpg";
 
 import dust1 from "../../src/images/RashBcopy.jpg";
 import dust2 from "../../src/images/RashB2.jpg";
@@ -10,6 +11,7 @@ import dust4 from "../../src/images/RashB4.jpg";
 
 import midget1 from "../../src/images/home2.jpg";
 import midget2 from "../../src/images/home3.jpg";
+import halvpall from "../../src/images/halvpall3.jpg";
    
    export const EuSlide: HomeSlide[] = [
         {
@@ -19,6 +21,7 @@ import midget2 from "../../src/images/home3.jpg";
             eu1,
             eu2,
             eu3,
+            eu4,
         ],
         alt: "EU-Pall",
         to: "/products?type=EuroPallet",
@@ -37,7 +40,7 @@ import midget2 from "../../src/images/home3.jpg";
         ],
         alt: "ovrigt",
         to: "/products?type=Other",
-        btnText: "Shoppa EU-pallar",
+        btnText: "Shoppa Övrigt",
     }
     ];
     export const HalfSlide: HomeSlide[] = [
@@ -47,9 +50,10 @@ import midget2 from "../../src/images/home3.jpg";
         image: [
             midget1,
             midget2,
+            halvpall,git 
         ],
         alt: "halfpallet",
         to: "/products?type=HalfPallet",
-        btnText: "Shoppa EU-pallar",
+        btnText: "Shoppa Halv-pallar",
     }
     ];
