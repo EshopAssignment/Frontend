@@ -109,6 +109,13 @@ export type LoginDto = {
     password: string;
 };
 
+export type MeDto = {
+    userId: number | string;
+    email: string;
+    displayName: null | string;
+    profile: UserProfileDto;
+};
+
 export type OrderCreatedDto = {
     orderId: number | string;
     orderNumber: string;
@@ -121,6 +128,7 @@ export type OrderCreatedDto = {
     orderStatus: OrderStatus;
     paymentStatus: PaymentStatus;
     shippingAddress: ShippingAddressDto;
+    userId: null | number | string;
 };
 
 export type OrderStatus = number;
@@ -207,6 +215,38 @@ export type ShippingAddressDto = {
 
 export type ToggleActiveRequest = {
     isActive: boolean;
+};
+
+export type UpdateProfileDto = {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    defaultShippingAddressId: null | number | string;
+};
+
+export type UpsertAddressDto = {
+    label: string;
+    street: string;
+    city: string;
+    postalCode: string;
+    country: string;
+};
+
+export type UserAddressDto = {
+    id: number | string;
+    label: string;
+    street: string;
+    city: string;
+    postalCode: string;
+    country: string;
+};
+
+export type UserProfileDto = {
+    fristName: string;
+    lastName: string;
+    phone: string;
+    defaultShippingAddressId: null | number | string;
+    addresses: Array<UserAddressDto>;
 };
 
 export type GetApiAdminOrdersData = {
@@ -480,6 +520,50 @@ export type PostAuthRefreshData = {
 };
 
 export type PostAuthRefreshResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetApiMeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/Me';
+};
+
+export type GetApiMeResponses = {
+    /**
+     * OK
+     */
+    200: MeDto;
+};
+
+export type GetApiMeResponse = GetApiMeResponses[keyof GetApiMeResponses];
+
+export type PutApiMeProfileData = {
+    body: UpdateProfileDto;
+    path?: never;
+    query?: never;
+    url: '/api/Me/profile';
+};
+
+export type PutApiMeProfileResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PostApiMeAddressesData = {
+    body: UpsertAddressDto;
+    path?: never;
+    query?: never;
+    url: '/api/Me/addresses';
+};
+
+export type PostApiMeAddressesResponses = {
     /**
      * OK
      */
