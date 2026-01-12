@@ -50,7 +50,7 @@ import halvpall from "../../src/images/halvpall3.jpg";
         image: [
             midget1,
             midget2,
-            halvpall,git 
+            halvpall,
         ],
         alt: "halfpallet",
         to: "/products?type=HalfPallet",
