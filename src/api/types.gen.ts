@@ -114,6 +114,7 @@ export type MeDto = {
     email: string;
     displayName: null | string;
     profile: UserProfileDto;
+    roles: Array<string>;
 };
 
 export type OrderCreatedDto = {
@@ -246,7 +247,7 @@ export type UserAddressDto = {
 };
 
 export type UserProfileDto = {
-    fristName: string;
+    firstName: string;
     lastName: string;
     phone: string;
     defaultShippingAddressId: null | number | string;
@@ -534,7 +535,7 @@ export type GetApiMeData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/api/Me';
+    url: '/api/me';
 };
 
 export type GetApiMeResponses = {
@@ -550,7 +551,7 @@ export type PutApiMeProfileData = {
     body: UpdateProfileDto;
     path?: never;
     query?: never;
-    url: '/api/Me/profile';
+    url: '/api/me/profile';
 };
 
 export type PutApiMeProfileResponses = {
@@ -564,7 +565,7 @@ export type PostApiMeAddressesData = {
     body: UpsertAddressDto;
     path?: never;
     query?: never;
-    url: '/api/Me/addresses';
+    url: '/api/me/addresses';
 };
 
 export type PostApiMeAddressesResponses = {
@@ -798,20 +799,6 @@ export type PutApiShippingOrdersByOrderNumberSelectionData = {
 };
 
 export type PutApiShippingOrdersByOrderNumberSelectionResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
-export type GetUsersMeData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/users/me';
-};
-
-export type GetUsersMeResponses = {
     /**
      * OK
      */
