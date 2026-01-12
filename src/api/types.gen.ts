@@ -199,6 +199,10 @@ export type ServicePointDto = {
     city: string;
 };
 
+export type SetDefaultAddressDto = {
+    defaultShippingAddressId: null | number | string;
+};
+
 export type SetShippingSelectionDto = {
     carrier: string;
     method: string;
@@ -564,6 +568,20 @@ export type PostApiMeAddressesData = {
 };
 
 export type PostApiMeAddressesResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PatchApiMeProfileDefaultAddressData = {
+    body: SetDefaultAddressDto;
+    path?: never;
+    query?: never;
+    url: '/api/Me/profile/default-address';
+};
+
+export type PatchApiMeProfileDefaultAddressResponses = {
     /**
      * OK
      */
