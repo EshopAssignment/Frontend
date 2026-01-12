@@ -1,34 +1,71 @@
-import {api} from "@/lib/http";
+import { api } from "@/lib/http";
 import * as sdk from "@/api/sdk.gen";
 
-import type { MeDto, UpdateProfileDto, UpsertAddressDto } from "@/api";
+export type MeDto = NonNullable<
+  Awaited<ReturnType<typeof sdk.getApiMe>>["data"]
+>;
 
-export async function getMe() {
-    const res = await sdk.getApiMe({client: api})
-    if (res.error) throw res.error
-    return res.data as MeDto;
+export type UpdateProfileDto = Parameters<typeof sdk.putApiMeProfile>[0]["body"];
+
+export type UpsertAddressDto = Parameters<typeof sdk.postApiMeAddresses>[0]["body"];
+
+export type SetDefaultAddressDto =
+  Parameters<typeof sdk.patchApiMeProfileDefaultAddress>[0]["body"];
+
+export async function getMe(opts?: { signal?: AbortSignal }): Promise<MeDto> {
+  const res = await sdk.getApiMe({
+    client: api,
+    signal: opts?.signal,
+  });
+  if (res.error) throw res.error;
+  const data = res.data!;
+  data.roles ??= [];
+  return data;
 }
 
-export async function updateProfile(body: UpdateProfileDto) {
-    const res = await sdk.putApiMeProfile({
-        client: api,
-        body,
-    });
-    if (res.error) throw res.error;
-    return;
+export async function updateProfile(
+  body: UpdateProfileDto,
+  opts?: { signal?: AbortSignal }
+): Promise<void> {
+  const res = await sdk.putApiMeProfile({
+    client: api,
+    body,
+    signal: opts?.signal,
+  });
+  if (res.error) throw res.error;
 }
 
-export async function createAddress(body:UpsertAddressDto) {
-    const res = await sdk.postApiMeAddresses({
-        client: api,
-        body
-    });
-    if (res.error) throw res.error;
-    return;    
+export async function addAddress(
+  body: UpsertAddressDto,
+  opts?: { signal?: AbortSignal }
+): Promise<void> {
+  const res = await sdk.postApiMeAddresses({
+    client: api,
+    body,
+    signal: opts?.signal,
+  });
+  if (res.error) throw res.error;
 }
 
-//helper for asycing added address to view.
-export async function addAddressReload(body: UpsertAddressDto) {
-    await createAddress(body);
-    return await getMe();
+export async function setDefaultShippingAddress(
+  defaultShippingAddressId: number | null,
+  opts?: { signal?: AbortSignal }
+): Promise<void> {
+  const body: SetDefaultAddressDto = { defaultShippingAddressId };
+
+  const res = await sdk.patchApiMeProfileDefaultAddress({
+    client: api,
+    body,
+    signal: opts?.signal,
+  });
+  if (res.error) throw res.error;
+}
+
+//cclanker made helper.
+export async function addAddressAndReload(
+  body: UpsertAddressDto,
+  opts?: { signal?: AbortSignal }
+): Promise<MeDto> {
+  await addAddress(body, opts);
+  return await getMe(opts);
 }

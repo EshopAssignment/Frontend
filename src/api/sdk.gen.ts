@@ -2,7 +2,7 @@
 
 import { type Client, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
 import { client } from './client.gen';
-import type { GetApiAdminOrdersByIdData, GetApiAdminOrdersByIdErrors, GetApiAdminOrdersByIdResponses, GetApiAdminOrdersData, GetApiAdminOrdersResponses, GetApiAdminProductsData, GetApiAdminProductsOptionsData, GetApiAdminProductsOptionsResponses, GetApiAdminProductsResponses, GetApiMeData, GetApiMeResponses, GetApiOrderByIdData, GetApiOrderByIdErrors, GetApiOrderByIdResponses, GetApiOrderByNumberByOrderNumberData, GetApiOrderByNumberByOrderNumberErrors, GetApiOrderByNumberByOrderNumberResponses, GetApiProductsByIdData, GetApiProductsByIdErrors, GetApiProductsByIdResponses, GetApiProductsData, GetApiProductsResponses, GetApiProductsSuggestData, GetApiProductsSuggestResponses, GetApiShippingServicePointsData, GetApiShippingServicePointsResponses, GetProductByIdAdminData, GetProductByIdAdminErrors, GetProductByIdAdminResponses, GetUsersMeData, GetUsersMeResponses, PatchApiAdminOrdersByIdStatusData, PatchApiAdminOrdersByIdStatusErrors, PatchApiAdminOrdersByIdStatusResponses, PatchApiAdminProductsByIdActivateData, PatchApiAdminProductsByIdActivateResponses, PostApiAdminProductsData, PostApiAdminProductsResponses, PostApiMeAddressesData, PostApiMeAddressesResponses, PostApiOrderData, PostApiOrderErrors, PostApiOrderResponses, PostApiPaymentsCreateIntentData, PostApiPaymentsCreateIntentResponses, PostApiPaymentsWebhookData, PostApiPaymentsWebhookResponses, PostAuthLoginData, PostAuthLoginResponses, PostAuthLogoutData, PostAuthLogoutResponses, PostAuthRefreshData, PostAuthRefreshResponses, PostAuthRegisterData, PostAuthRegisterResponses, PutApiAdminProductsByIdData, PutApiAdminProductsByIdImageData, PutApiAdminProductsByIdImageResponses, PutApiAdminProductsByIdResponses, PutApiMeProfileData, PutApiMeProfileResponses, PutApiShippingOrdersByOrderNumberSelectionData, PutApiShippingOrdersByOrderNumberSelectionResponses } from './types.gen';
+import type { GetApiAdminOrdersByIdData, GetApiAdminOrdersByIdErrors, GetApiAdminOrdersByIdResponses, GetApiAdminOrdersData, GetApiAdminOrdersResponses, GetApiAdminProductsData, GetApiAdminProductsOptionsData, GetApiAdminProductsOptionsResponses, GetApiAdminProductsResponses, GetApiMeData, GetApiMeResponses, GetApiOrderByIdData, GetApiOrderByIdErrors, GetApiOrderByIdResponses, GetApiOrderByNumberByOrderNumberData, GetApiOrderByNumberByOrderNumberErrors, GetApiOrderByNumberByOrderNumberResponses, GetApiProductsByIdData, GetApiProductsByIdErrors, GetApiProductsByIdResponses, GetApiProductsData, GetApiProductsResponses, GetApiProductsSuggestData, GetApiProductsSuggestResponses, GetApiShippingServicePointsData, GetApiShippingServicePointsResponses, GetProductByIdAdminData, GetProductByIdAdminErrors, GetProductByIdAdminResponses, PatchApiAdminOrdersByIdStatusData, PatchApiAdminOrdersByIdStatusErrors, PatchApiAdminOrdersByIdStatusResponses, PatchApiAdminProductsByIdActivateData, PatchApiAdminProductsByIdActivateResponses, PatchApiMeProfileDefaultAddressData, PatchApiMeProfileDefaultAddressResponses, PostApiAdminProductsData, PostApiAdminProductsResponses, PostApiMeAddressesData, PostApiMeAddressesResponses, PostApiOrderData, PostApiOrderErrors, PostApiOrderResponses, PostApiPaymentsCreateIntentData, PostApiPaymentsCreateIntentResponses, PostApiPaymentsWebhookData, PostApiPaymentsWebhookResponses, PostAuthLoginData, PostAuthLoginResponses, PostAuthLogoutData, PostAuthLogoutResponses, PostAuthRefreshData, PostAuthRefreshResponses, PostAuthRegisterData, PostAuthRegisterResponses, PutApiAdminProductsByIdData, PutApiAdminProductsByIdImageData, PutApiAdminProductsByIdImageResponses, PutApiAdminProductsByIdResponses, PutApiMeProfileData, PutApiMeProfileResponses, PutApiShippingOrdersByOrderNumberSelectionData, PutApiShippingOrdersByOrderNumberSelectionResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -96,10 +96,10 @@ export const postAuthLogout = <ThrowOnError extends boolean = false>(options?: O
 
 export const postAuthRefresh = <ThrowOnError extends boolean = false>(options?: Options<PostAuthRefreshData, ThrowOnError>) => (options?.client ?? client).post<PostAuthRefreshResponses, unknown, ThrowOnError>({ url: '/auth/refresh', ...options });
 
-export const getApiMe = <ThrowOnError extends boolean = false>(options?: Options<GetApiMeData, ThrowOnError>) => (options?.client ?? client).get<GetApiMeResponses, unknown, ThrowOnError>({ url: '/api/Me', ...options });
+export const getApiMe = <ThrowOnError extends boolean = false>(options?: Options<GetApiMeData, ThrowOnError>) => (options?.client ?? client).get<GetApiMeResponses, unknown, ThrowOnError>({ url: '/api/me', ...options });
 
 export const putApiMeProfile = <ThrowOnError extends boolean = false>(options: Options<PutApiMeProfileData, ThrowOnError>) => (options.client ?? client).put<PutApiMeProfileResponses, unknown, ThrowOnError>({
-    url: '/api/Me/profile',
+    url: '/api/me/profile',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -108,7 +108,16 @@ export const putApiMeProfile = <ThrowOnError extends boolean = false>(options: O
 });
 
 export const postApiMeAddresses = <ThrowOnError extends boolean = false>(options: Options<PostApiMeAddressesData, ThrowOnError>) => (options.client ?? client).post<PostApiMeAddressesResponses, unknown, ThrowOnError>({
-    url: '/api/Me/addresses',
+    url: '/api/me/addresses',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const patchApiMeProfileDefaultAddress = <ThrowOnError extends boolean = false>(options: Options<PatchApiMeProfileDefaultAddressData, ThrowOnError>) => (options.client ?? client).patch<PatchApiMeProfileDefaultAddressResponses, unknown, ThrowOnError>({
+    url: '/api/me/profile/default-address',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -156,5 +165,3 @@ export const putApiShippingOrdersByOrderNumberSelection = <ThrowOnError extends 
         ...options.headers
     }
 });
-
-export const getUsersMe = <ThrowOnError extends boolean = false>(options?: Options<GetUsersMeData, ThrowOnError>) => (options?.client ?? client).get<GetUsersMeResponses, unknown, ThrowOnError>({ url: '/users/me', ...options });
