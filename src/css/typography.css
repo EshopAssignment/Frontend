@@ -25,6 +25,17 @@ i{
     color:var(--destructive);
     font-size:26px;
     text-align: center;
+    border:1px solid var(--destructive);
+    border-radius: var(--radius6);
+}
+.success{
+    color:var(--accent);
+    font-size:26px;
+    text-align: center;
+    border:1px solid var(--accent);
+    padding:1rem;
+    border-radius: var(--radius6);
+
 }
 .form-error{
     padding:.3rem;
@@ -49,6 +60,7 @@ i{
         animation: spin 1s linear infinite;
     }
 }
+
 
 @keyframes spin {
     from {

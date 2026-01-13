@@ -1,4 +1,4 @@
-import { login } from "@/Services/authService";
+import { useLogin } from "@/queries/auth";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -21,10 +21,13 @@ export default function SignInForm() {
   const loc = useLocation() as any;
   const from = loc.state?.from?.pathname ?? "/";
 
+
+const mut = useLogin();
+
 const onSubmit = async (data: FormValues) => {
   setServerErr(null);
   try {
-    await login(data.email, data.password); 
+    await mut.mutateAsync({ email: data.email, password: data.password });
     nav(from, { replace: true });
   } catch {
     setServerErr("Inloggning misslyckades. Kontrollera e-post och lösenord.");
