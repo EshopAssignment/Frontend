@@ -579,7 +579,7 @@ export type PatchApiMeProfileDefaultAddressData = {
     body: SetDefaultAddressDto;
     path?: never;
     query?: never;
-    url: '/api/Me/profile/default-address';
+    url: '/api/me/profile/default-address';
 };
 
 export type PatchApiMeProfileDefaultAddressResponses = {
