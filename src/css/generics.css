@@ -70,17 +70,17 @@
 
   }
   /*#region Helper classes */
-  .center-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
+.center-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
 
-  a.active {
-    transition: .4s;
-    background-color: var(--sidebar-primary);
+a.active {
+  transition: .4s;
+  background-color: var(--sidebar-primary);
 }
 button.active{
   color: var(--primary-hover);

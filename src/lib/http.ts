@@ -6,6 +6,7 @@ function normalizeBase(url?: string) {
   return (url ?? "").replace(/\/+$/, "");
 }
 
+//certified clankermade component.
 const BASE = normalizeBase(import.meta.env.VITE_API_URL);
 
 async function doRefresh(): Promise<Response> {
