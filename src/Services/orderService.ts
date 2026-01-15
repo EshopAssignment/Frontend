@@ -12,27 +12,45 @@ export type OrderByIdDto = NonNullable<
 export type OrderByNumberDto = NonNullable<
   Awaited<ReturnType<typeof sdk.getApiOrderByNumberByOrderNumber>>["data"]
 >;
+export type UpdateOrderCustomerRequest =
+  Parameters<typeof sdk.patchApiOrderByNumberByOrderNumberCustomer>[0]["body"];
+
+export type UpdateOrderShippingAddressRequest =
+  Parameters<typeof sdk.patchApiOrderByNumberByOrderNumberShippingAddress>[0]["body"];
+
 
 export type OrderDto = (OrderByIdDto | OrderByNumberDto) & {
-  shippingAddress: {
+  orderNumber: string;
+  shippingCost: number;
+  grandTotal: number;
+  productsSubtotal: number;
+  taxTotal: number;
+
+  shippingAddress?: {
     street: string;
     city: string;
     postalCode: string;
     country: string;
-  };
-  shippingCost: number;
-  grandTotal?: number;
-  productsSubtotal?: number;
-  taxTotal?: number;
-  orderNumber?: string;
+  } | null;
+
+  customerFirstName?: string | null;
+  customerLastName?: string | null;
+  customerEmail?: string | null;
+  customerPhoneNumber?: string | null;
+
+  shippingCarrier?: string | null;
+  shippingMethod?: string | null;
 };
+
+
+
+
 function toNum(x: any): number {
   const n = typeof x === "string" ? Number(x) : typeof x === "number" ? x : NaN;
   return Number.isFinite(n) ? n : 0;
 }
 
 function normalizeOrder(o: any): OrderDto {
-
   const shippingAddress =
     o?.shippingAddress ??
     o?.ShippingAddress ??
@@ -40,19 +58,36 @@ function normalizeOrder(o: any): OrderDto {
     o?.shipping ??
     null;
 
-  return {
+  const hasAddress =
+    shippingAddress &&
+    String(shippingAddress?.postalCode ?? shippingAddress?.PostalCode ?? "").trim().length > 0;
+
+console.log("[normalize raw]", o);
+  
+return {
     ...o,
-    orderNumber: o?.orderNumber ?? o?.OrderNumber ?? o?.number ?? o?.orderNo,
+    orderNumber: String(o?.orderNumber ?? o?.OrderNumber ?? o?.number ?? o?.orderNo ?? ""),
     shippingCost: toNum(o?.shippingCost ?? o?.ShippingCost ?? o?.deliveryCost ?? 0),
     grandTotal: toNum(o?.grandTotal ?? o?.GrandTotal ?? 0),
     productsSubtotal: toNum(o?.productsSubtotal ?? o?.ProductsSubtotal ?? 0),
     taxTotal: toNum(o?.taxTotal ?? o?.TaxTotal ?? 0),
-    shippingAddress: {
-      street: String(shippingAddress?.street ?? shippingAddress?.Street ?? ""),
-      city: String(shippingAddress?.city ?? shippingAddress?.City ?? ""),
-      postalCode: String(shippingAddress?.postalCode ?? shippingAddress?.PostalCode ?? ""),
-      country: String(shippingAddress?.country ?? shippingAddress?.Country ?? "SE"),
-    },
+
+    customerFirstName: o?.customerFirstName ?? o?.CustomerFirstName ?? null,
+    customerLastName: o?.customerLastName ?? o?.CustomerLastName ?? null,
+    customerEmail: o?.customerEmail ?? o?.CustomerEmail ?? null,
+    customerPhoneNumber: o?.customerPhoneNumber ?? o?.CustomerPhoneNumber ?? null,
+
+    shippingCarrier: o?.shippingCarrier ?? o?.ShippingCarrier ?? null,
+    shippingMethod: o?.shippingMethod ?? o?.ShippingMethod ?? null,
+
+    shippingAddress: hasAddress
+      ? {
+          street: String(shippingAddress?.street ?? shippingAddress?.Street ?? ""),
+          city: String(shippingAddress?.city ?? shippingAddress?.City ?? ""),
+          postalCode: String(shippingAddress?.postalCode ?? shippingAddress?.PostalCode ?? ""),
+          country: String(shippingAddress?.country ?? shippingAddress?.Country ?? "SE"),
+        }
+      : null,
   };
 }
 
@@ -66,29 +101,17 @@ export async function createOrderFromCart(
   cartItems: CartItem[],
   cartId: string
 ): Promise<OrderCreatedDto> {
-  const body: CreateOrderRequest = {
-    customerFirstName: "Pall",
-    customerLastName: "McPall",
-    customerEmail: "pall.mcpall@pall.pall",
-    customerPhoneNumber: "0809090901",
-    shippingAddress: {
-      street: "Pallgatan",
-      city: "Varberg",
-      postalCode: "432 41",
-      country: "SE",
-    },
-    items: cartItems.map((x) => ({
-      productId: x.productId,
-      quantity: x.quantity,
-    })),
-    reservationTtlMinutes: 60,
-    cartId,
-    currency: "SEK",
+    const body: CreateOrderRequest = {
+      items: cartItems.map((x) => ({
+        productId: x.productId,
+        quantity: x.quantity,
+      })),
+      reservationTtlMinutes: 60,
+      cartId,
+      currency: "SEK",
+    };
 
-    shippingCost: 0,
-  };
-
-  return createOrder(body);
+    return createOrder(body)
 }
 
 export async function getOrderById(
@@ -114,5 +137,25 @@ export async function getOrderByNumber(
     signal: opts?.signal,
   });
   if (res.error) throw res.error;
+  
   return normalizeOrder(res.data!);
 }
+
+export async function updateOrderCustomer(orderNumber: string, body: UpdateOrderCustomerRequest) {
+  const res = await sdk.patchApiOrderByNumberByOrderNumberCustomer({
+    client:api,
+    path: {orderNumber},
+    body,
+  });
+  if (res.error) throw res.error
+
+}
+export async function updateOrderShippingAddress(orderNumber: string, body: UpdateOrderShippingAddressRequest) {
+  const res = await sdk.patchApiOrderByNumberByOrderNumberShippingAddress({
+    client: api,
+    path: { orderNumber },
+    body,
+  });
+  if (res.error) throw res.error;
+}
+

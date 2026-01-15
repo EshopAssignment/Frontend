@@ -92,15 +92,9 @@ export type CreateOrderItemRequestDto = {
 };
 
 export type CreateOrderRequestDto = {
-    customerFirstName: string;
-    customerLastName: string;
-    customerEmail: string;
-    customerPhoneNumber: string;
-    shippingAddress: ShippingAddressDto;
     items: Array<CreateOrderItemRequestDto>;
     cartId: string;
     currency?: string;
-    shippingCost?: null | number | string;
     reservationTtlMinutes?: number | string;
 };
 
@@ -128,7 +122,7 @@ export type OrderCreatedDto = {
     grandTotal: number | string;
     orderStatus: OrderStatus;
     paymentStatus: PaymentStatus;
-    shippingAddress: ShippingAddressDto;
+    shippingAddress: null | ShippingAddressDto;
     userId: null | number | string;
 };
 
@@ -220,6 +214,20 @@ export type ShippingAddressDto = {
 
 export type ToggleActiveRequest = {
     isActive: boolean;
+};
+
+export type UpdateOrderCustomerDto = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: null | string;
+};
+
+export type UpdateOrderShippingAddressDto = {
+    street: string;
+    city: string;
+    postalCode: string;
+    country?: string;
 };
 
 export type UpdateProfileDto = {
@@ -667,6 +675,68 @@ export type GetApiOrderByNumberByOrderNumberResponses = {
 };
 
 export type GetApiOrderByNumberByOrderNumberResponse = GetApiOrderByNumberByOrderNumberResponses[keyof GetApiOrderByNumberByOrderNumberResponses];
+
+export type PatchApiOrderByNumberByOrderNumberCustomerData = {
+    body: UpdateOrderCustomerDto;
+    path: {
+        orderNumber: string;
+    };
+    query?: never;
+    url: '/api/Order/by-number/{orderNumber}/customer';
+};
+
+export type PatchApiOrderByNumberByOrderNumberCustomerErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PatchApiOrderByNumberByOrderNumberCustomerError = PatchApiOrderByNumberByOrderNumberCustomerErrors[keyof PatchApiOrderByNumberByOrderNumberCustomerErrors];
+
+export type PatchApiOrderByNumberByOrderNumberCustomerResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type PatchApiOrderByNumberByOrderNumberCustomerResponse = PatchApiOrderByNumberByOrderNumberCustomerResponses[keyof PatchApiOrderByNumberByOrderNumberCustomerResponses];
+
+export type PatchApiOrderByNumberByOrderNumberShippingAddressData = {
+    body: UpdateOrderShippingAddressDto;
+    path: {
+        orderNumber: string;
+    };
+    query?: never;
+    url: '/api/Order/by-number/{orderNumber}/shipping-address';
+};
+
+export type PatchApiOrderByNumberByOrderNumberShippingAddressErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PatchApiOrderByNumberByOrderNumberShippingAddressError = PatchApiOrderByNumberByOrderNumberShippingAddressErrors[keyof PatchApiOrderByNumberByOrderNumberShippingAddressErrors];
+
+export type PatchApiOrderByNumberByOrderNumberShippingAddressResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type PatchApiOrderByNumberByOrderNumberShippingAddressResponse = PatchApiOrderByNumberByOrderNumberShippingAddressResponses[keyof PatchApiOrderByNumberByOrderNumberShippingAddressResponses];
 
 export type PostApiPaymentsCreateIntentData = {
     body: CreateIntentRequest;

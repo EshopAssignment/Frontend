@@ -5,7 +5,7 @@ import ShippingPicker from "@/components/Shipping/ShippingPicker";
 
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import PersonalForm from "../Checkout/PersonalForm";
 import DeliveryForm from "../Checkout/DeliveryForm";
@@ -52,79 +52,92 @@ export default function Checkout() {
   const [order, setOrder] = useState<OrderDto | null>(null);
   const [orderLoading, setOrderLoading] = useState(false);
 
-  const [shippingReady, setShippingReady] = useState(false);
-
   const [clientSecret, setClientSecret] = useState<string | undefined>(undefined);
   const [payLoading, setPayLoading] = useState(false);
 
-  useEffect(() => {
+  const refresh = useCallback(async () => {
     if (!orderNumber) return;
-
-    let alive = true;
     setErr(null);
     setOrderLoading(true);
+    try{
+      const o = await getOrderByNumber(orderNumber);
+      console.log("[refresh normalized order]", o);
+      setOrder(o)
+    } catch (e:any) {
+      setErr(e?.message ?? "Kunde inte hämta oroder");
+    } finally {
+      setOrderLoading(false)
+    }
+  }, [orderNumber])
 
-    getOrderByNumber(orderNumber)
-      .then((o) => {
-        if (!alive) return;
-        
-        console.log("[Checkout] orderNumber:", orderNumber);
-        console.log("[Checkout] raw order:", o);
-        console.log("[Checkout] shippingAddress:", o.shippingAddress);
-        console.log("[Checkout] postalCode:", o.shippingAddress?.postalCode);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
-        setOrder(o);
+  const customerReady = useMemo ( () => {
+    if (!order) return false;
+    return !!(
+      order.customerFirstName?.trim() &&
+      order.customerLastName?.trim() &&
+      order.customerEmail?.trim()
+    );
+  }, [order]);
 
-        const hasShipping = Number(o.shippingCost ?? 0) > 0;
-        setShippingReady(hasShipping);
-      })
-      .catch((e) => {
-        if (!alive) return;
-        setErr(e?.message ?? "Kunde inte hämta order.");
-      })
-      .finally(() => {
-        if (!alive) return;
-        setOrderLoading(false);
-      });
+  const addressReady = useMemo (() => {
+    const a = order?.shippingAddress;
+    return !!(
+      a?.street?.trim() &&
+      a?.city?.trim() &&
+      a?.postalCode?.trim() &&
+      a?.country?.trim()
+    );
+  }, [order]);
 
-    return () => {
-      alive = false;
-    };
-  }, [orderNumber]);
+  const postalCode = useMemo (() => {
+    return order?.shippingAddress?.postalCode?.trim() ?? "";
+  }, [order])
 
-  const postalCode = order?.shippingAddress?.postalCode?.trim() ?? "";
-  console.log("[Checkout] computed postalCode:", postalCode);
+  const shippingReady = useMemo(() => {
+    if (!order) return false
+
+    if(order.shippingCarrier && order.shippingMethod) {
+      return order.shippingCarrier !== "None" && order.shippingMethod !== "None"
+    }
+
+    return Number(order.shippingCost ?? 0) > 0;
+  },  [order]);
 
   useEffect(() => {
     if (!orderNumber) return;
-    if (!shippingReady) return;
+    if(!order) return;
+    if(!customerReady || !addressReady || !shippingReady) return
+    if (clientSecret) return;
 
     let alive = true;
     setErr(null);
     setPayLoading(true);
 
     createPaymentIntent(orderNumber, cartId)
-      .then((r) => {
-        if (!alive) return;
-        setClientSecret(r.clientSecret);
-      })
-      .catch((e) => {
-        if (!alive) return;
-        setErr(e?.message ?? "Kunde inte initiera betalning.");
-      })
-      .finally(() => {
-        if (!alive) return;
-        setPayLoading(false);
-      });
+    .then((r) => {
+      if(!alive) return
+      setClientSecret(r.clientSecret);
+    })
+    .catch((e) =>{
+      if (!alive) return;
+      setErr(e?.message ?? "Kunde inte starta betalning")
+    })
+    .finally(() => {
+      if (!alive) return;
+      setPayLoading(false)
+    });
 
     return () => {
       alive = false;
     };
-  }, [orderNumber, cartId, shippingReady]);
+  }, [orderNumber, cartId, order, customerReady, addressReady, shippingReady, clientSecret]);
 
   if (!orderNumber) return <p className="container">Ordernummer saknas.</p>;
   if (err) return <p className="container">{err}</p>;
-
   if (orderLoading || !order) return <p className="container">Laddar order…</p>;
 
   return (
@@ -133,21 +146,27 @@ export default function Checkout() {
 
         <div>Här är sammantällning av kundvagnen.</div>
         
-        <PersonalForm />
+        <PersonalForm
+        orderNumber={orderNumber}
+        order={order}
+        onSaved={() => refresh()} />
         
-        <DeliveryForm />
+        <DeliveryForm
+        orderNumber={orderNumber}
+        order={order}
+        locked={!customerReady}
+        onSaved={() => refresh()}
+         />
 
-        {!shippingReady && (
+         {!shippingReady && (
           <div>
-            {!postalCode ? (
-              <p>Ingen postkod på ordern.</p>
+            {!addressReady || !postalCode ? (
+              <p>Fyll i leveransuppgifter (postnummer) för att välja frakt.</p>
             ) : (
               <ShippingPicker
-              orderNumber={orderNumber}
-              postalCode={postalCode}
-              onSelectionSaved={() => {
-                setShippingReady(true);
-              }}
+                orderNumber={orderNumber}
+                postalCode={postalCode}
+                onSelectionSaved={() => refresh()}
               />
             )}
           </div>
@@ -158,12 +177,9 @@ export default function Checkout() {
             {payLoading && !clientSecret && <p>Laddar betalning…</p>}
             {clientSecret && (
               <Elements
-              stripe={stripePromise}
-              options={{
-                clientSecret,
-                appearance: { theme: "night" },
-                }}
-                >
+                stripe={stripePromise}
+                options={{ clientSecret, appearance: { theme: "night" } }}
+              >
                 <Form orderNumber={orderNumber} />
               </Elements>
             )}
