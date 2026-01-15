@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import PersonalForm from "../Checkout/PersonalForm";
 import DeliveryForm from "../Checkout/DeliveryForm";
+import CartSummary from "../Checkout/CartSummary";
 
 const pk = import.meta.env.VITE_STRIPE_PK;
 if (!pk) throw new Error("VITE_STRIPE_PK saknas i .env");
@@ -144,7 +145,7 @@ export default function Checkout() {
     <section>
       <div className="container">
 
-        <div>Här är sammantällning av kundvagnen.</div>
+        <CartSummary />
         
         <PersonalForm
         orderNumber={orderNumber}

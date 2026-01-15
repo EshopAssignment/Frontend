@@ -15,6 +15,7 @@ type CartState = {
 
 type Action =
   | { type: "ADD_ITEM"; payload: { item: Omit<CartItem, "quantity">; qty?: number } }
+  | { type: "ADD_ONE"; payload: { productId: number } }
   | { type: "SET_QTY"; payload: { productId: number; quantity: number } }
   | { type: "REMOVE_ONE"; payload: { productId: number } }
   | { type: "REMOVE_ALL"; payload: { productId: number } }
@@ -83,6 +84,14 @@ function reducer(state: CartState, action: Action): CartState {
       next[i] = { ...next[i], quantity: next[i].quantity + add };
       return { ...state, items: next };
     }
+    case "ADD_ONE": { 
+      const { productId } = action.payload;
+      const i = state.items.findIndex((x) => x.productId === productId);
+      if (i === -1) return state; 
+      const next = [...state.items];
+      next[i] = { ...next[i], quantity: next[i].quantity + 1 };
+      return { ...state, items: next };
+    }
 
     case "SET_QTY": {
       const { productId, quantity } = action.payload;
@@ -128,6 +137,7 @@ const CartContext = createContext<{
   totalExVat: number;
   itemCount: number;
   addItem: (item: Omit<CartItem, "quantity">, qty?: number) => void;
+  addOne: (productId: number) => void;
   setQuantity: (productId: number, quantity: number) => void;
   removeOne: (productId: number) => void;
   removeAll: (productId: number) => void;
@@ -177,6 +187,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       itemCount,
       addItem: (item: Omit<CartItem, "quantity">, qty = 1) =>
         dispatch({ type: "ADD_ITEM", payload: { item, qty } }),
+      addOne: (productId: number) => 
+        dispatch({ type: "ADD_ONE", payload: { productId } }),
       setQuantity: (productId: number, quantity: number) =>
         dispatch({ type: "SET_QTY", payload: { productId, quantity } }),
       removeOne: (productId: number) =>

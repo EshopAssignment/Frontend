@@ -586,6 +586,24 @@ button:hover{
 
 /*#endregion*/
 /*#region cart */
+.cart-sum{
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    margin:0 auto;
+    gap:1rem;
+    .table-img{gap:1rem;}
+}
+.summary-quantity{
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap:.5rem;
+    font-weight: 800;
+    .sub{color:var(--destructive)}.add{color: var(--accent);}
+    
+}
 .cart {
   background: var(--popover);
   padding: 2rem 1.5rem;
