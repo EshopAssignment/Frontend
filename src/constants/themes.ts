@@ -16,5 +16,8 @@ export const THEMES: { id: ThemeId; name: string; hint: string }[] = [
     },
     {
         id:"forest", name:"Skog", hint: "Där virket kommer ifrån. "
+    },
+    {
+        id:"midnight", name:"Midnight", hint: "Edgy"
     }
  ];

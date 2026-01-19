@@ -7,6 +7,11 @@ import { useState } from "react";
 
 export default function OptionsDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
     const [tab, setTab] = useState<"theme" | "cookies">("theme");
+
+    const tabBtnClass = (key: "theme" | "cookies" ) => 
+          `options-tab ${tab === key ? "is-active" : ""}`;
+   
+
     return (
         <div className="">
             <Dialog open={open} onClose={onClose} className="relative z-1000">
@@ -40,9 +45,9 @@ export default function OptionsDrawer({ open, onClose }: { open: boolean; onClos
                                         <DialogTitle className="text-base font-semibold text-white">Inställningar</DialogTitle>
                                     </div>
                                     <div className="relative mt-6 flex-1 px-4 sm:px-6">
-                                        <div className="options-header">
-                                            <button onClick={() => setTab("theme")}>Tema</button>
-                                            <button onClick={() => setTab("cookies")}>Cookies</button>
+                                        <div className="options-header" role="tablist" aria-label="Options tabs">
+                                            <button onClick={() => setTab("theme")} className={tabBtnClass("theme")} role="tab" aria-selected={tab === "theme"}>Tema</button>
+                                            <button onClick={() => setTab("cookies")} className={tabBtnClass("cookies")} role="tab" aria-selected={tab === "cookies"}>Cookies</button>
                                         </div>
                                         <div className="options-container">
                                             {tab === "theme" ? <ThemePanel /> : <CookiePanel />}

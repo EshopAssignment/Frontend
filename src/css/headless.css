@@ -17,7 +17,15 @@
 }
 .listbox{position:relative}
 .listbox-btn{border:1px solid var(--border);background:var(--popover);padding:.5rem .75rem;border-radius:8px}
-.listbox-options{position:absolute;z-index:50;min-width:220px;margin-top:.25rem;border:1px solid var(--border);background:var(--popover);border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,.2)}
+.listbox-options{position:absolute;
+  z-index:50;
+  min-width:220px;
+  margin-top:.25rem;
+  border:1px solid var(--border);
+  background:var(--card);
+  border-radius:8px;
+  box-shadow:0 8px 20px rgba(0,0,0,.2)}
+
 .listbox-option{padding:.5rem .75rem;cursor:pointer}
 .listbox-option:hover{background:rgba(255,255,255,.06)}
 
