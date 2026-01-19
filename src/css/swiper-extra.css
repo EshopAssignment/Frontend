@@ -72,6 +72,7 @@
     border: none;
     background: var(--gradient-1);
     overflow: hidden;
+    color: var(--destructive-foreground);
     }
 
     .btn-slide::after{
@@ -102,11 +103,15 @@
   display: flex;
   flex-direction: column;
   gap:.6rem;
+  color: var(--destructive-foreground);
   h3{
     font-size: 1.7rem;
     font-weight: 700;
+    color: inherit;
   }
   p{
     font-size: 1.2rem;
+    color: inherit;
+
   }
 }

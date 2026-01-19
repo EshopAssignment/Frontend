@@ -11,7 +11,19 @@
     justify-content: center;
     padding: 2rem;
 }
+main {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
 
+header {
+  min-height: 50px;
+}
+
+footer {
+  min-height: 50px;
+}
 
 .confirmation-view{
     display: flex;
