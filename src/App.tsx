@@ -4,14 +4,12 @@ import AppRouter from "./routes/AppRouter";
 
 function App() {
   return (
-    <div className="layout">
+    <>
       <main>
         <OptionsBtn />
-          <div>
-          <AppRouter />
-        </div>
+        <AppRouter />
       </main>
-    </div>
+    </>
   );
 }
 

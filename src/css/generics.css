@@ -1,75 +1,542 @@
 
+/*#region dark*/
+:root[data-theme="dark"]{
+  --background: radial-gradient( circle at top,#262626 0%, #1f1f1f 45%,#1b1b1b 100%  );
+  --foreground: #ebe8e0;
+  --card: #292929;
+  --popover: #292929;
+  --popover-foreground: #ebe8e0;
+  --primary: #40bf6a;
+  --primary-hover: #99a2f5;
+  --primary-foreground: #000;
+  --secondary: #333;
+  --muted: #292929;
+  --muted-foreground: #999;
+  --accent: #40bf6a;
+  --accent-foreground: #40bf6a;
+  --destructive: #d92626;
+  --destructive-foreground: #fff;
+  --border: #4d4d4d;
+  --input: #4d4d4d;
+  --ring: #40bf6a;
+  --mustardonthebeathoe: #caa100;
 
-  :root{
-    --background: radial-gradient( circle at top,#262626 0%, #1f1f1f 45%,#1b1b1b 100%  );
-    --foreground: #ebe8e0;
-    --card: #292929;
-    --popover: #292929;
-    --popover-foreground: #ebe8e0;
-    --primary: #40bf6a;
-    --primary-hover: #99a2f5;
-    --primary-foreground: #000;
-    --secondary: #333;
-    --muted: #333;
-    --muted-foreground: #999;
-    --accent: #40bf6a;
-    --accent-foreground: #40bf6a;
-    --destructive: #d92626;
-    --destructive-foreground: #fff;
-    --border: #4d4d4d;
-    --input: #4d4d4d;
-    --ring: #40bf6a;
-    --mustardonthebeathoe: #caa100;
+  --chart-1: #818cf8;
+  --chart-2: #395;
+  --chart-3: #4f46e5;
+  --chart-4: #4338ca;
+  --chart-5: #3730a3;
 
-    --chart-1: #818cf8;
-    --chart-2: #395;
-    --chart-3: #4f46e5;
-    --chart-4: #4338ca;
-    --chart-5: #3730a3;
+  --sidebar: #333;
 
-    --sidebar: #333;
+  --sidebar-foreground: #ebe8e0;
+  --sidebar-primary: #818cf8;
+  --sidebar-primary-foreground: #212121;
+  --sidebar-accent: #333;
+  --sidebar-accent-foreground: #bfbfbf;
+  --sidebar-border: #4b5563;
+  --sidebar-ring: #818cf8;
 
-    --sidebar-foreground: #ebe8e0;
-    --sidebar-primary: #818cf8;
-    --sidebar-primary-foreground: #212121;
-    --sidebar-accent: #333;
-    --sidebar-accent-foreground: #bfbfbf;
-    --sidebar-border: #4b5563;
-    --sidebar-ring: #818cf8;
+  --font-primary: 'Zalando Sans SemiExpanded', Courier, monospace;
+      /*<weight>: Use a value from 400 */
+  --font-secondary: 'Electrolize', Courier, monospace;
+      /*<weight>: Use a value from 200 to 900 */
+  --font-comp: sans-serif;
 
-    --font-primary: 'Zalando Sans SemiExpanded', Courier, monospace;
-        /*<weight>: Use a value from 400 */
-    --font-secondary: 'Electrolize', Courier, monospace;
-        /*<weight>: Use a value from 200 to 900 */
-    --font-comp: sans-serif;
+  --radius2: .2rem;
+  --radius4: .4rem;
+  --radius6: .6rem;
+  --radius8: .8rem;
+  --radius100: 100%;
 
-    --radius2: .2rem;
-    --radius4: .4rem;
-    --radius6: .6rem;
-    --radius8: .8rem;
-    --radius100: 100%;
+  --shadow-2xs: 0px 4px 8px -1px #ffffff0d;
+  --shadow-xs: 0px 4px 8px -1px #ffffff0d;
+  --shadow-sm: 0px 4px 8px -1px #ffffff1a,0px 1px 2px -2px #ffffff1a;
+  --shadow: 0px 4px 8px -1px #ffffff1a,0px 1px 2px -2px #ffffff1a;
+  --shadow-md: 0px 4px 8px -1px #ffffff1a,0px 2px 4px -2px #ffffff1a;
+  --shadow-lg: 0px 4px 8px -1px #ffffff1a,0px 4px 6px -2px #ffffff1a;
+  --shadow-xl: 0px 4px 8px -1px #ffffff1a,0px 8px 10px -2px #ffffff1a;
+  --shadow-2xl: 0px 4px 8px -1px #ffffff40;
 
-    --shadow-2xs: 0px 4px 8px -1px #ffffff0d;
-    --shadow-xs: 0px 4px 8px -1px #ffffff0d;
-    --shadow-sm: 0px 4px 8px -1px #ffffff1a,0px 1px 2px -2px #ffffff1a;
-    --shadow: 0px 4px 8px -1px #ffffff1a,0px 1px 2px -2px #ffffff1a;
-    --shadow-md: 0px 4px 8px -1px #ffffff1a,0px 2px 4px -2px #ffffff1a;
-    --shadow-lg: 0px 4px 8px -1px #ffffff1a,0px 4px 6px -2px #ffffff1a;
-    --shadow-xl: 0px 4px 8px -1px #ffffff1a,0px 8px 10px -2px #ffffff1a;
-    --shadow-2xl: 0px 4px 8px -1px #ffffff40;
+  --gradient-primary: linear-gradient(135deg,var(--primary),var(--chart-5));
+  --gradient-accent: linear-gradient(135deg,var(--accent),var(--muted));
+  --gradient-hero: linear-gradient(135deg,var(--secondary),var(--primary));
 
-    --gradient-primary: linear-gradient(135deg,var(--primary),var(--chart-5));
-    --gradient-accent: linear-gradient(135deg,var(--accent),var(--muted));
-    --gradient-hero: linear-gradient(135deg,var(--secondary),var(--primary));
+  --gradient-1: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.0));
+  --gradient-1-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  --gradient-2: linear-gradient(180deg, #f6f7f9 0%, #eef1f5 100%);
+  --gradient-3: linear-gradient(160deg, #1f2933 0%, #111827 100%);
+  --gradient-4: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
 
-    --gradient-1: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.0));
-    --gradient-1-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-    --gradient-2: linear-gradient(180deg, #f6f7f9 0%, #eef1f5 100%);
-    --gradient-3: linear-gradient(160deg, #1f2933 0%, #111827 100%);
-    --gradient-4: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+}
+/*#endregion*/
 
-  }
-  /*#region Helper classes */
+/*#region light*/
+:root[data-theme="light"] {
+  --background: #f7f5ef;
+  --foreground: #1f2937;
+
+  --card: #fbfaf6;
+  --card-foreground: #1f2937;
+
+  --popover: rgba(251, 250, 246, 0.92);
+  --popover-foreground: #1f2937;
+
+  --primary: #2f8f5b;
+  --primary-hover: #26764c;
+  --primary-foreground: #ffffff;
+
+  --secondary: #ebe7dd;
+  --secondary-foreground: #1f2937;
+
+  --muted: #f0ede6;
+  --muted-foreground: #6b7280;
+
+  --accent: #2f8f5b;
+  --accent-foreground: #ffffff;
+
+  --destructive: #d43a2f;
+  --destructive-foreground: #ffffff;
+
+  --success: #2f8f5b;
+  --success-foreground: #ffffff;
+
+  --border: #d7d2c7;
+  --input: #e3ded3;
+  --ring: #2f8f5b;
+
+  --chart-1: #2f8f5b;
+  --chart-2: #2b7a54;
+  --chart-3: #256a4a;
+  --chart-4: #1f5a40;
+  --chart-5: #1a4a35;
+
+  --sidebar: #f1eee6;
+  --sidebar-foreground: #1f2937;
+  --sidebar-primary: #2f8f5b;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e7e2d7;
+  --sidebar-accent-foreground: #1f2937;
+  --sidebar-border: #d7d2c7;
+  --sidebar-ring: #2f8f5b;
+
+  --font-sans: Inter, sans-serif;
+  --font-serif: Merriweather, serif;
+  --font-mono: JetBrains Mono, monospace;
+  --font-primary: 'Zalando Sans SemiExpanded', Courier, monospace;
+  --font-secondary: 'Electrolize', Courier, monospace;
+  --font-comp: sans-serif;
+
+  --radius: 4px;
+  --radius2: 0.2rem;
+  --radius4: 0.4rem;
+  --radius6: 0.6rem;
+  --radius8: 0.8rem;
+  --radius100: 100%;
+
+  --shadow-2xs: 0px 2px 6px -1px rgba(17, 24, 39, 0.06);
+  --shadow-xs: 0px 3px 8px -1px rgba(17, 24, 39, 0.08);
+  --shadow-sm: 0px 4px 10px -2px rgba(17, 24, 39, 0.10), 0px 1px 2px -2px rgba(17, 24, 39, 0.10);
+  --shadow: 0px 6px 14px -3px rgba(17, 24, 39, 0.12), 0px 2px 4px -2px rgba(17, 24, 39, 0.10);
+  --shadow-md: 0px 8px 18px -4px rgba(17, 24, 39, 0.14), 0px 4px 8px -4px rgba(17, 24, 39, 0.12);
+  --shadow-lg: 0px 12px 24px -6px rgba(17, 24, 39, 0.16), 0px 6px 12px -6px rgba(17, 24, 39, 0.14);
+  --shadow-xl: 0px 18px 36px -8px rgba(17, 24, 39, 0.18), 0px 10px 20px -10px rgba(17, 24, 39, 0.16);
+  --shadow-2xl: 0px 24px 48px -10px rgba(17, 24, 39, 0.22);
+
+  --gradient-primary: linear-gradient(135deg, #2f8f5b, #1a4a35);
+  --gradient-accent: linear-gradient(135deg, #e7e2d7, #f0ede6);
+  --gradient-hero: linear-gradient(135deg, #fbfaf6, #ebe7dd);
+
+  --gradient-1: linear-gradient(135deg, rgba(47, 143, 91, 0.10), rgba(0, 0, 0, 0.0));
+  --gradient-1-hover: linear-gradient(135deg, rgba(47, 143, 91, 0.16), rgba(0, 0, 0, 0.03));
+  --gradient-2: linear-gradient(180deg, #fbfaf6 0%, #f1eee6 100%);
+  --gradient-3: linear-gradient(160deg, #f0ede6 0%, #d7d2c7 100%);
+  --gradient-4: linear-gradient(135deg, rgba(17, 24, 39, 0.05), rgba(17, 24, 39, 0.02));
+
+  --mustardonthebeathoe: #caa100;
+}
+
+/*#endregion*/
+
+/*#region snow */
+  :root[data-theme="snow"]{
+  --background: #f9fbff;
+  --foreground: #1f2937;
+
+  --card: #ffffff;
+  --card-foreground: #1f2937;
+
+  --popover: rgba(255, 255, 255, 0.9);
+  --popover-foreground: #1f2937;
+
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-foreground: #ffffff;
+
+  --secondary: #e6f0ff;
+  --secondary-foreground: #1f2937;
+
+  --muted: #eef4ff;
+  --muted-foreground: #64748b;
+
+  --accent: #60a5fa;
+  --accent-foreground: #ffffff;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #fff;
+
+  --success: #22c55e;
+  --success-foreground: #ffffff;
+
+  --border: #c7ddf5;
+  --input: #dbeafe;
+  --ring: #3b82f6;
+
+  --chart-1: #3b82f6;
+  --chart-2: #2563eb;
+  --chart-3: #1d4ed8;
+  --chart-4: #1e40af;
+  --chart-5: #172554;
+
+  --sidebar: #f1f6ff;
+  --sidebar-foreground: #1f2937;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #bfdbfe;
+  --sidebar-accent-foreground: #1f2937;
+  --sidebar-border: #c7ddf5;
+  --sidebar-ring: #3b82f6;
+
+  --font-sans: Inter, sans-serif;
+  --font-serif: Merriweather, serif;
+  --font-mono: JetBrains Mono, monospace;
+
+  --radius: 4px;
+  --radius2: .2rem;
+  --radius4: .4rem;
+  --radius6: .6rem;
+  --radius8: .8rem;
+  --radius100: 100%;
+
+  --shadow-2xs: 0px 2px 6px -1px rgba(30, 64, 175, 0.08);
+  --shadow-xs: 0px 3px 8px -1px rgba(30, 64, 175, 0.10);
+  --shadow-sm: 0px 4px 10px -2px rgba(30, 64, 175, 0.12);
+  --shadow: 0px 6px 14px -3px rgba(30, 64, 175, 0.14);
+  --shadow-md: 0px 8px 18px -4px rgba(30, 64, 175, 0.16);
+  --shadow-lg: 0px 12px 24px -6px rgba(30, 64, 175, 0.18);
+  --shadow-xl: 0px 18px 36px -8px rgba(30, 64, 175, 0.22);
+  --shadow-2xl: 0px 24px 48px -10px rgba(30, 64, 175, 0.28);
+
+  --gradient-primary: linear-gradient(
+    135deg,
+    #60a5fa,
+    #1d4ed8
+  );
+
+  --gradient-accent: linear-gradient(
+    135deg,
+    #bfdbfe,
+    #e6f0ff
+  );
+
+  --gradient-hero: linear-gradient(
+    135deg,
+    #f0f7ff,
+    #c7ddf5
+  );
+
+  --gradient-1: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.08),
+    rgba(255, 255, 255, 0.0)
+  );
+
+  --gradient-1-hover: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.14),
+    rgba(255, 255, 255, 0.04)
+  );
+
+  --gradient-2: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #eef4ff 100%
+  );
+
+  --gradient-3: linear-gradient(
+    160deg,
+    #e6f0ff 0%,
+    #c7ddf5 100%
+  );
+
+  --gradient-4: linear-gradient(
+    135deg,
+    rgba(96, 165, 250, 0.12),
+    rgba(96, 165, 250, 0.04)
+  );
+  --mustardonthebeathoe: #caa100;
+
+  --font-primary: 'Zalando Sans SemiExpanded', Courier, monospace;
+  --font-secondary: 'Electrolize', Courier, monospace;
+  --font-comp: sans-serif;
+}
+/*#endregion */
+
+/*#region beige */
+:root[data-theme="beige"]{
+  --background: #f7f3ee;            
+  --foreground: #2a2a26;           
+
+  --card: #fbf9f5;
+  --card-foreground: #2a2a26;
+
+  --popover: rgba(251, 249, 245, 0.92);
+  --popover-foreground: #2a2a26;
+
+ 
+  --primary: #8b8a6f;              
+  --primary-hover: #7a7962;
+  --primary-foreground: #ffffff;
+
+  --secondary: #ede7df;
+  --secondary-foreground: #2a2a26;
+
+  --muted: #e6dfd6;
+  --muted-foreground: #6f6a63;
+
+  --accent: #b89b5e;                
+  --accent-foreground: #2a2a26;
+
+  --destructive: #c84b3a;
+  --destructive-foreground: #ffffff;
+
+  --success: #6f8f6b;
+  --success-foreground: #ffffff;
+
+  --border: #d6cec3;
+  --input: #e1d9cf;
+  --ring: #b89b5e;
+
+  --chart-1: #8b8a6f;
+  --chart-2: #b89b5e;
+  --chart-3: #a07f4c;
+  --chart-4: #6f6a63;
+  --chart-5: #4a4843;
+
+  --sidebar: #f1ece6;
+  --sidebar-foreground: #2a2a26;
+  --sidebar-primary: #8b8a6f;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e1d9cf;
+  --sidebar-accent-foreground: #2a2a26;
+  --sidebar-border: #d6cec3;
+  --sidebar-ring: #b89b5e;
+
+  --font-sans: Inter, sans-serif;
+  --font-serif: Merriweather, serif;
+  --font-mono: JetBrains Mono, monospace;
+
+  --radius: 4px;
+  --radius2: .2rem;
+  --radius4: .4rem;
+  --radius6: .6rem;
+  --radius8: .8rem;
+  --radius100: 100%;
+
+  --shadow-2xs: 0px 2px 6px -1px rgba(80, 70, 50, 0.06);
+  --shadow-xs: 0px 3px 8px -1px rgba(80, 70, 50, 0.08);
+  --shadow-sm: 0px 4px 10px -2px rgba(80, 70, 50, 0.10);
+  --shadow: 0px 6px 14px -3px rgba(80, 70, 50, 0.12);
+  --shadow-md: 0px 8px 18px -4px rgba(80, 70, 50, 0.14);
+  --shadow-lg: 0px 12px 24px -6px rgba(80, 70, 50, 0.18);
+  --shadow-xl: 0px 18px 36px -8px rgba(80, 70, 50, 0.22);
+  --shadow-2xl: 0px 24px 48px -10px rgba(80, 70, 50, 0.26);
+
+  --gradient-primary: linear-gradient(
+    135deg,
+    #b89b5e,
+    #8b8a6f
+  );
+
+  --gradient-accent: linear-gradient(
+    135deg,
+    #ede7df,
+    #f7f3ee
+  );
+
+  --gradient-hero: linear-gradient(
+    135deg,
+    #fbf9f5,
+    #e1d9cf
+  );
+
+  --gradient-1: linear-gradient(
+    135deg,
+    rgba(184, 155, 94, 0.10),
+    rgba(255, 255, 255, 0.0)
+  );
+
+  --gradient-1-hover: linear-gradient(
+    135deg,
+    rgba(184, 155, 94, 0.16),
+    rgba(255, 255, 255, 0.04)
+  );
+
+  --gradient-2: linear-gradient(
+    180deg,
+    #fbf9f5 0%,
+    #ede7df 100%
+  );
+
+  --gradient-3: linear-gradient(
+    160deg,
+    #ede7df 0%,
+    #d6cec3 100%
+  );
+
+  --gradient-4: linear-gradient(
+    135deg,
+    rgba(184, 155, 94, 0.14),
+    rgba(184, 155, 94, 0.04)
+  );
+
+  --mustardonthebeathoe: #caa100;
+
+  --font-primary: 'Zalando Sans SemiExpanded', Courier, monospace;
+  --font-secondary: 'Electrolize', Courier, monospace;
+  --font-comp: sans-serif;
+}
+
+ /*#endregion */
+
+/*#region skog*/
+:root[data-theme="forest"]{
+  /* Core surfaces */
+  --background: #1f2420;          
+  --foreground: #e3e6df;          
+
+  --card: #262c27;                
+  --card-foreground: #e3e6df;
+
+  --popover: rgba(38, 44, 39, 0.94);
+  --popover-foreground: #e3e6df;
+
+  --primary: #6f8f6b;             
+  --primary-hover: #5f7f5b;
+  --primary-foreground: #0e140f;
+
+  --secondary: #2e3530;
+  --secondary-foreground: #e3e6df;
+
+  --muted: #2a302c;
+  --muted-foreground: #9aa49b;
+
+  --accent: #8aa17a;              
+  --accent-foreground: #0e140f;
+
+  --destructive: #9e3f2f;         
+  --destructive-foreground: #fff;
+
+  --success: #5f7f5b;
+  --success-foreground: #0e140f;
+
+  --border: #3a423d;              
+  --input: #2f3631;
+  --ring: #8aa17a;
+
+  --chart-1: #6f8f6b;
+  --chart-2: #8aa17a;
+  --chart-3: #a89f6a;             
+  --chart-4: #7a6a4f;           
+  --chart-5: #4a524b;           
+
+  --sidebar: #1b201c;
+  --sidebar-foreground: #e3e6df;
+  --sidebar-primary: #6f8f6b;
+  --sidebar-primary-foreground: #0e140f;
+  --sidebar-accent: #2e3530;
+  --sidebar-accent-foreground: #e3e6df;
+  --sidebar-border: #3a423d;
+  --sidebar-ring: #8aa17a;
+
+  --font-sans: Inter, sans-serif;
+  --font-serif: Merriweather, serif;
+  --font-mono: JetBrains Mono, monospace;
+
+  --radius: 4px;
+  --radius2: .2rem;
+  --radius4: .4rem;
+  --radius6: .6rem;
+  --radius8: .8rem;
+  --radius100: 100%;
+
+  --shadow-2xs: 0px 2px 6px -1px rgba(0, 0, 0, 0.35);
+  --shadow-xs: 0px 3px 8px -1px rgba(0, 0, 0, 0.38);
+  --shadow-sm: 0px 4px 10px -2px rgba(0, 0, 0, 0.40);
+  --shadow: 0px 6px 14px -3px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0px 8px 18px -4px rgba(0, 0, 0, 0.50);
+  --shadow-lg: 0px 12px 24px -6px rgba(0, 0, 0, 0.55);
+  --shadow-xl: 0px 18px 36px -8px rgba(0, 0, 0, 0.60);
+  --shadow-2xl: 0px 24px 48px -10px rgba(0, 0, 0, 0.65);
+
+  --gradient-primary: linear-gradient(
+    135deg,
+    #8aa17a,
+    #4f6b4a
+  );
+
+  --gradient-accent: linear-gradient(
+    135deg,
+    #2e3530,
+    #1f2420
+  );
+
+  --gradient-hero: radial-gradient(
+    circle at top,
+    #2a302c 0%,
+    #1f2420 70%
+  );
+
+  --gradient-1: linear-gradient(
+    135deg,
+    rgba(138, 161, 122, 0.18),
+    rgba(0, 0, 0, 0.0)
+  );
+
+  --gradient-1-hover: linear-gradient(
+    135deg,
+    rgba(138, 161, 122, 0.26),
+    rgba(0, 0, 0, 0.05)
+  );
+
+  --gradient-2: linear-gradient(
+    180deg,
+    #262c27 0%,
+    #1f2420 100%
+  );
+
+  --gradient-3: linear-gradient(
+    160deg,
+    #2e3530 0%,
+    #1b201c 100%
+  );
+
+  --gradient-4: linear-gradient(
+    135deg,
+    rgba(111, 143, 107, 0.22),
+    rgba(111, 143, 107, 0.06)
+  );
+
+  --mustardonthebeathoe: #caa100;
+
+  --font-primary: 'Zalando Sans SemiExpanded', Courier, monospace;
+  --font-secondary: 'Electrolize', Courier, monospace;
+  --font-comp: sans-serif;
+}
+
+/*#endregion*/
+
+/*#region trams */
 .center-content {
   display: flex;
   flex-direction: column;
@@ -85,3 +552,4 @@ a.active {
 button.active{
   color: var(--primary-hover);
 }
+  /*#endregion*/

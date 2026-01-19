@@ -5,10 +5,16 @@ export const THEMES: { id: ThemeId; name: string; hint: string }[] = [
         id: "light", name: "Light", hint: "Ljust"
     },
     {
-        id: "dark", name: "Dark", hint: "Möööökt"
+        id: "dark", name: "Dark", hint: "Mörkt, som kaffe ska serveras"
 
     },
     {
-        id: "idiot", name: "Idiot", hint: "självbeskrivande"
+        id: "snow", name: "Snow", hint: "Mysigt"
+    },
+    {
+        id: "beige", name:"beige", hint: "Varför vill du använda denna?"
+    },
+    {
+        id:"forest", name:"Skog", hint: "Där virket kommer ifrån. "
     }
  ];
