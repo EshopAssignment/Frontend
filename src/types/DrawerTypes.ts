@@ -1,4 +1,4 @@
-type ThemeId = "light" | "dark" | "snow" | "beige" | "forest";
+type ThemeId = "light" | "dark" | "snow" | "beige" | "forest" | "midnight";
 export type {ThemeId}
 
 export type CookiePrefs = {

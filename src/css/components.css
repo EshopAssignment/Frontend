@@ -89,6 +89,7 @@
 .btn-group{
     display: flex;
     flex-direction: row;
+    align-items: center;
     gap:1rem;
     button{
         padding:1rem;
@@ -373,9 +374,7 @@
 }
 /*#endregion */
 /*#region buttons */
-.listbox-options{
-    width: 100%;
-}
+
 .btn-add-wide{
     border:1px solid var(--accent);
     padding: 1rem 4rem;
@@ -571,19 +570,7 @@ button:hover{
         
     }
 }
-.menu{
-    display: flex;
-    flex-direction: column;
-    color: var(--foreground);
-    background-color: var(--card);
-    border-radius: var(--radius2);
-    padding:.5rem;
-    gap:.2rem;
-    a{
-        padding-left: .5rem;
-        border-radius: var(--radius2);
-    }
-}
+
 
 
 /*#endregion*/
@@ -607,7 +594,7 @@ button:hover{
     
 }
 .cart {
-  background: var(--popover);
+  background: var(--card);
   padding: 2rem 1.5rem;
   border-radius: var(--radius4);
   max-height: 400px;
@@ -686,6 +673,85 @@ button:hover{
 }
 /*#endregion */ 
 /*#region profile */
+
+.profile-btn{
+  display:flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius8);
+  border:1px solid var(--border);
+  background: transparent;
+  color: var(--foreground);
+  box-shadow: var(--shadow-2xs);
+  transition:
+    background .12s ease,
+    border-color .12s ease,
+    box-shadow .12s ease,
+    transform .12s ease;
+}
+
+.profile-btn:hover{
+  background: var(--gradient-1-hover);
+  transform: translateY(-1px);
+}
+
+.profile-btn:focus-visible{
+  outline:2px solid var(--ring);
+  outline-offset:2px;
+}
+
+.profile-btn.is-guest{
+  background: transparent;
+  box-shadow: none;
+}
+
+.profile-btn.is-auth{
+  background: var(--gradient-1);
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-btn.is-loading{
+  opacity:.6;
+  pointer-events:none;
+}
+
+.menu .menu-item{
+  display:flex;
+  align-items:center;
+  width:100%;
+  padding:.55rem .75rem;
+  border-radius: var(--radius6);
+}
+
+.menu .menu-item:hover,
+.menu .menu-item[data-focus]{
+  background: var(--primary-hover);
+}
+
+.menu-divider{
+  height:1px;
+  margin:.35rem;
+  background: var(--border);
+}
+
+.menu .menu-item.is-danger{
+  color: color-mix(in oklab, var(--destructive) 90%, white 10%);
+}
+.menu{
+    display: flex;
+    flex-direction: column;
+    color: var(--foreground);
+    background-color: var(--card);
+    border-radius: var(--radius2);
+    padding:.5rem;
+    gap:.2rem;
+    a{
+        padding-left: .5rem;
+        border-radius: var(--radius2);
+    }
+}
+
 .my-profile{
     padding:1rem;
     background: var(--popover);
@@ -699,7 +765,7 @@ button:hover{
     font-size: 40px;
     font-weight: 800;
     font-family: var(--font-secondary);
-    text-decoration: underline;
+    text-decoration: under line;
 }
 .status-group{
     display: flex;
