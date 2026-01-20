@@ -111,6 +111,15 @@ export type MeDto = {
     roles: Array<string>;
 };
 
+export type MyOrderListItemDto = {
+    createdAtUtc: string;
+    orderNumber: string;
+    orderStatus: OrderStatus;
+    grandTotal: number | string;
+    trackingUrl: null | string;
+    receiptUrl: null | string;
+};
+
 export type OrderCreatedDto = {
     orderId: number | string;
     orderNumber: string;
@@ -122,7 +131,14 @@ export type OrderCreatedDto = {
     grandTotal: number | string;
     orderStatus: OrderStatus;
     paymentStatus: PaymentStatus;
+    customerFirstName: null | string;
+    customerLastName: null | string;
+    customerEmail: null | string;
+    customerPhoneNumber: null | string;
     shippingAddress: null | ShippingAddressDto;
+    shippingCarrier: ShippingCarrier;
+    shippingMethod: ShippingMethod;
+    servicePointId: null | string;
     userId: null | number | string;
 };
 
@@ -211,6 +227,10 @@ export type ShippingAddressDto = {
     postalCode: string;
     country: string;
 };
+
+export type ShippingCarrier = number;
+
+export type ShippingMethod = number;
 
 export type ToggleActiveRequest = {
     isActive: boolean;
@@ -596,6 +616,25 @@ export type PatchApiMeProfileDefaultAddressResponses = {
      */
     200: unknown;
 };
+
+export type GetApiMeOrdersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        skip?: number | string;
+        take?: number | string;
+    };
+    url: '/api/me/orders';
+};
+
+export type GetApiMeOrdersResponses = {
+    /**
+     * OK
+     */
+    200: Array<MyOrderListItemDto>;
+};
+
+export type GetApiMeOrdersResponse = GetApiMeOrdersResponses[keyof GetApiMeOrdersResponses];
 
 export type PostApiOrderData = {
     body: CreateOrderRequestDto;

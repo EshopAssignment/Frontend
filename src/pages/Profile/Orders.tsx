@@ -1,38 +1,26 @@
+import { getMyOrders } from "@/Services/orderService";
+import { useQuery } from "@tanstack/react-query";
+
 const Help = () => {
-  const tempOrders = [
-  {
-    date: "2025-11-26",
-    orderNumber: "ORD-20251126092603892-2512",
-    trackingUrl: "https://tracking.example.com/track/ORD-20251126092603892-2512",
-    receiptUrl: "https://pallshoppen.example.com/receipts/19",
-    status: "Pending",
-    total: 900
-  },
-  {
-    date: "2025-11-23",
-    orderNumber: "ORD-20251123184312931-8931",
-    trackingUrl: "https://tracking.example.com/track/ORD-20251123184312931-8931",
-    receiptUrl: "https://pallshoppen.example.com/receipts/18",
-    status: "Shipped",
-    total: 1450
-  },
-  {
-    date: "2025-11-18",
-    orderNumber: "ORD-20251118101255732-1183",
-    trackingUrl: "https://tracking.example.com/track/ORD-20251118101255732-1183",
-    receiptUrl: "https://pallshoppen.example.com/receipts/17",
-    status: "Delivered",
-    total: 299
-  },
-  {
-    date: "2025-11-14",
-    orderNumber: "ORD-20251114153200722-0091",
-    trackingUrl: "https://tracking.example.com/track/ORD-20251114153200722-0091",
-    receiptUrl: "https://pallshoppen.example.com/receipts/16",
-    status: "Cancelled",
-    total: 1200
+  const { data, isLoading, isError} = useQuery({
+    queryKey: ["my-orders"],
+    queryFn: () => getMyOrders(),
+  });
+
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
-];
+
+  if (isError) {
+    return <div>Error loading orders.</div>;
+  }
+
+  const orders = data ?? [];
+
+    if (orders.length === 0 ) {
+      return <div> Du har inte handlat något än</div>;
+    }
+  
 
   return (
     <section>
@@ -51,12 +39,39 @@ const Help = () => {
             </thead>
 
             <tbody>
-              {tempOrders.map(order => (
+              {orders.map(order => (
                 <tr key={order.orderNumber}>
                   <td>{order.date}</td>
                   <td>{order.orderNumber}</td>
-                  <td><a href={order.trackingUrl} target="_blank" rel="noopener noreferrer"><i className="truck fa-solid fa-truck"></i></a></td>
-                  <td><a href={order.receiptUrl} target="_blank" rel="noopener noreferrer"><i className="recipt fa-solid fa-receipt"></i></a></td>
+                
+                <td>
+                  {order.trackingUrl ? (
+                    <a
+                      href={order.trackingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <i className="truck fa-solid fa-truck"></i>
+                    </a>
+                  ) : (
+                    <span>-</span>
+                  )}
+                </td>
+
+                <td>
+                  {order.receiptUrl ? (
+                    <a
+                      href={order.receiptUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <i className="recipt fa-solid fa-receipt"></i>
+                    </a>
+                  ) : (
+                    <span>-</span>
+                  )}
+                </td>
+                
                   <td>{order.status}</td>
                   <td>{order.total}kr</td>
                   <td className="table-details">
