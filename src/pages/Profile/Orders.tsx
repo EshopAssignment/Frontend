@@ -1,10 +1,7 @@
 import { getMyOrders } from "@/Services/orderService";
 import { useQuery } from "@tanstack/react-query";
 
-
-
-
-const Help = () => {
+const UserOrders = () => {
   const { data, isLoading, isError} = useQuery({
     queryKey: ["my-orders"],
     queryFn: () => getMyOrders(),
@@ -27,7 +24,6 @@ const Help = () => {
   function fmtDate(input: string) {
     if (!input) return "-";
 
-    // säkerställ UTC om backend skickar utan Z
     const safe = input.endsWith("Z") ? input : input + "Z";
     const d = new Date(safe);
 
@@ -103,4 +99,4 @@ const Help = () => {
   );
 };
 
-export default Help;
+export default UserOrders;
