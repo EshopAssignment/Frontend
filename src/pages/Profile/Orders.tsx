@@ -1,6 +1,9 @@
 import { getMyOrders } from "@/Services/orderService";
 import { useQuery } from "@tanstack/react-query";
 
+
+
+
 const Help = () => {
   const { data, isLoading, isError} = useQuery({
     queryKey: ["my-orders"],
@@ -21,6 +24,20 @@ const Help = () => {
       return <div> Du har inte handlat något än</div>;
     }
   
+  function fmtDate(input: string) {
+    if (!input) return "-";
+
+    // säkerställ UTC om backend skickar utan Z
+    const safe = input.endsWith("Z") ? input : input + "Z";
+    const d = new Date(safe);
+
+    if (isNaN(d.getTime())) return "-";
+
+    return d.toLocaleString("sv-SE", {
+      dateStyle: "short",
+      timeStyle: "short",
+    });
+  }
 
   return (
     <section>
@@ -41,7 +58,7 @@ const Help = () => {
             <tbody>
               {orders.map(order => (
                 <tr key={order.orderNumber}>
-                  <td>{order.date}</td>
+                  <td>{fmtDate(order.date)}</td>
                   <td>{order.orderNumber}</td>
                 
                 <td>
