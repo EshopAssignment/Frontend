@@ -10,9 +10,24 @@ export type AdminOrderListItem =
 export type AdminOrderDetails =
   NonNullable<Awaited<ReturnType<typeof sdk.getApiAdminOrdersById>>["data"]>;
 
-type PatchArgs = Parameters<typeof sdk.patchApiAdminOrdersByIdStatus>[0];
-type PatchBody = NonNullable<PatchArgs>["body"];
-export type AdminOrderStatus = PatchBody extends { orderStatus: infer S } ? S : never;
+type UpdateStatusReq = Parameters<typeof sdk.patchApiAdminOrdersByIdStatus>[0]["body"];
+export type AdminOrderStatus = NonNullable<UpdateStatusReq>["orderStatus"];
+
+
+type PatchTrackingArgs = Parameters<typeof sdk.patchApiAdminOrdersByIdTracking>[0];
+type PatchTrackingBody = NonNullable<PatchTrackingArgs>["body"];
+
+export async function setTracking(
+  id: number,
+  body: PatchTrackingBody
+): Promise<void> {
+  const res = await sdk.patchApiAdminOrdersByIdTracking({
+    client: api,
+    path: { id },
+    body,
+  });
+  if (res.error) throw res.error;
+}
 
 export async function listOrders(opts: {
   page: number;

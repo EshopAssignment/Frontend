@@ -36,6 +36,8 @@ export type AdminOrderDetailsDto = {
     shippingCost: number | string;
     taxTotal: number | string;
     grandTotal: number | string;
+    trackingNumber: null | string;
+    tackingUrl: null | string;
     items: Array<AdminOrderItemDto>;
 };
 
@@ -59,6 +61,11 @@ export type AdminOrderListItemDto = {
     paymentStatus: PaymentStatus;
     grandTotal: number | string;
     paymentMethod: string;
+};
+
+export type AdminSetTrackingRequest = {
+    trackingNumber: string;
+    markAsShipped?: boolean;
 };
 
 export type AdminUpdateOrderStatusRequest = {
@@ -362,6 +369,37 @@ export type PatchApiAdminOrdersByIdStatusResponses = {
 };
 
 export type PatchApiAdminOrdersByIdStatusResponse = PatchApiAdminOrdersByIdStatusResponses[keyof PatchApiAdminOrdersByIdStatusResponses];
+
+export type PatchApiAdminOrdersByIdTrackingData = {
+    body: AdminSetTrackingRequest;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/admin/orders/{id}/tracking';
+};
+
+export type PatchApiAdminOrdersByIdTrackingErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PatchApiAdminOrdersByIdTrackingError = PatchApiAdminOrdersByIdTrackingErrors[keyof PatchApiAdminOrdersByIdTrackingErrors];
+
+export type PatchApiAdminOrdersByIdTrackingResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type PatchApiAdminOrdersByIdTrackingResponse = PatchApiAdminOrdersByIdTrackingResponses[keyof PatchApiAdminOrdersByIdTrackingResponses];
 
 export type GetApiAdminProductsData = {
     body?: never;
