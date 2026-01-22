@@ -61,7 +61,7 @@ export async function setDefaultShippingAddress(
   if (res.error) throw res.error;
 }
 
-//cclanker made helper.
+//generetade: GPT 5.2
 export async function addAddressAndReload(
   body: UpsertAddressDto,
   opts?: { signal?: AbortSignal }

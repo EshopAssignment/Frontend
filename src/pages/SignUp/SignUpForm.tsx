@@ -1,10 +1,10 @@
 import { useForm } from "react-hook-form";
-import { api } from "@/lib/http";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useLogin, useRegister } from "@/queries/auth";
 
 type FormValues = {
-  display: string;
+  displayName: string;
   email: string;
   password: string;
   confirm: string;
@@ -12,47 +12,33 @@ type FormValues = {
 
 export default function SignUpForm() {
   const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors, isSubmitting },
+    register, handleSubmit, watch, 
+    formState: {errors, isSubmitting},
   } = useForm<FormValues>();
 
+  const [serverErr, setServerErr] = useState<string | null>(null);
   const nav = useNavigate();
   const loc = useLocation() as any;
-  const from = loc.state?.from?.pathname ?? "/";
-
-  const [serverErr, setServerErr] = useState<string | null>(null);
+  const from = loc.state?.from?.pathname ?? "/"
+  const regMut = useRegister();
+  const loginMut = useLogin();
 
   const onSubmit = async (data: FormValues) => {
     setServerErr(null);
-    try {
-      // Registrera
-      const reg = await api.request({
-        method: "POST",
-        url: "/auth/register",
-        body: { 
-          email: data.email, 
-          password: data.password, 
-          displayName: data.display 
-        },
-      });
-      if (reg.error) throw reg.error;
 
-      // Auto-login
-      const login = await api.request({
-        method: "POST",
-        url: "/auth/login",
-        body: { email: data.email, password: data.password },
-      });
-      if (login.error) throw login.error;
+    const email = data.email.trim();
+    const displayName = data.displayName.trim();
 
-      nav(from, { replace: true });
+    try{
+      await regMut.mutateAsync({displayName, email, password: data.password});
+      await loginMut.mutateAsync({email, password:data.password});
+
+        nav(from, {replace: true});
     } catch {
-      setServerErr("Registrering misslyckades. Kontrollera uppgifterna.");
+      setServerErr("Registering misslyckades");
     }
   };
-
+ 
   return (
     <div className="auth-form-container">
       <div className="form-header">
@@ -64,19 +50,28 @@ export default function SignUpForm() {
 
       <form className="auth-form" noValidate onSubmit={handleSubmit(onSubmit)}>
         <div className="input-group">
-          <label>Användarnamn</label>
+          <label htmlFor="displayName">Namn</label>
           <input
             className="input"
-            {...register("display", { required: "Fyll i ett användarnamn" })}
+            id="displayName"
+            type="text"
+            autoComplete="name"
+            {...register("displayName", {
+              required: "Namn krävs",
+              minLength: { value: 2, message: "Minst 2 tecken" },
+            })}
           />
-          {errors.display && <p className="form-error">{errors.display.message}</p>}
+          {errors.displayName && <p className="form-error">{errors.displayName.message}</p>}
         </div>
 
+
         <div className="input-group">
-          <label>E-post</label>
+          <label htmlFor="email">E-post</label>
           <input
             className="input"
+            id="email"
             type="email"
+            autoComplete="email"
             {...register("email", {
               required: "E-post krävs",
               pattern: {
@@ -89,30 +84,30 @@ export default function SignUpForm() {
         </div>
 
         <div className="input-group">
-          <label>Lösenord</label>
+          <label htmlFor="password">Lösenord</label>
           <input
             className="input"
+            id="password"
             type="password"
+            autoComplete="new-password"
             {...register("password", {
               required: "Lösenord krävs",
-              minLength: {
-                value: 8,
-                message: "Minst 8 tecken",
-              },
+              minLength: { value: 8, message: "Minst 8 tecken" },
             })}
           />
           {errors.password && <p className="form-error">{errors.password.message}</p>}
         </div>
 
         <div className="input-group">
-          <label>Bekräfta Lösenord</label>
+          <label htmlFor="confirm">Bekräfta lösenord</label>
           <input
             className="input"
+            id="confirm"
             type="password"
+            autoComplete="new-password"
             {...register("confirm", {
               required: "Bekräfta lösenordet",
-              validate: (value) =>
-                value === watch("password") || "Lösenorden matchar inte",
+              validate: (value) => value === watch("password") || "Lösenorden matchar inte",
             })}
           />
           {errors.confirm && <p className="form-error">{errors.confirm.message}</p>}

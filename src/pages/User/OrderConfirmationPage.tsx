@@ -53,7 +53,6 @@ const OrderConfirmationPage = () => {
   if (!ok) return;
 
   const key = `cart-cleared:${data.orderNumber ?? orderNumber}`;
-  //make sure we dont doubleclear
   if (!sessionStorage.getItem(key)) {
     clear();
     sessionStorage.setItem(key, "1");

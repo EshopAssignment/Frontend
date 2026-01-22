@@ -77,8 +77,6 @@ function normalizeOrder(o: any): OrderDto {
   const hasAddress =
     shippingAddress &&
     String(shippingAddress?.postalCode ?? shippingAddress?.PostalCode ?? "").trim().length > 0;
-
-console.log("[normalize raw]", o);
   
 return {
     ...o,

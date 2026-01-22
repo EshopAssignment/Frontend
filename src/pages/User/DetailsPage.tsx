@@ -58,7 +58,7 @@ const DetailsPage = () => {
     <div className="container">
         <Breadcrumbs
             trail={[
-            { label: "Hem", to: " / " },
+            { label: "Hem", to: "/" },
             { label: "Produkter", to: "/products" }, 
             { label: product.name }          
         ]}

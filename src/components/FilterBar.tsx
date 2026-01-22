@@ -1,8 +1,16 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel, Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition, TransitionChild } from "@headlessui/react";
+import {
+  clearAllFilters,
+  readDraftFromSearchParams,
+  writeDraftToSearchParams,
+  type ProductFilterDraft,
+} from "@/helpers/productFilterParams";
 
-/*100% clanker made copy-paste from chatGPT 5.1*/
+
+
+/*100% copy-paste from chatGPT 5.2*/
 
 const SORT_OPTIONS = [
   { value: "", label: "Relevans" },
@@ -13,94 +21,78 @@ const SORT_OPTIONS = [
 ];
 
 const PALLET_TYPES = ["EuroPallet", "HalfPallet", "IndustrialPallet", "CustomPallet", "SpecialPallet", "Other"];
-const CONDITIONS = ["New", "Used" ,"Refurbished"];
+const CONDITIONS = ["New", "Used", "Refurbished"];
+
+const toggle = (arr: string[], val: string) =>
+  arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val];
 
 export default function FilterBar() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const q = searchParams.get("q") ?? "";
-  const sort = searchParams.get("sort") ?? "";
-  const type = searchParams.getAll("type");
-  const condition = searchParams.getAll("condition");
-  const inStock = searchParams.get("inStock") === "true";
-  const minPrice = searchParams.get("minPrice") ?? "";
-  const maxPrice = searchParams.get("maxPrice") ?? "";
 
+  const live = useMemo(() => readDraftFromSearchParams(searchParams), [searchParams]);
+
+  const [draft, setDraft] = useState<ProductFilterDraft>(live);
   const [open, setOpen] = useState(false);
-  const [localSort, setLocalSort] = useState(sort);
-  const [localType, setLocalType] = useState<string[]>(type);
-  const [localCondition, setLocalCondition] = useState<string[]>(condition);
-  const [localInStock, setLocalInStock] = useState(inStock);
-  const [localMinPrice, setLocalMinPrice] = useState(minPrice);
-  const [localMaxPrice, setLocalMaxPrice] = useState(maxPrice);
 
   useEffect(() => {
-    setLocalSort(sort);
-    setLocalType(type);
-    setLocalCondition(condition);
-    setLocalInStock(inStock);
-    setLocalMinPrice(minPrice);
-    setLocalMaxPrice(maxPrice);
-  }, [sort, type.join(","), condition.join(","), inStock, minPrice, maxPrice]);
+    setDraft(live);
+  }, [
+    live.sort,
+    live.inStock,
+    live.minPrice,
+    live.maxPrice,
+    live.type.join(","),
+    live.condition.join(","),
+  ]);
+
+  const hasAnyFilters =
+    !!live.sort ||
+    live.type.length > 0 ||
+    live.condition.length > 0 ||
+    live.inStock ||
+    !!live.minPrice ||
+    !!live.maxPrice;
 
   function apply() {
-    const next = new URLSearchParams(searchParams);
-
-    if (localSort) next.set("sort", localSort); else next.delete("sort");
-
-    next.delete("type");
-    localType.forEach(t => next.append("type", t));
-
-    next.delete("condition");
-    localCondition.forEach(c => next.append("condition", c));
-
-    if (localInStock) next.set("inStock", "true");
-    else next.delete("inStock");
-
-    if (localMinPrice) next.set("minPrice", localMinPrice); else next.delete("minPrice");
-    if (localMaxPrice) next.set("maxPrice", localMaxPrice); else next.delete("maxPrice");
-
-    next.delete("page");
-    setSearchParams(next);
+    setSearchParams(writeDraftToSearchParams(searchParams, draft));
     setOpen(false);
   }
 
   function clearAll() {
-    const next = new URLSearchParams(searchParams);
-    ["sort","type","condition","inStock","minPrice","maxPrice"].forEach(k => next.delete(k));
-    next.delete("page");
-    setSearchParams(next);
+    setSearchParams(clearAllFilters(searchParams));
     setOpen(false);
   }
 
-  const toggle = (arr: string[], val: string) =>
-    arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val];
+  function setSortInstant(val: string) {
+    const nextDraft = { ...draft, sort: val };
+    setDraft(nextDraft);
+    setSearchParams(writeDraftToSearchParams(searchParams, nextDraft));
+  }
 
   return (
     <>
       <div className="filters-toolbar">
         <div className="filters-left">
-          <button type="button" className="btn" onClick={() => setOpen(true)}>Filtrera</button>
+          <button type="button" className="btn" onClick={() => setOpen(true)}>
+            Filtrera
+          </button>
 
-          
-          <Listbox
-            value={localSort}
-            onChange={(val) => {
-                setLocalSort(val);
-                const next = new URLSearchParams(searchParams);
-                if (val) next.set("sort", val);
-                else next.delete("sort");
-                next.delete("page");
-                setSearchParams(next);
-            }}
-            >
+          <Listbox value={draft.sort} onChange={setSortInstant}>
             <div className="listbox">
               <ListboxButton className="listbox-btn">
-                {SORT_OPTIONS.find(o => o.value === localSort)?.label ?? "Relevans"}
+                {SORT_OPTIONS.find((o) => o.value === draft.sort)?.label ?? "Relevans"}
               </ListboxButton>
-              <Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
+
+              <Transition
+                as={Fragment}
+                leave="transition ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
                 <ListboxOptions className="listbox-options">
-                  {SORT_OPTIONS.map(o => (
+                  {SORT_OPTIONS.map((o) => (
                     <ListboxOption key={o.value} value={o.value} className="listbox-option">
                       {o.label}
                     </ListboxOption>
@@ -113,13 +105,14 @@ export default function FilterBar() {
 
         <div className="filters-right">
           {q && <span className="badge">Sök: “{q}”</span>}
-          {(type.length > 0 || condition.length > 0 || inStock || minPrice || maxPrice) && (
-            <button type="button" className="link" onClick={clearAll}>Rensa filter</button>
+          {hasAnyFilters && (
+            <button type="button" className="link" onClick={clearAll}>
+              Rensa filter
+            </button>
           )}
         </div>
       </div>
 
-      
       <Transition show={open} as={Fragment}>
         <Dialog onClose={setOpen} className="filter-dialog">
           <div className="filter-backdrop" aria-hidden="true" />
@@ -140,12 +133,12 @@ export default function FilterBar() {
                   <DisclosureButton className="disclosure-btn">Palltyp</DisclosureButton>
                   <DisclosurePanel className="disclosure-panel">
                     <div className="check-grid">
-                      {PALLET_TYPES.map(t => (
+                      {PALLET_TYPES.map((t) => (
                         <label key={t} className="check">
                           <input
                             type="checkbox"
-                            checked={localType.includes(t)}
-                            onChange={() => setLocalType(curr => toggle(curr, t))}
+                            checked={draft.type.includes(t)}
+                            onChange={() => setDraft((d) => ({ ...d, type: toggle(d.type, t) }))}
                           />
                           <span>{t}</span>
                         </label>
@@ -158,12 +151,14 @@ export default function FilterBar() {
                   <DisclosureButton className="disclosure-btn">Skick</DisclosureButton>
                   <DisclosurePanel className="disclosure-panel">
                     <div className="check-grid">
-                      {CONDITIONS.map(c => (
+                      {CONDITIONS.map((c) => (
                         <label key={c} className="check">
                           <input
                             type="checkbox"
-                            checked={localCondition.includes(c)}
-                            onChange={() => setLocalCondition(curr => toggle(curr, c))}
+                            checked={draft.condition.includes(c)}
+                            onChange={() =>
+                              setDraft((d) => ({ ...d, condition: toggle(d.condition, c) }))
+                            }
                           />
                           <span>{c}</span>
                         </label>
@@ -178,33 +173,39 @@ export default function FilterBar() {
                     <label className="check">
                       <input
                         type="checkbox"
-                        checked={localInStock}
-                        onChange={() => setLocalInStock(v => !v)}
+                        checked={draft.inStock}
+                        onChange={() => setDraft((d) => ({ ...d, inStock: !d.inStock }))}
                       />
                       <span>Endast i lager</span>
                     </label>
 
                     <div className="price-row">
                       <input
-                        type="number" min={0}
+                        type="number"
+                        min={0}
                         placeholder="Min"
-                        value={localMinPrice}
-                        onChange={e => setLocalMinPrice(e.target.value)}
+                        value={draft.minPrice}
+                        onChange={(e) => setDraft((d) => ({ ...d, minPrice: e.target.value }))}
                       />
                       <span>–</span>
                       <input
-                        type="number" min={0}
+                        type="number"
+                        min={0}
                         placeholder="Max"
-                        value={localMaxPrice}
-                        onChange={e => setLocalMaxPrice(e.target.value)}
+                        value={draft.maxPrice}
+                        onChange={(e) => setDraft((d) => ({ ...d, maxPrice: e.target.value }))}
                       />
                     </div>
                   </DisclosurePanel>
                 </Disclosure>
 
                 <div className="filter-actions">
-                  <button type="button" className="btn" onClick={clearAll}>Rensa</button>
-                  <button type="button" className="btn" onClick={apply}>Verkställ</button>
+                  <button type="button" className="btn" onClick={clearAll}>
+                    Rensa
+                  </button>
+                  <button type="button" className="btn" onClick={apply}>
+                    Verkställ
+                  </button>
                 </div>
               </DialogPanel>
             </TransitionChild>
@@ -214,3 +215,5 @@ export default function FilterBar() {
     </>
   );
 }
+
+
