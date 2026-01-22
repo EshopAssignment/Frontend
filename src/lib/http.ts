@@ -6,7 +6,7 @@ function normalizeBase(url?: string) {
   return (url ?? "").replace(/\/+$/, "");
 }
 
-//certified clankermade component.
+//genereated gpt5.2
 const BASE = normalizeBase(import.meta.env.VITE_API_URL);
 
 async function doRefresh(): Promise<Response> {
@@ -86,31 +86,25 @@ export async function httpJson<T>(url: string, init?: RequestInit): Promise<T> {
 export const api = createClient({
   baseUrl: BASE,
   fetch: async (input, init) => {
-    // Normalisera indata till url + init
     let url: string;
     let method: string;
     let headers = new Headers();
     let body: any = null;
 
     if (input instanceof Request) {
-      // Starta från Request
       url = input.url;
       method = input.method;
 
-      // Headers från Request
       input.headers.forEach((v, k) => headers.set(k, v));
 
-      // Init-values override: method/headers/body etc kan komma via init
       if (init?.headers) {
         new Headers(init.headers).forEach((v, k) => headers.set(k, v));
       }
       method = init?.method ?? method;
 
-      // Body-prio: init.body först, annars läs request-body
       if (init?.body !== undefined) {
         body = init.body;
       } else if (method !== "GET" && method !== "HEAD") {
-        // Klona och läs request-bodyn om möjligt
         try {
           const cloned = input.clone();
           body = await cloned.text();
@@ -126,30 +120,19 @@ export const api = createClient({
       body = init?.body ?? null;
     }
 
-    // Content-Type och body-normalisering
+    
     if (body instanceof FormData) {
-      headers.delete("Content-Type"); // låt browsern sätta boundary
+      headers.delete("Content-Type");
     } else if (body != null) {
       if (typeof body === "object" && !(body instanceof Blob) && !(body instanceof ArrayBuffer)) {
-        // JS-objekt → JSON
         body = JSON.stringify(body);
         if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
       } else if (typeof body === "string") {
-        // Sträng: om Content-Type saknas och den ser ut som JSON → sätt header
         if (!headers.has("Content-Type") && /^[\s]*[{[]/.test(body)) {
           headers.set("Content-Type", "application/json");
         }
       }
     }
-
-    // Debug: se att vi faktiskt skickar body och CT
-    console.log("🔍 API Request", {
-      url,
-      method,
-      contentType: headers.get("Content-Type"),
-      bodyPreview: typeof body === "string" ? body.slice(0, 120) : body instanceof FormData ? "[FormData]" : typeof body
-    });
-
     return withAuthFetch(url, {
       method,
       headers,

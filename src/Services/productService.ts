@@ -7,7 +7,8 @@ export type PagedProducts = NonNullable<
 export type ProductDto = NonNullable<PagedProducts['items']>[number];
 export type ProductSuggestionDto =
   NonNullable<Awaited<ReturnType<typeof sdk.getApiProductsSuggest>>['data']>[number];
-type SortUi = 'price_asc' | 'price_desc' | 'name_asc' | 'name_desc' | undefined;
+export type SortUi = 'price_asc' | 'price_desc' | 'name_asc' | 'name_desc';
+
 
 
 
@@ -49,7 +50,7 @@ export async function getProductsPaged(
     condition: rest.condition,
     minPrice: rest.minPrice,
     maxPrice: rest.maxPrice,
-    inStock: rest.inStock ? true : undefined,
+    inStock: rest.inStock,
   });
 
   const res = await sdk.getApiProducts({ client: api, query, signal });

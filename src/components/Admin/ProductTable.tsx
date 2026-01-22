@@ -10,7 +10,7 @@ type Props = {
   onToggle: (id: number, current: boolean) => void;
   onUpload: (id: number, file: File) => void;
 };
-//clanker(ChatGpt5.1) made table to outline the fields for testing. 
+//(ChatGpt5.1) made table to outline the fields for testing. 
 
 function toNumId(v: unknown): number | null {
   const n = typeof v === "number" ? v : typeof v === "string" ? Number(v) : NaN;
