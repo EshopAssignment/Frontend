@@ -13,10 +13,7 @@ i{
 }
 .error{
     color:var(--destructive);
-    font-size:26px;
-    text-align: center;
-    border:1px solid var(--destructive);
-    border-radius: var(--radius6);
+    font-size:12px;
 }
 .success{
     color:var(--accent);

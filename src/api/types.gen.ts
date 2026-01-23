@@ -205,8 +205,8 @@ export type ProductSuggestionDto = {
 
 export type RegisterDto = {
     email: string;
-    password: string;
     displayName: string;
+    password: string;
 };
 
 export type ServicePointDto = {
@@ -260,16 +260,16 @@ export type UpdateOrderShippingAddressDto = {
 export type UpdateProfileDto = {
     firstName: string;
     lastName: string;
-    phone: string;
+    phone: null | string;
     defaultShippingAddressId: null | number | string;
 };
 
 export type UpsertAddressDto = {
-    label: string;
+    label: null | string;
     street: string;
     city: string;
     postalCode: string;
-    country: string;
+    country: null | string;
 };
 
 export type UserAddressDto = {

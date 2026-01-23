@@ -1,9 +1,14 @@
+import { consumeRedirectToast } from "@/lib/redirectToast";
+import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 
 
 
 const SignupLayout = () => {
-  return (
+  useEffect(() => {
+    consumeRedirectToast();
+  }, []);
+  return(
   <>
     <div className="container">
             <Outlet />
