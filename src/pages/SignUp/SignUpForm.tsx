@@ -2,6 +2,9 @@ import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useLogin, useRegister } from "@/queries/auth";
+import toast from "react-hot-toast";
+import { toFieldErrors } from "@/lib/FieldErrors";
+import { setRedirectToast } from "@/lib/redirectToast";
 
 type FormValues = {
   displayName: string;
@@ -11,10 +14,14 @@ type FormValues = {
 };
 
 export default function SignUpForm() {
-  const {
-    register, handleSubmit, watch, 
-    formState: {errors, isSubmitting},
-  } = useForm<FormValues>();
+const {
+  register,
+  handleSubmit,
+  watch,
+  setError,
+  clearErrors,
+  formState: { errors, isSubmitting },
+} = useForm<FormValues>();
 
   const [serverErr, setServerErr] = useState<string | null>(null);
   const nav = useNavigate();
@@ -23,21 +30,32 @@ export default function SignUpForm() {
   const regMut = useRegister();
   const loginMut = useLogin();
 
-  const onSubmit = async (data: FormValues) => {
-    setServerErr(null);
+const onSubmit = async (data: FormValues) => {
+  setServerErr(null);
+  clearErrors();
 
-    const email = data.email.trim();
-    const displayName = data.displayName.trim();
+  const email = data.email.trim();
+  const displayName = data.displayName.trim();
 
-    try{
-      await regMut.mutateAsync({displayName, email, password: data.password});
-      await loginMut.mutateAsync({email, password:data.password});
+  try {
+    await regMut.mutateAsync({ displayName, email, password: data.password });
+    await loginMut.mutateAsync({ email, password: data.password });
 
-        nav(from, {replace: true});
-    } catch {
-      setServerErr("Registering misslyckades");
+    setRedirectToast({ type: "success", message: `Välkommen, ${displayName}.` });
+    nav(from, { replace: true });
+  } catch (e) {
+    const fe = toFieldErrors(e);
+    if (fe) {
+      if (fe.email) setError("email", { type: "server", message: fe.email });
+      if (fe.displayName) setError("displayName", { type: "server", message: fe.displayName });
+      if (fe.password) setError("password", { type: "server", message: fe.password });
+    } else {
+      setServerErr("Registrering misslyckades.");
     }
-  };
+
+    toast.error("Något gick fel");
+  }
+};
  
   return (
     <div className="auth-form-container">

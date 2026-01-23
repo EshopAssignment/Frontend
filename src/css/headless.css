@@ -17,9 +17,12 @@
 }
 .listbox{position:relative}
 .listbox-btn{border:1px solid var(--border);background:var(--popover);padding:.5rem .75rem;border-radius:8px}
-.listbox-options{position:absolute;
+.listbox-options{
+  position:absolute;
   z-index:50;
   min-width:220px;
+  width: 100%;
+  overflow-y: auto;
   margin-top:.25rem;
   border:1px solid var(--border);
   background:var(--card);

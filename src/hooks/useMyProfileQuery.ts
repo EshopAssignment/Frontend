@@ -10,11 +10,15 @@ import {
 } from "@/Services/profileService";
 import { qk } from "@/queries/queryKeys";
 import { findSelectedDefault, toAddressOptions, toDefaultId } from "@/helpers/profileVm";
+import toast from "react-hot-toast";
+import { toFieldErrors } from "@/lib/FieldErrors";
+
+type FieldErrors = Record<string, string>;
+
+type ProfileFormVm = Omit<UpdateProfileDto, "phone"> & { phone: string };
 
 export function useMyProfileQuery() {
   const qc = useQueryClient();
-
-  const [saved, setSaved] = useState<string | null>(null);
 
   const meQuery = useQuery({
     queryKey: qk.meProfile,
@@ -25,7 +29,10 @@ export function useMyProfileQuery() {
 
   const me = meQuery.data ?? null;
 
-  const [profileForm, setProfileForm] = useState<UpdateProfileDto>({
+  const [profileErrors, setProfileErrors] = useState<FieldErrors>({});
+  const [addressErrors, setAddressErrors] = useState<FieldErrors>({});
+
+  const [profileForm, setProfileForm] = useState<ProfileFormVm>({
     firstName: "",
     lastName: "",
     phone: "",
@@ -40,9 +47,27 @@ export function useMyProfileQuery() {
     country: "SE",
   });
 
-const didInitProfile = useRef(false);
+  function setProfileField<K extends keyof ProfileFormVm>(key: K, value: ProfileFormVm[K]) {
+    setProfileForm((p) => ({ ...p, [key]: value }));
+    setProfileErrors((e) => {
+      const copy = { ...e };
+      delete copy[String(key)];
+      return copy;
+    });
+  }
 
-useEffect(() => {
+  function setAddressField<K extends keyof UpsertAddressDto>(key: K, value: UpsertAddressDto[K]) {
+    setAddressForm((a) => ({ ...a, [key]: value }));
+    setAddressErrors((e) => {
+      const copy = { ...e };
+      delete copy[String(key)];
+      return copy;
+    });
+  }
+
+  const didInitProfile = useRef(false);
+
+  useEffect(() => {
     if (!me || didInitProfile.current) return;
 
     setProfileForm({
@@ -51,7 +76,6 @@ useEffect(() => {
       phone: me.profile?.phone ?? "",
       defaultShippingAddressId: me.profile?.defaultShippingAddressId ?? null,
     });
-    
 
     didInitProfile.current = true;
   }, [me]);
@@ -63,19 +87,17 @@ useEffect(() => {
     [addressOptions, defaultId]
   );
 
-const updateProfileMut = useMutation({
-  mutationFn: (dto: UpdateProfileDto) => updateProfile(dto),
-  onSuccess: async () => {
-    setSaved("Uppgifter sparade.");
-    didInitProfile.current = false;
-    await qc.invalidateQueries({ queryKey: qk.meProfile });
-  },
-});
+  const updateProfileMut = useMutation({
+    mutationFn: (dto: UpdateProfileDto) => updateProfile(dto),
+    onSuccess: async () => {
+      didInitProfile.current = false;
+      await qc.invalidateQueries({ queryKey: qk.meProfile });
+    },
+  });
 
   const addAddressMut = useMutation({
     mutationFn: (dto: UpsertAddressDto) => addAddress(dto),
     onSuccess: async () => {
-      setSaved("Adress sparad.");
       setAddressForm({
         label: "Home",
         street: "",
@@ -90,10 +112,53 @@ const updateProfileMut = useMutation({
   const setDefaultMut = useMutation({
     mutationFn: (id: number | null) => setDefaultShippingAddress(id),
     onSuccess: async () => {
-      setSaved("Standardadress uppdaterad.");
       await qc.invalidateQueries({ queryKey: qk.meProfile });
     },
   });
+
+  async function submitProfile() {
+    setProfileErrors({});
+
+    const dto: UpdateProfileDto = {
+      ...profileForm,
+      phone: profileForm.phone.trim() === "" ? null : profileForm.phone.trim(),
+    };
+
+    try {
+      await updateProfileMut.mutateAsync(dto);
+      toast.success("Uppgifter sparade.");
+    } catch (e) {
+      const fe = toFieldErrors(e);
+      if (fe) setProfileErrors(fe);
+      toast.error("Något gick fel");
+      throw e;
+    }
+  }
+
+  async function submitAddress() {
+    setAddressErrors({});
+
+    try {
+      await addAddressMut.mutateAsync(addressForm);
+      toast.success("Adress sparad.");
+    } catch (e) {
+      const fe = toFieldErrors(e);
+      if (fe) setAddressErrors(fe);
+      toast.error("Något gick fel");
+      throw e;
+    }
+  }
+
+  async function chooseDefault(id: number | null) {
+    try {
+      await setDefaultMut.mutateAsync(id);
+      toast.success("Standardadress uppdaterad.");
+    } catch (e) {
+      toast.error("Något gick fel");
+      
+      throw e;
+    }
+  }
 
   const error =
     (meQuery.error as any)?.message ??
@@ -102,21 +167,6 @@ const updateProfileMut = useMutation({
     (setDefaultMut.error as any)?.message ??
     null;
 
-  async function submitProfile() {
-    setSaved(null);
-    await updateProfileMut.mutateAsync(profileForm);
-  }
-
-  async function submitAddress() {
-    setSaved(null);
-    await addAddressMut.mutateAsync(addressForm);
-  }
-
-  async function chooseDefault(id: number | null) {
-    setSaved(null);
-    await setDefaultMut.mutateAsync(id);
-  }
-
   return {
     me,
 
@@ -124,13 +174,14 @@ const updateProfileMut = useMutation({
     fetching: meQuery.isFetching,
 
     error,
-    saved,
-    clearSaved: () => setSaved(null),
 
     profileForm,
-    setProfileForm,
+    setProfileField,
+    profileErrors,
+
     addressForm,
-    setAddressForm,
+    setAddressField,
+    addressErrors,
 
     addressOptions,
     defaultId,
@@ -144,6 +195,4 @@ const updateProfileMut = useMutation({
     savingAddress: addAddressMut.isPending,
     savingDefault: setDefaultMut.isPending,
   };
-
-
 }

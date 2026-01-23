@@ -1,6 +1,8 @@
+import { setRedirectToast } from "@/lib/redirectToast";
 import { useLogin } from "@/queries/auth";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 type FormValues = {
@@ -26,10 +28,17 @@ const mut = useLogin();
 
 const onSubmit = async (data: FormValues) => {
   setServerErr(null);
+
+  const email = data.email.trim();
+
   try {
-    await mut.mutateAsync({ email: data.email, password: data.password });
+    await mut.mutateAsync({ email, password: data.password });
+
+    setRedirectToast({ type: "success", message: "Välkommen tillbaka." });
+
     nav(from, { replace: true });
   } catch {
+    toast.error("Något gick fel");
     setServerErr("Inloggning misslyckades. Kontrollera e-post och lösenord.");
   }
 };
