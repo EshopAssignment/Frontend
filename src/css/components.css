@@ -1089,4 +1089,75 @@ button:hover{
     border-radius: var(--radius4);
 }
 /*#endregion*/
+/*#region userOrders */
+.details-btn{
+    display: flex;
+    justify-content: end;
+}
+.user-order-details{
+    display: flex;
+    flex-direction: column;
+    gap:.5rem;
+}
+.details-total{
+    padding:1rem .5rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:.5rem;
+    span{
+        font-size: 1rem;
+        font-weight: bold;
+    }
+}
+.user-table {
+    width:100%;
+    border-collapse: collapse;
+    }
 
+.user-table th, .user-table td { border-bottom:1px solid var(--border); padding:.6rem .5rem; text-align:left }
+.user-group{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap:1rem;
+}
+.user-group{
+    display: flex;
+    flex-direction: column;
+}
+
+.user-product-head{
+    display: grid;
+    grid-template-columns:2rem repeat(9, 1fr);
+    font-size: 12px;
+    gap:.5rem;
+    margin:.5rem;
+    align-items: center;
+    border: var(--border) 1px solid;
+    span, .input-group{
+        border-right: var(--border) 1px solid;
+    }
+    .input{
+        border:none;
+    }
+    
+}
+
+.user-product-items{
+    display: grid;
+    grid-template-columns:2rem repeat(9, 1fr);
+    font-size: 12px;
+    gap:.5rem;
+    margin:.5rem;
+    align-items: center;
+    border: var(--border) 1px solid;
+    span, .input-group{
+        border-right:var(--border) 1px solid;
+    }
+    .input{
+        border:none;
+    }
+    
+}
+
+/*#endregion */

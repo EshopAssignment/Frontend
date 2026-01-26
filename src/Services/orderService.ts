@@ -4,19 +4,12 @@ import type { CartItem } from "@/context/CartContext";
 
 export type CreateOrderRequest = Parameters<typeof sdk.postApiOrder>[0]["body"];
 export type OrderCreatedDto = NonNullable<Awaited<ReturnType<typeof sdk.postApiOrder>>["data"]>;
-
-export type OrderByIdDto = NonNullable<
-  Awaited<ReturnType<typeof sdk.getApiOrderById>>["data"]
->;
-export type OrderByNumberDto = NonNullable<
-  Awaited<ReturnType<typeof sdk.getApiOrderByNumberByOrderNumber>>["data"]
->;
-export type UpdateOrderCustomerRequest =
-  Parameters<typeof sdk.patchApiOrderByNumberByOrderNumberCustomer>[0]["body"];
-
-export type UpdateOrderShippingAddressRequest =
-  Parameters<typeof sdk.patchApiOrderByNumberByOrderNumberShippingAddress>[0]["body"];
-
+export type OrderByIdDto = NonNullable<  Awaited<ReturnType<typeof sdk.getApiOrderById>>["data"]>;
+export type OrderByNumberDto = NonNullable<Awaited<ReturnType<typeof sdk.getApiOrderByNumberByOrderNumber>>["data"]>;
+export type UpdateOrderCustomerRequest = Parameters<typeof sdk.patchApiOrderByNumberByOrderNumberCustomer>[0]["body"];
+export type UpdateOrderShippingAddressRequest = Parameters<typeof sdk.patchApiOrderByNumberByOrderNumberShippingAddress>[0]["body"];
+export type MyOrdersDto = NonNullable<Awaited<ReturnType<typeof sdk.getApiMeOrders>>["data"]>;
+export type MyOrderDetailsDto = NonNullable<Awaited<ReturnType<typeof sdk.getApiMeOrdersByOrderNumber>>["data"]>;
 
 export type OrderDto = (OrderByIdDto | OrderByNumberDto) & {
   orderNumber: string;
@@ -40,8 +33,6 @@ export type OrderDto = (OrderByIdDto | OrderByNumberDto) & {
   shippingCarrier?: string | null;
   shippingMethod?: string | null;
 };
-
-
 export type MyOrderListItem = {
   date: string;
   orderNumber: string;
@@ -57,13 +48,6 @@ export type MyOrderListItem = {
 function toNum(x: any): number {
   const n = typeof x === "string" ? Number(x) : typeof x === "number" ? x : NaN;
   return Number.isFinite(n) ? n : 0;
-}
-
-function toStatus(x: any): string {
-  if (x == null) return "";
-  if (typeof x === "string") return x;
-  if (typeof x === "number") return String(x);
-  return String(x);
 }
 
 function normalizeOrder(o: any): OrderDto {
@@ -105,28 +89,15 @@ return {
   };
 }
 
-function normalizeMyOrderListItem(o: any): MyOrderListItem {
-  const date = String(o?.createdAtUtc ?? o?.CreatedAtUtc ?? o?.createdAt ?? o?.CreatedAt ?? "");
-  const orderNumber = String(o?.orderNumber ?? o?.OrderNumber ?? "");
-  const status = toStatus(o?.orderStatus ?? o?.OrderStatus ?? o?.status ?? o?.Status);
-  const total = toNum(o?.grandTotal ?? o?.GrandTotal ?? o?.total ?? o?.Total);
 
-  return {
-    date,
-    orderNumber,
-    status,
-    total,
-    trackingUrl: o?.trackingUrl ?? o?.TrackingUrl ?? null,
-    receiptUrl: o?.receiptUrl ?? o?.ReceiptUrl ?? null,
-  };
-}
+
+
 
 export async function createOrder(body: CreateOrderRequest): Promise<OrderCreatedDto> {
   const res = await sdk.postApiOrder({ client: api, body });
   if (res.error) throw res.error;
   return res.data!;
 }
-
 export async function createOrderFromCart(
   cartItems: CartItem[],
   cartId: string
@@ -143,7 +114,6 @@ export async function createOrderFromCart(
 
     return createOrder(body)
 }
-
 export async function getOrderById(
   id: number,
   opts?: { signal?: AbortSignal }
@@ -156,7 +126,6 @@ export async function getOrderById(
   if (res.error) throw res.error;
   return normalizeOrder(res.data!);
 }
-
 export async function getOrderByNumber(
   orderNumber: string,
   opts?: { signal?: AbortSignal }
@@ -170,7 +139,6 @@ export async function getOrderByNumber(
   
   return normalizeOrder(res.data!);
 }
-
 export async function updateOrderCustomer(orderNumber: string, body: UpdateOrderCustomerRequest) {
   const res = await sdk.patchApiOrderByNumberByOrderNumberCustomer({
     client:api,
@@ -188,21 +156,41 @@ export async function updateOrderShippingAddress(orderNumber: string, body: Upda
   });
   if (res.error) throw res.error;
 }
-
-export async function getMyOrders(args?: {skip?: number; take?: number; signal?: AbortSignal}): Promise<MyOrderListItem[]> {
+export async function getMyOrders(args?: { skip?: number; take?: number; signal?: AbortSignal }): Promise<MyOrderListItem[]> {
   const skip = Math.max(0, args?.skip ?? 0);
   const take = Math.max(1, Math.min(100, args?.take ?? 20));
 
-  const res = await (sdk as any).getApiMeOrders({
+  const res = await sdk.getApiMeOrders({
     client: api,
-    query:{skip, take},
+    query: { skip, take },
     signal: args?.signal,
   });
 
-  if (res?.error) throw res.error;
+  if (res.error) throw res.error;
 
-  const data = res?.data ?? [];
-  const arr = Array.isArray(data) ? data : (data?.items ?? []);
-  return arr.map(normalizeMyOrderListItem);
+  const data = res.data ?? [];
+  const arr = Array.isArray(data) ? data : [];
+
+  return arr.map((o: any) => ({
+    date: String(o.createdAtUtc ?? o.CreatedAtUtc ?? ""),
+    orderNumber: String(o.orderNumber ?? o.OrderNumber ?? ""),
+    status: String(o.orderStatus ?? o.OrderStatus ?? ""),
+    total: toNum(o.grandTotal ?? o.GrandTotal ?? 0),
+    trackingUrl: o.trackingUrl ?? o.TrackingUrl ?? null,
+    receiptUrl: o.receiptUrl ?? o.ReceiptUrl ?? null,
+  }));
+}
+export async function getMyOrderDetailsByNumber(
+  orderNumber: string,
+  opts?: { signal?: AbortSignal }
+): Promise<MyOrderDetailsDto> {
+  const res = await sdk.getApiMeOrdersByOrderNumber({
+    client: api,
+    path: { orderNumber },
+    signal: opts?.signal,
+  });
+
+  if (res.error) throw res.error;
+  return res.data!;
 }
 
