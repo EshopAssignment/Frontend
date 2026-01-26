@@ -7,7 +7,13 @@ function App() {
   return (
     <>
       <main>
-        <Toaster  />
+        <Toaster 
+        position="bottom-center"
+        gutter={16}
+        toastOptions={{
+          className: 'toaster-style',
+          duration:7000,
+        }}  />
         <OptionsBtn />
         <AppRouter />
       </main>

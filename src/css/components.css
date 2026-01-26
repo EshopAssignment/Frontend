@@ -6,6 +6,10 @@
     border: var(--border) 1px solid;
     margin:.5rem 0;
 }
+.toaster-style{
+    background: var(--gradient-3) !important;
+    color: var(--foreground) !important;
+}
 .home-img{
     max-width: 100svw;
 }
@@ -1033,6 +1037,7 @@ button:hover{
 }
 /*#endregion*/
 /*#region checkout */
+
 .carrier-option{
     display: flex;
     align-items: center;
@@ -1084,3 +1089,4 @@ button:hover{
     border-radius: var(--radius4);
 }
 /*#endregion*/
+
