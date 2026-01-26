@@ -674,6 +674,33 @@ export type GetApiMeOrdersResponses = {
 
 export type GetApiMeOrdersResponse = GetApiMeOrdersResponses[keyof GetApiMeOrdersResponses];
 
+export type GetApiMeOrdersByOrderNumberData = {
+    body?: never;
+    path: {
+        orderNumber: string;
+    };
+    query?: never;
+    url: '/api/me/orders/{orderNumber}';
+};
+
+export type GetApiMeOrdersByOrderNumberErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetApiMeOrdersByOrderNumberError = GetApiMeOrdersByOrderNumberErrors[keyof GetApiMeOrdersByOrderNumberErrors];
+
+export type GetApiMeOrdersByOrderNumberResponses = {
+    /**
+     * OK
+     */
+    200: OrderCreatedDto;
+};
+
+export type GetApiMeOrdersByOrderNumberResponse = GetApiMeOrdersByOrderNumberResponses[keyof GetApiMeOrdersByOrderNumberResponses];
+
 export type PostApiOrderData = {
     body: CreateOrderRequestDto;
     path?: never;
