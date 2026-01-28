@@ -80,17 +80,28 @@ export function OrderDetailsModal({ orderNumber, onClose }: Props) {
               </thead>
 
               <tbody>
-                {(((q.data as any).items ?? []) as any[]).map((it) => {
-                  const qty = asNum(it.quantity, 0);
-                  const price = asNum(it.unitPrice, 0);
-                  const line = asNum(it.lineTotal, price * qty);
+              {(((q.data as any).items ?? []) as any[]).map((it) => {
+                const qty = asNum(it.quantity, 0);
+
+                const unitEx = asNum(it.unitPriceExVat ?? it.UnitPriceExVat ?? it.unitPrice ?? it.UnitPrice, 0);
+                const unitInc = asNum(it.unitPriceIncVat ?? it.UnitPriceIncVat, NaN);
+
+                const lineEx = asNum(it.lineTotalExVat ?? it.LineTotalExVat ?? it.lineTotal ?? it.LineTotal, unitEx * qty);
+                const lineInc = asNum(it.lineTotalIncVat ?? it.LineTotalIncVat, NaN);
+
+                const vatRate = asNum(it.vatRatePercent ?? it.VatRatePercent, 25);
+                const computedUnitInc = unitEx * (1 + vatRate / 100);
+                const computedLineInc = lineEx * (1 + vatRate / 100);
+
+                const displayUnit = Number.isFinite(unitInc) ? unitInc : computedUnitInc;
+                const displayLine = Number.isFinite(lineInc) ? lineInc : computedLineInc;
 
                   return (
                     <tr key={`${it.productId}-${it.productName}`}>
                       <td>{it.productName}</td>
                       <td>{qty}</td>
-                      <td>{fmtSEK(price)}</td>
-                      <td>{fmtSEK(line)}</td>
+                      <td>{fmtSEK(displayUnit)}</td>
+                      <td>{fmtSEK(displayLine)}</td>
                     </tr>
                   );
                 })}
@@ -103,7 +114,7 @@ export function OrderDetailsModal({ orderNumber, onClose }: Props) {
 
                 <p>Frakt: {fmtSEK(asNum((q.data as any).shippingTotal ?? (q.data as any).shippingCost, 0))}{" "}</p>
 
-                <p>Moms: {fmtSEK(asNum((q.data as any).taxTotal, 0))}</p>
+                <p>Moms: {fmtSEK(asNum((q.data as any).vatTotal, 0))}</p>
 
                 <span> Totalt:{" "}{fmtSEK(asNum((q.data as any).grandTotal, 0))}</span>
 

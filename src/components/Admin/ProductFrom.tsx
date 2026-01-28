@@ -10,6 +10,20 @@ type Props = {
   loading?: boolean;
 };
 
+function asNum(v: unknown, fb = 0) {
+  const n = typeof v === "number" ? v : typeof v === "string" ? Number(v) : NaN;
+  return Number.isFinite(n) ? n : fb;
+}
+
+function clampVat(v: unknown) {
+  const n = asNum(v, 25);
+  return n === 6 || n === 12 || n === 25 ? n : 25;
+}
+
+function round2(n: number) {
+  return Math.round(n * 100) / 100;
+}
+
 export default function ProductForm({ title, productId, onSubmit, onCancel, loading }: Props) {
   const idNum = typeof productId === "number" ? productId : Number(productId);
   const isEdit = Number.isFinite(idNum);
@@ -34,6 +48,7 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
     condition: "",
     imgUrl: "",
     priceExVat: 0,
+    vatRatePercent: 25,
     onHand: 0,
     isActive: true,
   });
@@ -48,37 +63,65 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
       palletType: data.palletType,
       condition: data.condition,
       imgUrl: data.imgUrl ?? "",
-      priceExVat: data.priceExVat,
-      onHand: data.onHand,
-      isActive: data.isActive,
+      priceExVat: asNum(data.priceExVat, 0),
+      vatRatePercent: clampVat(data.vatRatePercent),
+      onHand: asNum(data.onHand, 0),
+      isActive: Boolean(data.isActive),
     });
   }, [isEdit, data]);
 
   useEffect(() => {
     if (!options) return;
-    setForm(prev => ({
+
+    setForm((prev) => ({
       ...prev,
       palletType: prev.palletType || options.productTypes[0]?.value || "",
       condition: prev.condition || options.productConditions[0]?.value || "",
+      vatRatePercent: clampVat(prev.vatRatePercent),
     }));
   }, [options]);
 
   const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : undefined), [file]);
+  useEffect(() => {
+    if (!previewUrl) return;
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [previewUrl]);
+
+  const priceIncVat = useMemo(() => {
+    const ex = asNum(form.priceExVat, 0);
+    const vat = clampVat(form.vatRatePercent);
+    return round2(ex * (1 + vat / 100));
+  }, [form.priceExVat, form.vatRatePercent]);
+
+  const vatOptions = useMemo(() => {
+    const list = options?.vatRates ?? [];
+    if (list.length) return list;
+    return [
+      { value: "Vat6", label: "6%", intValue: 6 },
+      { value: "Vat12", label: "12%", intValue: 12 },
+      { value: "Vat25", label: "25%", intValue: 25 },
+    ];
+  }, [options]);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
+
+    const payload: AdminCreateReq = {
+      ...form,
+      name: String(form.name ?? "").trim(),
+      description: String(form.description ?? "").trim(),
+      priceExVat: round2(asNum(form.priceExVat, 0)),
+      vatRatePercent: clampVat(form.vatRatePercent),
+      onHand: Math.max(0, Math.floor(asNum(form.onHand, 0))),
+    };
+
     if (isEdit) {
-      const body: AdminUpdateReq = { id: productId!, ...form };
+      const body: AdminUpdateReq = { id: productId!, ...payload } as AdminUpdateReq;
       onSubmit(body, file);
     } else {
-      onSubmit(form, file);
+      onSubmit(payload, file);
     }
   }
-  
-  useEffect(() => {
-  if (!previewUrl) return;
-  return () => URL.revokeObjectURL(previewUrl);
-}, [previewUrl]);
 
 
 
@@ -152,6 +195,33 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
               }}
             />
           </label>
+
+          <label>
+            Moms
+            <div className="vat-group">
+              <select
+                className="input"
+                value={String(clampVat(form.vatRatePercent))}
+                onChange={(e) => setForm({ ...form, vatRatePercent: Number(e.target.value) })}
+                disabled={!options}
+                required
+              >
+                {vatOptions
+                  .slice()
+                  .sort((a, b) => a.intValue - b.intValue)
+                  .map((o) => (
+                    <option className="options" key={o.intValue} value={o.intValue}>
+                      {o.label}
+                    </option>
+                  ))}
+              </select>
+
+              <span className="muted" title="Beräknat från exkl. moms + momssats">
+                Inkl: {priceIncVat.toFixed(0)} kr
+              </span>
+            </div>
+          </label>
+
 
           <label>
             Lager (On hand)

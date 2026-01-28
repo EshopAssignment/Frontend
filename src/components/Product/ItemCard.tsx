@@ -1,13 +1,16 @@
-import type { ProductDto } from "../Services/productService";
-import placeholder from "../Images/Placeholder.jpg";
-import { useCart } from "../context/CartContext";
+import type { ProductDto } from "../../Services/productService";
+import placeholder from "@/images/Placeholder.jpg";
+import { useCart } from "../../context/CartContext";
 import { Link } from "react-router-dom";
-import { toCartItem } from "../helpers/toCartItem";
-import { buildImageUrl } from "../helpers/url";
+import { toCartItem } from "../../helpers/toCartItem";
+import { buildImageUrl } from "../../helpers/url";
+import { priceIncVat } from "@/helpers/money";
+import { fmtSEK } from "@/helpers/orderFormat";
 
 interface Props{
   product: ProductDto
 }
+
 
 
 const ItemCard = ({product}: Props) => {
@@ -30,6 +33,8 @@ const getBadgeText = (qty: number) => {
   return `(${qty} st)`
 }
   const disabled = available === 0;
+  
+  const priceInc = priceIncVat(product.priceExVat, product.vatRatePercent);
 
   return (
     <div className="item-card">
@@ -54,7 +59,7 @@ const getBadgeText = (qty: number) => {
       </Link>
 
         <div className="item-price">
-          <p>{product.priceExVat} kr/st</p>
+          <p>{fmtSEK(priceInc)} kr/st</p>
           
           <div className={getBadgeClass(available)} aria-label={`Lagersaldo: ${available}`}>
             <p> {getBadgeText(available)}</p>

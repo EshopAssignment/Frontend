@@ -16,7 +16,7 @@ export type OrderDto = (OrderByIdDto | OrderByNumberDto) & {
   shippingCost: number;
   grandTotal: number;
   productsSubtotal: number;
-  taxTotal: number;
+  vatTotal: number;
 
   shippingAddress?: {
     street: string;
@@ -68,7 +68,7 @@ return {
     shippingCost: toNum(o?.shippingCost ?? o?.ShippingCost ?? o?.deliveryCost ?? 0),
     grandTotal: toNum(o?.grandTotal ?? o?.GrandTotal ?? 0),
     productsSubtotal: toNum(o?.productsSubtotal ?? o?.ProductsSubtotal ?? 0),
-    taxTotal: toNum(o?.taxTotal ?? o?.TaxTotal ?? 0),
+    vatTotal: toNum(o?.vatTotal ?? o?.vatTotal ?? 0),
 
     customerFirstName: o?.customerFirstName ?? o?.CustomerFirstName ?? null,
     customerLastName: o?.customerLastName ?? o?.CustomerLastName ?? null,

@@ -3,7 +3,8 @@ import { createContext, useContext, useEffect, useMemo, useReducer } from "react
 export type CartItem = {
   productId: number;
   name: string;
-  priceExVat: number; // UI-visning; server räknar pris och moms på riktigt
+  priceExVat: number; 
+  vatRatePercent: number,
   quantity: number;
   imgUrl?: string;
 };
@@ -35,6 +36,7 @@ function isValidItem(x: any): x is CartItem {
     && Number.isFinite(Number(x.productId))
     && typeof x.name === "string"
     && Number.isFinite(Number(x.priceExVat))
+    && Number.isFinite(Number(x.vatRatePercent))
     && Number.isFinite(Number(x.quantity));
 }
 
@@ -61,11 +63,13 @@ function loadInitialState(): CartState {
 function coerceItem(i: Omit<CartItem, "quantity">): Omit<CartItem, "quantity"> {
   const productId = Number(i.productId);
   const priceExVat = Number(i.priceExVat);
+  const vatRatePercent = Number((i as any).vatRatePercent);
   return {
     productId: Number.isFinite(productId) ? productId : 0,
-    name: String(i.name ?? ""),
+    name: String((i as any).name ?? ""),
     priceExVat: Number.isFinite(priceExVat) ? priceExVat : 0,
-    imgUrl: i.imgUrl ? String(i.imgUrl) : undefined,
+    vatRatePercent: Number.isFinite(vatRatePercent) ? vatRatePercent : 25,
+    imgUrl: (i as any).imgUrl ? String((i as any).imgUrl) : undefined,
   };
 }
 
@@ -123,9 +127,13 @@ function reducer(state: CartState, action: Action): CartState {
     case "HYDRATE":
       return {
         cartId: action.payload.cartId || state.cartId || uuid(),
-        items: Array.isArray(action.payload.items) ? action.payload.items : [],
+        items: Array.isArray(action.payload.items)
+          ? action.payload.items.map((x: any) => ({
+              ...x,
+              vatRatePercent: Number.isFinite(Number(x.vatRatePercent)) ? Number(x.vatRatePercent) : 25,
+            }))
+          : [],
       };
-
     default:
       return state;
   }
