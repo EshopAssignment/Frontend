@@ -1,29 +1,46 @@
-import type { ProductDto } from "../../Services/productService";
+import type { AdminProduct } from "../../Services/adminProductService";
 
 type Props = {
-  data: ProductDto[];
+  data: AdminProduct[];
   page: number;
   totalPages: number;
   onPrev: () => void;
   onNext: () => void;
   onEdit: (id: number) => void;
   onToggle: (id: number, current: boolean) => void;
-  onUpload: (id: number, file: File) => void;
+  onUpload: (id: number, file: File) => void; // du hade den i Props, men använde inte den i komponenten
 };
-//(ChatGpt5.1) made table to outline the fields for testing. 
 
-function toNumId(v: unknown): number | null {
+function fmtSEK0(n: number): string {
+  // inga decimaler, för människor får panik av "256.2 kr"
+  return new Intl.NumberFormat("sv-SE", {
+    style: "currency",
+    currency: "SEK",
+    maximumFractionDigits: 0,
+  }).format(Number.isFinite(n) ? n : 0);
+}
+
+function vatSafe(v: unknown): number {
   const n = typeof v === "number" ? v : typeof v === "string" ? Number(v) : NaN;
-  return Number.isFinite(n) ? n : null;
+  if (n === 6 || n === 12 || n === 25) return n;
+  return 25;
 }
 
-function toMoney(v: unknown): string {
-  const n = typeof v === "number" ? v : Number(v);
-  const safe = Number.isFinite(n) ? n : 0;
-  return new Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK" }).format(safe);
+function priceIncVat(priceExVat: number, vatRatePercent: number): number {
+  const ex = Number.isFinite(priceExVat) ? priceExVat : 0;
+  const vat = vatSafe(vatRatePercent);
+  return Math.round(ex * (1 + vat / 100)); // 0 decimaler: vi rundar till helt SEK
 }
 
-export default function ProductTable({ data, page, totalPages, onPrev, onNext, onEdit, onToggle }: Props) {
+export default function ProductTable({
+  data,
+  page,
+  totalPages,
+  onPrev,
+  onNext,
+  onEdit,
+  onToggle,
+}: Props) {
   return (
     <>
       <table className="admin-table">
@@ -32,35 +49,40 @@ export default function ProductTable({ data, page, totalPages, onPrev, onNext, o
             <th>Id</th>
             <th>Namn</th>
             <th>Aktiv</th>
-            <th>Pris</th>
+            <th>Pris (inkl moms)</th>
+            <th>Moms</th>
             <th>Lager</th>
             <th>Meny</th>
           </tr>
         </thead>
+
         <tbody>
-          {data.map(p => {
-            const idNum = toNumId((p as any).id);
-            const price = toMoney((p as any).priceExVat);
+          {data.map((p) => {
+            const idNum = p.id;
+            const inc = priceIncVat(p.priceExVat, p.vatRatePercent);
 
             return (
-              <tr key={String((p as any).id)}>
-                <td>{String((p as any).id)}</td>
+              <tr key={String(p.id)}>
+                <td>{p.id}</td>
                 <td>{p.name}</td>
+
                 <td>
                   <label className="switch">
                     <input
                       type="checkbox"
                       checked={p.isActive}
-                      onChange={() => idNum !== null && onToggle(idNum, p.isActive)}
-                      disabled={idNum === null}
+                      onChange={() => onToggle(idNum, p.isActive)}
                     />
                     <span className="slider" />
                   </label>
                 </td>
-                <td>{price}</td>
+
+                <td>{fmtSEK0(inc)}</td>
+                <td>{vatSafe(p.vatRatePercent)}%</td>
                 <td>{p.available}</td>
+
                 <td>
-                  <button className="btn" onClick={() => idNum !== null && onEdit(idNum)} disabled={idNum === null}>
+                  <button className="btn" onClick={() => onEdit(idNum)}>
                     Redigera
                   </button>
                 </td>
@@ -71,9 +93,15 @@ export default function ProductTable({ data, page, totalPages, onPrev, onNext, o
       </table>
 
       <div className="pagination">
-        <button onClick={onPrev} disabled={page === 1}>{"<"}</button>
-        <span>Sida {page} av {totalPages}</span>
-        <button onClick={onNext} disabled={page === totalPages}>{">"}</button>
+        <button onClick={onPrev} disabled={page === 1}>
+          {"<"}
+        </button>
+        <span>
+          Sida {page} av {totalPages}
+        </span>
+        <button onClick={onNext} disabled={page === totalPages}>
+          {">"}
+        </button>
       </div>
     </>
   );

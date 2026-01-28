@@ -3,9 +3,10 @@ import { useCart } from "../../context/CartContext";
 import { createOrderFromCart } from "../../Services/orderService";
 import { useNavigate } from "react-router-dom";
 import placeholder from "../../Images/Placeholder.jpg";
+import { lineIncVat, vatAmountFromEx } from "@/helpers/money";
 
 const Cart = () => {
-    const {state, cartId, totalExVat, removeOne, removeAll, clear} = useCart();
+    const {state, cartId, removeOne, removeAll, clear} = useCart();
     const navigate = useNavigate();
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -29,11 +30,20 @@ const Cart = () => {
     } finally {
       setSubmitting(false);
     }
-
-    
-
   };
-    return(   
+
+  
+const totalIncVat = state.items.reduce(
+  (sum, x) => sum + lineIncVat(x.priceExVat, x.vatRatePercent, x.quantity),
+  0
+);
+
+const totalVat = state.items.reduce(
+  (sum, x) => sum + vatAmountFromEx(x.priceExVat, x.vatRatePercent, x.quantity),
+  0
+);
+
+  return(   
       <div className="cart">
         <p>Varukorg</p>
 
@@ -77,9 +87,12 @@ const Cart = () => {
             <button className="btn-clear" onClick={clear}>Töm varukorgen</button>
 
             <div className="checkout">
-            <p className="cart-total">
-              Totalt: {totalExVat} kr
-            </p>
+              <p className="cart-total">
+                Totalt: {totalIncVat} kr
+              </p>
+              <p>
+                Varav moms: {totalVat} kr
+              </p>
             <button className="btn-checkout"
               onClick={handleCheckout}
               disabled={submitting}>

@@ -106,6 +106,11 @@ const OrderConfirmationPage = () => {
               {isFetching ? " (verifierar…)" : ""}
             </p>
 
+            <p>
+              varav Moms: {data?.vatTotal} SEK
+              {isFetching ? " (verifierar…)" : ""}
+            </p>
+
             <p>Orderdatum: <strong>{dateText}</strong></p>
 
             <div className="support">

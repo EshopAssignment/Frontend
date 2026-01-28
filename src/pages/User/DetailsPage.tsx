@@ -5,6 +5,8 @@ import Breadcrumbs from "../../components/Breadcrumbs";
 import { toCartItem } from "../../helpers/toCartItem";
 import { useProduct } from "../../queries/useProducts";
 import { buildImageUrl } from "../../helpers/url";
+import { priceIncVat } from "@/helpers/money";
+import { fmtSEK } from "@/helpers/orderFormat";
 
 
 const DetailsPage = () => {
@@ -53,6 +55,7 @@ const DetailsPage = () => {
 
   const disabled = available === 0;
 
+  const priceInc = priceIncVat(product.priceExVat, product.vatRatePercent);
   return (
 
     <div className="container">
@@ -78,7 +81,7 @@ const DetailsPage = () => {
 
                 <div className="details-price">
 
-                    <p>Pris/st: {product.priceExVat} Kr</p>
+                    <p>Pris/st: {fmtSEK(priceInc)} Kr</p>
                     <div className={getBadgeClass(available)} aria-label={`Lagersaldo: ${available}`}> Tillgängliga:
                         {getBadgeText(available)}
                     </div>

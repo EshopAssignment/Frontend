@@ -4,6 +4,8 @@ import { useCart } from "../../context/CartContext";
 import { Link } from "react-router-dom";
 import { toCartItem } from "../../helpers/toCartItem";
 import { buildImageUrl } from "../../helpers/url";
+import { priceIncVat } from "@/helpers/money";
+import { fmtSEK } from "@/helpers/orderFormat";
 
 interface Props{
   product: ProductDto
@@ -31,6 +33,8 @@ const ProductListView = ({product}: Props) => {
     };
 
     const disabled = available === 0;
+
+    const priceInc = priceIncVat(product.priceExVat, product.vatRatePercent);
 
     return (
         <div className="product-list-item">
@@ -61,7 +65,7 @@ const ProductListView = ({product}: Props) => {
 
             </Link>
             <div className="product-shopping">
-                <p className="product-price">{product.priceExVat} kr/st</p>
+                <p className="product-price">{fmtSEK(priceInc)} kr/st</p>
                 <div className={getBadgeClass(available)} aria-label={`Lagersaldo: ${available}`}>
                     <p>{getBadgeText(available)}</p>
                 </div>

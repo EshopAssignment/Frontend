@@ -8,6 +8,15 @@ export default function CartSummary() {
     
     const [error, ] = useState<string | null>(null);
     const [orderNumber, ] = useState<string | null>(null);
+
+    const totalIncVat = state.items.reduce((sum, x) => {
+    const ex = Number(x.priceExVat) || 0;
+    const vat = Number(x.vatRatePercent) || 25;
+    return sum + ex * (1 + vat / 100) * x.quantity;
+  }, 0);
+
+  const totalVat = totalIncVat - totalExVat;
+
     
   return (
     <div className="cart-sum">
@@ -47,7 +56,9 @@ export default function CartSummary() {
                             {item.quantity}
                         <button className="sub" onClick={() => removeOne(item.productId)}>-</button>
                     </td>
-                    <td>{item.priceExVat * item.quantity} kr</td>
+                    <td>
+                        {totalVat * item.quantity} kr
+                    </td>
                     <td>
                         <button className="btn-trash" onClick={() => removeAll(item.productId)}><i className="fa-solid fa-trash-can"></i></button>
                     </td>
@@ -59,9 +70,11 @@ export default function CartSummary() {
 
             <div className="price-summary">
                 <p className="cart-total">
-                Totalt: {totalExVat} kr
+                    Totalt: {totalIncVat} kr
                 </p>
-                <span className="moms">Varav moms:</span>
+                <p>
+                    Varav moms: {totalVat}kr (25%)
+                </p>
             </div>
 
           </>

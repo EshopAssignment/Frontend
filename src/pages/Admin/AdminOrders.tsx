@@ -357,28 +357,47 @@ export default function AdminOrders() {
               <tbody>
                 {(((details.data as any).items ?? []) as any[]).map((it) => {
                   const qty = asNum(it.quantity, 0);
-                  const price = asNum(it.unitPrice, 0);
-                  const line = asNum(it.lineTotal, price * qty);
+
+                  const unitEx = asNum(it.unitPriceExVat ?? it.UnitPriceExVat ?? it.unitPrice ?? it.UnitPrice, 0);
+                  const unitInc = asNum(it.unitPriceIncVat ?? it.UnitPriceIncVat, NaN);
+
+                  const lineEx = asNum(it.lineTotalExVat ?? it.LineTotalExVat ?? it.lineTotal ?? it.LineTotal, unitEx * qty);
+                  const lineInc = asNum(it.lineTotalIncVat ?? it.LineTotalIncVat, NaN);
+
+                  const vatRate = asNum(it.vatRatePercent ?? it.VatRatePercent, 25);
+                  const computedUnitInc = unitEx * (1 + vatRate / 100);
+                  const computedLineInc = lineEx * (1 + vatRate / 100);
+
+                  const displayUnit = Number.isFinite(unitInc) ? unitInc : computedUnitInc;
+                  const displayLine = Number.isFinite(lineInc) ? lineInc : computedLineInc;
+
                   return (
                     <tr key={`${it.productId}-${it.productName}`}>
                       <td>{it.productName}</td>
                       <td>{qty}</td>
-                      <td>{fmtSEK(price)}</td>
-                      <td>{fmtSEK(line)}</td>
+                      <td>{fmtSEK(displayUnit)}</td>
+                      <td>{fmtSEK(displayLine)}</td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
 
-            <p className="total" style={{ marginTop: ".75rem" }}>
-              Produkter: {fmtSEK(asNum((details.data as any).productsSubtotal, 0))} &nbsp;|&nbsp; Frakt:{" "}
-              {fmtSEK(asNum((details.data as any).shippingCost, 0))} &nbsp;|&nbsp; Moms:{" "}
-              {fmtSEK(asNum((details.data as any).taxTotal, 0))} &nbsp;|&nbsp; Totalt:{" "}
-              {fmtSEK(asNum((details.data as any).grandTotal, 0))}
-            </p>
 
-            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
+
+            <div className="details-total">
+
+                <p>Produkter: {fmtSEK(asNum((details.data as any).productSubtotal ?? (details.data as any).productsSubtotal, 0))}{" "}</p>
+
+                <p>Frakt: {fmtSEK(asNum((details.data as any).shippingTotal ?? (details.data as any).shippingCost, 0))}{" "}</p>
+
+                <p>Moms: {fmtSEK(asNum((details.data as any).vatTotal, 0))}</p>
+
+                <span> Totalt:{" "}{fmtSEK(asNum((details.data as any).grandTotal, 0))}</span>
+
+            </div>
+
+            <div className="details-btn">
               <button className="btn" autoFocus onClick={() => setSelectedId(null)}>
                 Stäng
               </button>

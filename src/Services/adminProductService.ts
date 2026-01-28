@@ -8,6 +8,7 @@ export type AdminProduct = {
   description: string;
   imgUrl: string;
   priceExVat: number;
+  vatRatePercent:number;
   palletType: string;
   condition: string;
   stockStatus: string;
@@ -30,6 +31,7 @@ export type EnumOption = { value: string; label: string; intValue: number };
 export type AdminProductOptions = {
   productTypes: EnumOption[];
   productConditions: EnumOption[];
+  vatRates: EnumOption[];
 };
 
 export type AdminCreateReq =
@@ -43,13 +45,27 @@ const asNum = (v: unknown, fb = 0) => {
   return Number.isFinite(n) ? n : fb;
 };
 
+const clampVat = (v: unknown) => {
+  const n = asNum(v, 25);
+  return n === 6 || n === 12 || n === 25 ? n : 25;
+};
+
 function mapProduct(raw: any): AdminProduct {
+  const vat = 
+  raw?.vatRatePercent ??
+  raw?.vatRatePercent ??
+  raw?.vatRate ??
+  raw?.vatRate ??
+  raw?.vat ??
+  raw?.vat;
+
   return {
     id: asNum(raw.id, 0),
     name: String(raw.name ?? ""),
     description: String(raw.description ?? ""),
     imgUrl: String(raw.imgUrl ?? ""),
     priceExVat: asNum(raw.priceExVat, 0),
+    vatRatePercent: clampVat(vat),
     palletType: String(raw.palletType ?? ""),
     condition: String(raw.condition ?? ""),
     stockStatus: String(raw.stockStatus ?? ""),
@@ -185,6 +201,7 @@ export async function adminGetProductOptions(): Promise<AdminProductOptions> {
   const data = (res.data ?? {}) as {
     productTypes?: unknown[];
     productConditions?: unknown[];
+    vatRates?: unknown[];
   };
 
   const sanitize = (xs: unknown[] | undefined): EnumOption[] =>
@@ -205,6 +222,7 @@ export async function adminGetProductOptions(): Promise<AdminProductOptions> {
 
   return {
     productTypes: sanitize(data.productTypes),         
-    productConditions: sanitize(data.productConditions)
+    productConditions: sanitize(data.productConditions),
+    vatRates: sanitize(data.vatRates)
   };
 }

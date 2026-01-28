@@ -16,7 +16,8 @@ export function fmtSEK(n: number | null | undefined) {
     return new Intl.NumberFormat("sv-SE", {
         style: "currency",
         currency: "SEK",
-        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
     }).format(x);
 }
 

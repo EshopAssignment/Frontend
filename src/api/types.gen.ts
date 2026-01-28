@@ -10,6 +10,7 @@ export type AdminCreateProductRequestDto = {
     palletType: string;
     condition: string;
     priceExVat: number | string;
+    vatRatePercent: number | string;
     onHand: number | string;
     imgUrl: string;
     isActive: boolean;
@@ -34,10 +35,10 @@ export type AdminOrderDetailsDto = {
     currency: string;
     productsSubtotal: number | string;
     shippingCost: number | string;
-    taxTotal: number | string;
+    vatTotal: number | string;
     grandTotal: number | string;
     trackingNumber: null | string;
-    tackingUrl: null | string;
+    trackingUrl: null | string;
     items: Array<AdminOrderItemDto>;
 };
 
@@ -45,10 +46,14 @@ export type AdminOrderItemDto = {
     productId: number | string;
     sku: string;
     productName: string;
-    unitPrice: number | string;
-    vatRate: number | string;
+    unitPriceExVat: number | string;
+    vatRatePercent: number | string;
+    unitVatAmount: number | string;
+    unitPriceIncVat: number | string;
     quantity: number | string;
-    lineTotal: number | string;
+    lineTotalExVat: number | string;
+    lineTotalVat: number | string;
+    lineTotalIncVat: number | string;
 };
 
 export type AdminOrderListItemDto = {
@@ -79,6 +84,7 @@ export type AdminUpdateProductRequestDto = {
     palletType: string;
     condition: string;
     priceExVat: number | string;
+    vatRatePercent: number | string;
     onHand: number | string;
     imgUrl: string;
     isActive: boolean;
@@ -134,7 +140,7 @@ export type OrderCreatedDto = {
     currency: string;
     productsSubtotal: number | string;
     shippingCost: number | string;
-    taxTotal: number | string;
+    vatTotal: number | string;
     grandTotal: number | string;
     orderStatus: OrderStatus;
     paymentStatus: PaymentStatus;
@@ -183,6 +189,7 @@ export type ProductDto = {
     description: string;
     imgUrl: string;
     priceExVat: number | string;
+    vatRatePercent: number | string;
     palletType: string;
     condition: string;
     stockStatus: string;
