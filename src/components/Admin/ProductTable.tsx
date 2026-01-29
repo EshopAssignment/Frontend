@@ -1,5 +1,5 @@
 import type { AdminProduct } from "../../Services/adminProductService";
-
+//cleaned using gpt5.2
 type Props = {
   data: AdminProduct[];
   page: number;
@@ -8,11 +8,10 @@ type Props = {
   onNext: () => void;
   onEdit: (id: number) => void;
   onToggle: (id: number, current: boolean) => void;
-  onUpload: (id: number, file: File) => void; // du hade den i Props, men använde inte den i komponenten
+  onUpload: (id: number, file: File) => void;
 };
 
 function fmtSEK0(n: number): string {
-  // inga decimaler, för människor får panik av "256.2 kr"
   return new Intl.NumberFormat("sv-SE", {
     style: "currency",
     currency: "SEK",
@@ -29,7 +28,7 @@ function vatSafe(v: unknown): number {
 function priceIncVat(priceExVat: number, vatRatePercent: number): number {
   const ex = Number.isFinite(priceExVat) ? priceExVat : 0;
   const vat = vatSafe(vatRatePercent);
-  return Math.round(ex * (1 + vat / 100)); // 0 decimaler: vi rundar till helt SEK
+  return Math.round(ex * (1 + vat / 100)); 
 }
 
 export default function ProductTable({
