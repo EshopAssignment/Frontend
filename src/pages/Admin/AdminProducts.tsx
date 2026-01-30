@@ -54,7 +54,7 @@ export default function AdminProducts() {
   const createMut = useMutation({
     mutationFn: (body: AdminCreateReq) => adminCreateProduct(body),
     onSuccess: () => {
-      toast.success("Produkt skapad (inaktiv tills du laddar upp bild och allt är komplett).");
+      toast.success("Produkt skapad.");
       setCreating(false);
       qc.invalidateQueries({ queryKey: ["admin-products"] });
     },

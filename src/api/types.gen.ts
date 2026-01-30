@@ -224,6 +224,13 @@ export type ServicePointDto = {
     city: string;
 };
 
+export type SetCartReservationDto = {
+    cartId: string;
+    productId: number | string;
+    quantity: number | string;
+    reservationTtlMinutes?: number | string;
+};
+
 export type SetDefaultAddressDto = {
     defaultShippingAddressId: null | number | string;
 };
@@ -950,6 +957,20 @@ export type GetApiProductsSuggestResponses = {
 };
 
 export type GetApiProductsSuggestResponse = GetApiProductsSuggestResponses[keyof GetApiProductsSuggestResponses];
+
+export type PutApiReservationApiCartReservationsData = {
+    body: SetCartReservationDto;
+    path?: never;
+    query?: never;
+    url: '/api/Reservation/api/cart/reservations';
+};
+
+export type PutApiReservationApiCartReservationsResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type GetApiShippingServicePointsData = {
     body?: never;
