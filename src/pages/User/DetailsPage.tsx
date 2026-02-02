@@ -7,7 +7,7 @@ import { useProduct } from "../../queries/useProducts";
 import { buildImageUrl } from "../../helpers/url";
 import { priceIncVat } from "@/helpers/money";
 import { fmtSEK } from "@/helpers/orderFormat";
-
+import { useState } from "react";
 
 const DetailsPage = () => {
   const { id } = useParams();
@@ -22,6 +22,9 @@ const DetailsPage = () => {
 
   const { data: product, isLoading, isError } = useProduct(pid);
 
+  const [adding, setAdding] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
   if (isLoading) {
     return (
       <section className="container product-details">
@@ -29,6 +32,7 @@ const DetailsPage = () => {
       </section>
     );
   }
+
   if (isError || !product) {
     return (
       <section className="container product-details">
@@ -39,7 +43,7 @@ const DetailsPage = () => {
   }
 
   const imgSrc = buildImageUrl(product.imgUrl) || placeholder;
-  const available = Number(product.available) || 0;
+  const available = Number((product as any).available) || 0;
 
   const getBadgeClass = (qty: number) => {
     if (qty === 0) return "badge badge-oos";
@@ -53,68 +57,87 @@ const DetailsPage = () => {
     return `(${qty} st)`;
   };
 
-  const disabled = available === 0;
+  const disabledByStock = available === 0;
+  const disabled = disabledByStock || adding;
 
   const priceInc = priceIncVat(product.priceExVat, product.vatRatePercent);
+
+  const onAdd = async () => {
+    if (disabled) return;
+    setErr(null);
+    setAdding(true);
+    try {
+      await addItem(toCartItem(product), 1);
+    } catch (e) {
+      setErr((e as Error)?.message ?? "Kunde inte lägga i varukorgen.");
+    } finally {
+      setAdding(false);
+    }
+  };
+
   return (
-
     <div className="container">
-        <Breadcrumbs
-            trail={[
-            { label: "Hem", to: "/" },
-            { label: "Produkter", to: "/products" }, 
-            { label: product.name }          
+      <Breadcrumbs
+        trail={[
+          { label: "Hem", to: "/" },
+          { label: "Produkter", to: "/products" },
+          { label: product.name },
         ]}
-        />
-        <div className="details-content">
-            <div className="details-hero">
-                <div className="details-name">
-                    <h2>{product.name}</h2>
-                    <p>Type: {product.palletType}</p>
-                    <p>Condition: {product.condition}</p>
-                </div>
+      />
 
-                <div className="details-desc">
-                    <span>{product.description}</span>
-                </div>
+      <div className="details-content">
+        <div className="details-hero">
+          <div className="details-name">
+            <h2>{product.name}</h2>
+            <p>Type: {product.palletType}</p>
+            <p>Condition: {product.condition}</p>
+          </div>
 
+          <div className="details-desc">
+            <span>{product.description}</span>
+          </div>
 
-                <div className="details-price">
+          <div className="details-price">
+            <p>Pris/st: {fmtSEK(priceInc)} Kr</p>
 
-                    <p>Pris/st: {fmtSEK(priceInc)} Kr</p>
-                    <div className={getBadgeClass(available)} aria-label={`Lagersaldo: ${available}`}> Tillgängliga:
-                        {getBadgeText(available)}
-                    </div>
-
-                </div>
-
-                <button
-                  className={`btn-add-wide${disabled ? " is-disabled" : ""}`}
-                  disabled={disabled}
-                  aria-disabled={disabled}
-                  title={disabled ? "Produkten är slut i lager" : "Lägg i kundvagn"}
-                  onClick={() => {
-                    if (!disabled) addItem(toCartItem(product));
-                  }}
-                >
-                    <i className="fa-solid fa-cart-plus"></i>
-                </button>
+            <div className={getBadgeClass(available)} aria-label={`Lagersaldo: ${available}`}>
+              Tillgängliga: {getBadgeText(available)}
             </div>
+          </div>
 
-            <div className="divider"></div>
+          <button
+            className={`btn-add-wide${disabled ? " is-disabled" : ""}`}
+            disabled={disabled}
+            aria-disabled={disabled}
+            title={
+              disabledByStock
+                ? "Produkten är slut i lager"
+                : adding
+                ? "Lägger i varukorg..."
+                : "Lägg i kundvagn"
+            }
+            onClick={() => void onAdd()}
+          >
+            <i className="fa-solid fa-cart-plus"></i>
+          </button>
 
-            <div className="details-img">
-            <img
-              src={imgSrc}
-              alt={product.name}
-              onError={(e) => {
-                e.currentTarget.src = placeholder;
-              }}
-            />
-            </div>
-        </div>          
+          {err && <p className="details-error">{err}</p>}
+        </div>
+
+        <div className="divider"></div>
+
+        <div className="details-img">
+          <img
+            src={imgSrc}
+            alt={product.name}
+            onError={(e) => {
+              e.currentTarget.src = placeholder;
+            }}
+          />
+        </div>
+      </div>
     </div>
-  )
-  
-}
+  );
+};
+
 export default DetailsPage;
