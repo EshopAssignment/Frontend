@@ -1,63 +1,34 @@
-import type { ProductDto } from "../../Services/productService";
-import placeholder from "@/images/Placeholder.jpg";
-import { useCart } from "../../context/CartContext";
 import { Link } from "react-router-dom";
-import { toCartItem } from "../../helpers/toCartItem";
+
+import type { ProductDto } from "../../Services/productService";
 import { buildImageUrl } from "../../helpers/url";
 import { priceIncVat } from "@/helpers/money";
 import { fmtSEK } from "@/helpers/orderFormat";
-import { useState } from "react";
+import { getStockBadgeClass, getStockBadgeText } from "@/helpers/stockBadge";
 
-interface Props{
-  product: ProductDto
+import placeholder from "@/images/Placeholder.jpg";
+import { useAddToCart } from "@/hooks/useAddCart";
+
+interface Props {
+  product: ProductDto;
 }
 
+const ItemCard = ({ product }: Props) => {
+
+  const imgSrc = buildImageUrl(product.imgUrl) || placeholder;
+
+  const available = Number((product as any).available) || 0;
 
 
-const ItemCard = ({product}: Props) => {
-const {addItem} = useCart();
-
-const [adding, setAdding] = useState(false);
-const [err, setErr] = useState<string | null>(null);
-
-const img = buildImageUrl(product.imgUrl);
-const imgSrc = img || placeholder;
-
-const available = Number(product.available) || 0;
-
-const getBadgeClass = (qty:number) => {
-  if (qty == 0 ) return "badge badge-oos"
-  if (qty <= 20) return "badge badge-low" 
-  return "badge badge-high"
-}
-
-const getBadgeText = (qty: number) => {
-    if (qty == 0 ) return "Slut i lager"
-  if (qty <= 20) return `Få kvar (${qty})`;
-  return `(${qty} st)`
-}
-
-const onAdd = async () => {
-  if (disabledByStock || adding ) return;
-
-  setErr(null)
-  setAdding(true);
-  try {
-    await addItem(toCartItem(product), 1);
-  } catch(e) {
-    const msg = (e as Error)?.message ?? "Kunde inte lägga till i varukorg";
-    setErr(msg)
-  } finally {
-    setAdding(false);
-  }
-}
-  const disabledByStock = available === 0;
   const priceInc = priceIncVat(product.priceExVat, product.vatRatePercent);
 
+  const badgeClass = getStockBadgeClass(available);
+  const badgeText = getStockBadgeText(available, "few");
 
-  const disabled = disabledByStock || adding;
-  
-   return (
+  const { add, disabled, disabledByStock, adding, error } = useAddToCart(product, available);
+
+
+  return (
     <div className="item-card">
       <Link to={`/product/${product.id}`}>
         <div>
@@ -68,7 +39,7 @@ const onAdd = async () => {
           />
         </div>
 
-        <div className="divider"></div>
+        <div className="divider" />
 
         <div className="product-text">
           <div>
@@ -87,8 +58,8 @@ const onAdd = async () => {
       <div className="item-price">
         <p>{fmtSEK(priceInc)} kr/st</p>
 
-        <div className={getBadgeClass(available)} aria-label={`Lagersaldo: ${available}`}>
-          <p>{getBadgeText(available)}</p>
+        <div className={badgeClass} aria-label={`Lagersaldo: ${available}`}>
+          <p>{badgeText}</p>
         </div>
 
         <button
@@ -102,16 +73,15 @@ const onAdd = async () => {
               ? "Lägger i varukorg..."
               : "Lägg i kundvagn"
           }
-          onClick={() => void onAdd()}
+          onClick={() => void add()}
         >
-          <i className="fa-solid fa-cart-plus"></i>
+          <i className="fa-solid fa-cart-plus" />
         </button>
 
-        {err && <p className="item-card-error">{err}</p>}
+        {error && <p className="item-card-error">{error}</p>}
       </div>
     </div>
   );
 };
 
 export default ItemCard;
-
