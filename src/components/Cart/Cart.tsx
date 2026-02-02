@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useCart } from "../../context/CartContext";
 import { createOrderFromCart } from "../../Services/orderService";
 import { useNavigate } from "react-router-dom";
@@ -11,106 +11,163 @@ const Cart = () => {
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [orderNumber, setOrderNumber] = useState<string | null>(null);
+    const [busyIds, setBusyIds] = useState<Record<number, boolean>>({});
+
+    const setBusy = (productId:number, on:boolean) => 
+      setBusyIds((m) => ({...m, [productId]: on}));
+
+    const isBusy =(productId: number) => !!busyIds[productId];
     
     const handleCheckout = async () => {
       if (state.items.length === 0 || submitting) return;
+
       setSubmitting(true);
-      setError(null);
+      setError(null)
       setOrderNumber(null);
-  try {
-    const result = await createOrderFromCart(state.items, cartId);
+      try {
+        const result = await createOrderFromCart(state.items, cartId);
 
-    navigate(`/checkout/${result.orderNumber}`, {
-      state: result 
-    });
-
-    } catch (err) {
-      console.error(err);
-      setError("Could not create order.")
-    } finally {
-      setSubmitting(false);
-    }
+        
+        navigate(`/checkout/${result.orderNumber}`, {
+          state: result,
+      });
+      } catch(err) {
+        console.error(err);
+        setError("could not create order.")
+      } finally {
+        setSubmitting(false);
+      }
   };
 
   
-const totalIncVat = state.items.reduce(
-  (sum, x) => sum + lineIncVat(x.priceExVat, x.vatRatePercent, x.quantity),
-  0
-);
+  const totalIncVat = useMemo(
+    () =>
+      state.items.reduce(
+        (sum, x) => sum + lineIncVat(x.priceExVat, x.vatRatePercent, x.quantity),
+        0
+      ),
+    [state.items]
+  );
 
-const totalVat = state.items.reduce(
-  (sum, x) => sum + vatAmountFromEx(x.priceExVat, x.vatRatePercent, x.quantity),
-  0
-);
+  const totalVat = useMemo(
+    () =>
+      state.items.reduce(
+        (sum, x) => sum + vatAmountFromEx(x.priceExVat, x.vatRatePercent, x.quantity),
+        0
+      ),
+    [state.items]
+  );
+
+
+  const onRemoveOne = async (productId:number) => {
+    if (isBusy(productId)) return;
+    setError(null);
+    
+    setBusy(productId, true);
+    try {
+      await removeOne(productId);
+    } catch (e) {
+      setError((e as Error)?.message ?? "Could not update cart");
+    } finally {
+      setBusy(productId, false);
+    }
+  };
+
+  const onRemoveAll = async (productId: number) => {
+    if (isBusy(productId)) return;
+    setError(null);
+    setBusy(productId, true);
+    try {
+      await removeAll(productId);
+    } catch (e) {
+      setError((e as Error)?.message ?? "Could not update cart");
+    } finally {
+      setBusy (productId, false);
+    }
+  }
+
+  const onClear = () => {
+    setError(null);
+    clear();
+  };
 
   return(   
-      <div className="cart">
-        <p>Varukorg</p>
+    <div className="cart">
+      <p>Varukorg</p>
 
-        {state.items.length === 0 &&(
-            <p>Nothing in your cart! Get to the shopping!</p>
-          )}
+      {state.items.length === 0 && <p>Nothing in your cart! Get to the shopping!</p>}
 
-          {state.items.length > 0 && (
-          <>
-            <table className="cart-table">
+      {state.items.length > 0 && (
+        <>
+          <table className="cart-table">
             <thead className="cart-head">
               <tr>
-              <th>Produkt</th>
-              <th>Antal</th>
-              <th>Pris</th>
-              <th>Åtgärder</th>
+                <th>Produkt</th>
+                <th>Antal</th>
+                <th>Pris</th>
+                <th>Åtgärder</th>
               </tr>
             </thead>
+
             <tbody className="cart-body">
-              {state.items.map(item => (
-              <tr key={item.productId}>
-                <td className="table-img">
-                <img
-                className="cart-item-img"
-                  src={item.imgUrl || placeholder}
-                  alt={item.name}
-                  onError={(e) => (e.currentTarget.src = placeholder)}
-                />
-                <span>{item.name}</span>
-                </td>
-                <td>x {item.quantity}</td>
-                <td>{item.priceExVat * item.quantity} kr</td>
-                <td className="btn-cart">
-                <button className="btn-subtract" onClick={() => removeOne(item.productId)}>-1</button>
-                <button className="btn-trash" onClick={() => removeAll(item.productId)}><i className="fa-solid fa-trash-can"></i></button>
-                </td>
-              </tr>
+              {state.items.map((item) => (
+                <tr key={item.productId}>
+                  <td className="table-img">
+                    <img
+                      className="cart-item-img"
+                      src={item.imgUrl || placeholder}
+                      alt={item.name}
+                      onError={(e) => (e.currentTarget.src = placeholder)}
+                    />
+                    <span>{item.name}</span>
+                  </td>
+
+                  <td>x {item.quantity}</td>
+                  <td>{item.priceExVat * item.quantity} kr</td>
+
+                  <td className="btn-cart">
+                    <button
+                      className="btn-subtract"
+                      onClick={() => void onRemoveOne(item.productId)}
+                      disabled={isBusy(item.productId) || submitting}
+                      title={isBusy(item.productId) ? "Uppdaterar..." : "Ta bort 1"}
+                    >
+                      -1
+                    </button>
+
+                    <button
+                      className="btn-trash"
+                      onClick={() => void onRemoveAll(item.productId)}
+                      disabled={isBusy(item.productId) || submitting}
+                      title={isBusy(item.productId) ? "Uppdaterar..." : "Ta bort alla"}
+                    >
+                      <i className="fa-solid fa-trash-can" />
+                    </button>
+                  </td>
+                </tr>
               ))}
             </tbody>
-            </table>
-            <button className="btn-clear" onClick={clear}>Töm varukorgen</button>
+          </table>
 
-            <div className="checkout">
-              <p className="cart-total">
-                Totalt: {totalIncVat} kr
-              </p>
-              <p>
-                Varav moms: {totalVat} kr
-              </p>
-            <button className="btn-checkout"
-              onClick={handleCheckout}
-              disabled={submitting}>
-              {submitting ? "Skickar order..." : <i className="fa-regular fa-credit-card"></i>}
-              </button>
-            </div>
+          <button className="btn-clear" onClick={onClear} disabled={submitting}>
+            Töm varukorgen
+          </button>
 
-          </>
-          )}
+          <div className="checkout">
+            <p className="cart-total">Totalt: {totalIncVat} kr</p>
+            <p>Varav moms: {totalVat} kr</p>
 
-          {orderNumber && (
-          <p>
-            orderNumber: {orderNumber}
-          </p>
-          )}
+            <button className="btn-checkout" onClick={handleCheckout} disabled={submitting}>
+              {submitting ? "Skickar order..." : <i className="fa-regular fa-credit-card" />}
+            </button>
+          </div>
+        </>
+      )}
 
-          {error && <p>{error}</p>}
-      </div>    
-    )};
+      {orderNumber && <p>orderNumber: {orderNumber}</p>}
+      {error && <p>{error}</p>}
+    </div>
+  );
+};
 
 export default Cart;

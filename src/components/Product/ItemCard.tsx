@@ -6,6 +6,7 @@ import { toCartItem } from "../../helpers/toCartItem";
 import { buildImageUrl } from "../../helpers/url";
 import { priceIncVat } from "@/helpers/money";
 import { fmtSEK } from "@/helpers/orderFormat";
+import { useState } from "react";
 
 interface Props{
   product: ProductDto
@@ -15,6 +16,9 @@ interface Props{
 
 const ItemCard = ({product}: Props) => {
 const {addItem} = useCart();
+
+const [adding, setAdding] = useState(false);
+const [err, setErr] = useState<string | null>(null);
 
 const img = buildImageUrl(product.imgUrl);
 const imgSrc = img || placeholder;
@@ -32,53 +36,80 @@ const getBadgeText = (qty: number) => {
   if (qty <= 20) return `Få kvar (${qty})`;
   return `(${qty} st)`
 }
-  const disabled = available === 0;
-  
+
+const onAdd = async () => {
+  if (disabledByStock || adding ) return;
+
+  setErr(null)
+  setAdding(true);
+  try {
+    await addItem(toCartItem(product), 1);
+  } catch(e) {
+    const msg = (e as Error)?.message ?? "Kunde inte lägga till i varukorg";
+    setErr(msg)
+  } finally {
+    setAdding(false);
+  }
+}
+  const disabledByStock = available === 0;
   const priceInc = priceIncVat(product.priceExVat, product.vatRatePercent);
 
-  return (
+
+  const disabled = disabledByStock || adding;
+  
+   return (
     <div className="item-card">
-        <Link to={`/product/${product.id}`} >
-          <div>
-            <img src={imgSrc} alt={product.name}
-            onError={(e) => (e.currentTarget.src = placeholder)} />
-          </div>
-        
+      <Link to={`/product/${product.id}`}>
+        <div>
+          <img
+            src={imgSrc}
+            alt={product.name}
+            onError={(e) => (e.currentTarget.src = placeholder)}
+          />
+        </div>
+
         <div className="divider"></div>
 
         <div className="product-text">
           <div>
             <span>{product.name}</span>
-            <p>{product.condition} | {product.palletType}</p>
+            <p>
+              {product.condition} | {product.palletType}
+            </p>
           </div>
 
           <div>
-            <p className="card-description">{product.description}</p>  
+            <p className="card-description">{product.description}</p>
           </div>
         </div>
       </Link>
 
-        <div className="item-price">
-          <p>{fmtSEK(priceInc)} kr/st</p>
-          
-          <div className={getBadgeClass(available)} aria-label={`Lagersaldo: ${available}`}>
-            <p> {getBadgeText(available)}</p>
-          </div>
+      <div className="item-price">
+        <p>{fmtSEK(priceInc)} kr/st</p>
 
-            <button
-              disabled={disabled}
-              aria-disabled={disabled}
-              className={disabled ? "is-disabled" : ""}
-              title={disabled ? "Produkten är slut i lager" : "Lägg i kundvagn"}
-              onClick={() => {
-                if (!disabled) addItem(toCartItem(product));
-              }}
-            >
-            <i className="fa-solid fa-cart-plus"></i>
-          </button>
+        <div className={getBadgeClass(available)} aria-label={`Lagersaldo: ${available}`}>
+          <p>{getBadgeText(available)}</p>
         </div>
 
+        <button
+          disabled={disabled}
+          aria-disabled={disabled}
+          className={disabled ? "is-disabled" : ""}
+          title={
+            disabledByStock
+              ? "Produkten är slut i lager"
+              : adding
+              ? "Lägger i varukorg..."
+              : "Lägg i kundvagn"
+          }
+          onClick={() => void onAdd()}
+        >
+          <i className="fa-solid fa-cart-plus"></i>
+        </button>
+
+        {err && <p className="item-card-error">{err}</p>}
       </div>
+    </div>
   );
 };
 
