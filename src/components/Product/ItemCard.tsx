@@ -78,7 +78,7 @@ const ItemCard = ({ product }: Props) => {
           <i className="fa-solid fa-cart-plus" />
         </button>
 
-        {error && <p className="item-card-error">{error}</p>}
+        {error && <p className="item-card-error sr-only">{error}</p>}
       </div>
     </div>
   );
