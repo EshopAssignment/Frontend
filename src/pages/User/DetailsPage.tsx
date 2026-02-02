@@ -1,26 +1,34 @@
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import placeholder from "../../images/placeholder.jpg";
-import { useCart } from "../../context/CartContext";
 import Breadcrumbs from "../../components/Breadcrumbs";
-import { toCartItem } from "../../helpers/toCartItem";
 import { useProduct } from "../../queries/useProducts";
 import { buildImageUrl } from "../../helpers/url";
 import { priceIncVat } from "@/helpers/money";
 import { fmtSEK } from "@/helpers/orderFormat";
 
+import { getStockBadgeClass, getStockBadgeText } from "@/helpers/stockBadge";
+import { useAddToCart } from "@/hooks/useAddCart";
 
 const DetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addItem } = useCart();
 
   const pid = Number(id);
-  if (!pid || Number.isNaN(pid)) {
-    navigate("/", { replace: true });
-    return null;
-  }
+  const isValidPid = Number.isFinite(pid) && pid > 0;
+  const safePid = isValidPid ? pid : 0;
 
-  const { data: product, isLoading, isError } = useProduct(pid);
+  const { data: product, isLoading, isError } = useProduct(safePid);
+
+  useEffect(() => {
+    if (!isValidPid) navigate("/", { replace: true });
+  }, [isValidPid, navigate]);
+
+  const available = product ? Number((product as any).available) || 0 : 0;
+
+  const { add, disabled, disabledByStock, adding, error } = useAddToCart(product ?? null, available);
+
+  if (!isValidPid) return null;
 
   if (isLoading) {
     return (
@@ -29,6 +37,7 @@ const DetailsPage = () => {
       </section>
     );
   }
+
   if (isError || !product) {
     return (
       <section className="container product-details">
@@ -39,82 +48,75 @@ const DetailsPage = () => {
   }
 
   const imgSrc = buildImageUrl(product.imgUrl) || placeholder;
-  const available = Number(product.available) || 0;
 
-  const getBadgeClass = (qty: number) => {
-    if (qty === 0) return "badge badge-oos";
-    if (qty <= 20) return "badge badge-low";
-    return "badge badge-high";
-  };
-
-  const getBadgeText = (qty: number) => {
-    if (qty === 0) return "Slut i lager";
-    if (qty <= 20) return `Lågt saldo (${qty})`;
-    return `(${qty} st)`;
-  };
-
-  const disabled = available === 0;
+  const badgeClass = getStockBadgeClass(available);
+  const badgeText = getStockBadgeText(available, "low");
 
   const priceInc = priceIncVat(product.priceExVat, product.vatRatePercent);
+
   return (
-
     <div className="container">
-        <Breadcrumbs
-            trail={[
-            { label: "Hem", to: "/" },
-            { label: "Produkter", to: "/products" }, 
-            { label: product.name }          
+      <Breadcrumbs
+        trail={[
+          { label: "Hem", to: "/" },
+          { label: "Produkter", to: "/products" },
+          { label: product.name },
         ]}
-        />
-        <div className="details-content">
-            <div className="details-hero">
-                <div className="details-name">
-                    <h2>{product.name}</h2>
-                    <p>Type: {product.palletType}</p>
-                    <p>Condition: {product.condition}</p>
-                </div>
+      />
 
-                <div className="details-desc">
-                    <span>{product.description}</span>
-                </div>
+      <div className="details-content">
+        <div className="details-hero">
+          <div className="details-name">
+            <h2>{product.name}</h2>
+            <p>Type: {product.palletType}</p>
+            <p>Condition: {product.condition}</p>
+          </div>
 
+          <div className="details-desc">
+            <span>{product.description}</span>
+          </div>
 
-                <div className="details-price">
+          <div className="details-price">
+            <p>Pris/st: {fmtSEK(priceInc)} Kr</p>
 
-                    <p>Pris/st: {fmtSEK(priceInc)} Kr</p>
-                    <div className={getBadgeClass(available)} aria-label={`Lagersaldo: ${available}`}> Tillgängliga:
-                        {getBadgeText(available)}
-                    </div>
-
-                </div>
-
-                <button
-                  className={`btn-add-wide${disabled ? " is-disabled" : ""}`}
-                  disabled={disabled}
-                  aria-disabled={disabled}
-                  title={disabled ? "Produkten är slut i lager" : "Lägg i kundvagn"}
-                  onClick={() => {
-                    if (!disabled) addItem(toCartItem(product));
-                  }}
-                >
-                    <i className="fa-solid fa-cart-plus"></i>
-                </button>
+            <div className={badgeClass} aria-label={`Lagersaldo: ${available}`}>
+              Tillgängliga: {badgeText}
             </div>
+          </div>
 
-            <div className="divider"></div>
+          <button
+            className={`btn-add-wide${disabled ? " is-disabled" : ""}`}
+            disabled={disabled}
+            aria-disabled={disabled}
+            title={
+              disabledByStock
+                ? "Produkten är slut i lager"
+                : adding
+                ? "Lägger i varukorg..."
+                : "Lägg i kundvagn"
+            }
+            onClick={() => void add(1)}
+          >
+            <i className="fa-solid fa-cart-plus" />
+          </button>
 
-            <div className="details-img">
-            <img
-              src={imgSrc}
-              alt={product.name}
-              onError={(e) => {
-                e.currentTarget.src = placeholder;
-              }}
-            />
-            </div>
-        </div>          
+          {error && <p className="details-error">{error}</p>}
+        </div>
+
+        <div className="divider" />
+
+        <div className="details-img">
+          <img
+            src={imgSrc}
+            alt={product.name}
+            onError={(e) => {
+              e.currentTarget.src = placeholder;
+            }}
+          />
+        </div>
+      </div>
     </div>
-  )
-  
-}
+  );
+};
+
 export default DetailsPage;

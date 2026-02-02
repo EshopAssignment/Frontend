@@ -1,86 +1,87 @@
-import type { ProductDto } from "../../Services/productService";
-import placeholder from "@/images/Placeholder.jpg";
-import { useCart } from "../../context/CartContext";
 import { Link } from "react-router-dom";
-import { toCartItem } from "../../helpers/toCartItem";
+
+import type { ProductDto } from "../../Services/productService";
 import { buildImageUrl } from "../../helpers/url";
 import { priceIncVat } from "@/helpers/money";
 import { fmtSEK } from "@/helpers/orderFormat";
+import { getStockBadgeClass, getStockBadgeText } from "@/helpers/stockBadge";
 
-interface Props{
-  product: ProductDto
+import placeholder from "@/images/Placeholder.jpg";
+import { useAddToCart } from "@/hooks/useAddCart";
+
+interface Props {
+  product: ProductDto;
 }
 
+const ItemCard = ({ product }: Props) => {
+
+  const imgSrc = buildImageUrl(product.imgUrl) || placeholder;
+
+  const available = Number((product as any).available) || 0;
 
 
-const ItemCard = ({product}: Props) => {
-const {addItem} = useCart();
-
-const img = buildImageUrl(product.imgUrl);
-const imgSrc = img || placeholder;
-
-const available = Number(product.available) || 0;
-
-const getBadgeClass = (qty:number) => {
-  if (qty == 0 ) return "badge badge-oos"
-  if (qty <= 20) return "badge badge-low" 
-  return "badge badge-high"
-}
-
-const getBadgeText = (qty: number) => {
-    if (qty == 0 ) return "Slut i lager"
-  if (qty <= 20) return `Få kvar (${qty})`;
-  return `(${qty} st)`
-}
-  const disabled = available === 0;
-  
   const priceInc = priceIncVat(product.priceExVat, product.vatRatePercent);
+
+  const badgeClass = getStockBadgeClass(available);
+  const badgeText = getStockBadgeText(available, "few");
+
+  const { add, disabled, disabledByStock, adding, error } = useAddToCart(product, available);
+
 
   return (
     <div className="item-card">
-        <Link to={`/product/${product.id}`} >
-          <div>
-            <img src={imgSrc} alt={product.name}
-            onError={(e) => (e.currentTarget.src = placeholder)} />
-          </div>
-        
-        <div className="divider"></div>
+      <Link to={`/product/${product.id}`}>
+        <div>
+          <img
+            src={imgSrc}
+            alt={product.name}
+            onError={(e) => (e.currentTarget.src = placeholder)}
+          />
+        </div>
+
+        <div className="divider" />
 
         <div className="product-text">
           <div>
             <span>{product.name}</span>
-            <p>{product.condition} | {product.palletType}</p>
+            <p>
+              {product.condition} | {product.palletType}
+            </p>
           </div>
 
           <div>
-            <p className="card-description">{product.description}</p>  
+            <p className="card-description">{product.description}</p>
           </div>
         </div>
       </Link>
 
-        <div className="item-price">
-          <p>{fmtSEK(priceInc)} kr/st</p>
-          
-          <div className={getBadgeClass(available)} aria-label={`Lagersaldo: ${available}`}>
-            <p> {getBadgeText(available)}</p>
-          </div>
+      <div className="item-price">
+        <p>{fmtSEK(priceInc)} kr/st</p>
 
-            <button
-              disabled={disabled}
-              aria-disabled={disabled}
-              className={disabled ? "is-disabled" : ""}
-              title={disabled ? "Produkten är slut i lager" : "Lägg i kundvagn"}
-              onClick={() => {
-                if (!disabled) addItem(toCartItem(product));
-              }}
-            >
-            <i className="fa-solid fa-cart-plus"></i>
-          </button>
+        <div className={badgeClass} aria-label={`Lagersaldo: ${available}`}>
+          <p>{badgeText}</p>
         </div>
 
+        <button
+          disabled={disabled}
+          aria-disabled={disabled}
+          className={disabled ? "is-disabled" : ""}
+          title={
+            disabledByStock
+              ? "Produkten är slut i lager"
+              : adding
+              ? "Lägger i varukorg..."
+              : "Lägg i kundvagn"
+          }
+          onClick={() => void add()}
+        >
+          <i className="fa-solid fa-cart-plus" />
+        </button>
+
+        {error && <p className="item-card-error">{error}</p>}
       </div>
+    </div>
   );
 };
 
 export default ItemCard;
-
