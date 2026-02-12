@@ -53,7 +53,7 @@ const ProductListView = ({ product }: Props) => {
       </Link>
 
       <div className="product-shopping">
-        <p className="product-price">{fmtSEK(priceInc)} kr/st</p>
+        <p className="product-price">{fmtSEK(priceInc)}/st</p>
 
         <div className={badgeClass} aria-label={`Lagersaldo: ${available}`}>
           <p>{badgeText}</p>

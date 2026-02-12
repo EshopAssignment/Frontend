@@ -349,9 +349,9 @@
     padding:1rem;
     flex-direction: column;
     gap:.5rem;
-    height:400px;
+    max-height:500px;
     width: 250px;
-    min-height: 300px;
+    min-height: 350px;
     border: var(--border) 1px solid;
     border-radius:var(--radius4);
     .divider{
