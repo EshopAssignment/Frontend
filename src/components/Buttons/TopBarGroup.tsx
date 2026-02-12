@@ -4,17 +4,19 @@ import ProfileBtn from "./ProfileBtn";
 import HelpBtn from "./HelpBtn";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { useLocation } from "react-router-dom";
+import AdminBtn from "./AdminBtn";
+import { useMe } from "@/queries/auth";
 
 const TopBarGroup = () => {
     const { state } = useCart();
     const { pathname } = useLocation();
-
+    const {data:me} = useMe();
 
     const hideCart = pathname.startsWith("/checkout") || pathname.startsWith("/order/thank-you");
     const totalItems = state.items.reduce((sum, item) => sum + item.quantity, 0);
     const badgeLabel = totalItems > 99 ? "99+" : totalItems.toString();
 
-
+  const isAdmin = !!me?.roles?.includes("Admin");
   return (
     <>
       <div className="btn-group">
@@ -44,7 +46,8 @@ const TopBarGroup = () => {
       )}
 
           <ProfileBtn />
-          <HelpBtn />
+
+          {isAdmin ? <AdminBtn /> : <HelpBtn />}
       </div>
 
     </>

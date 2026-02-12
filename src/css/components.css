@@ -378,7 +378,20 @@
 }
 /*#endregion */
 /*#region buttons */
-
+.admin-btn{
+    display: flex;
+    padding: 1rem;
+    font-size:2rem;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    i{
+        font-size: inherit;
+    }
+}
+.admin-btn:hover{
+    color: var(--primary-hover);
+    transition: .4s;
+}
 .btn-add-wide{
     border:1px solid var(--accent);
     padding: 1rem 4rem;

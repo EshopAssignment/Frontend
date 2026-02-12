@@ -1,13 +1,31 @@
-import { Link, Outlet } from "react-router-dom";
+import { useLogout } from "@/queries/auth";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 
 
 const AdminLayout = () => {
+  const logout = useLogout();
+  const nav = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout.mutateAsync();
+      nav("/", {replace: true});
+    } catch{}
+  }
   return (
     <>
       <header>            
         <Link className="btn" to="/">
               Back to start
-          </Link></header>
+          </Link>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="btn btn-primary"
+          >
+            Logga ut
+          </button>
+          </header>
         <Outlet />
     </>
   );
