@@ -56,7 +56,7 @@ const ItemCard = ({ product }: Props) => {
       </Link>
 
       <div className="item-price">
-        <p>{fmtSEK(priceInc)} kr/st</p>
+        <p>{fmtSEK(priceInc)}/st</p>
 
         <div className={badgeClass} aria-label={`Lagersaldo: ${available}`}>
           <p>{badgeText}</p>
@@ -78,7 +78,7 @@ const ItemCard = ({ product }: Props) => {
           <i className="fa-solid fa-cart-plus" />
         </button>
 
-        {error && <p className="item-card-error">{error}</p>}
+        {error && <p className="item-card-error sr-only">{error}</p>}
       </div>
     </div>
   );

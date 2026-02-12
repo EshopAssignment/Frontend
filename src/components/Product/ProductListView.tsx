@@ -53,7 +53,7 @@ const ProductListView = ({ product }: Props) => {
       </Link>
 
       <div className="product-shopping">
-        <p className="product-price">{fmtSEK(priceInc)} kr/st</p>
+        <p className="product-price">{fmtSEK(priceInc)}/st</p>
 
         <div className={badgeClass} aria-label={`Lagersaldo: ${available}`}>
           <p>{badgeText}</p>
@@ -75,7 +75,7 @@ const ProductListView = ({ product }: Props) => {
           <i className="fa-solid fa-cart-plus" />
         </button>
 
-        {error && <p className="list-error">{error}</p>}
+        {error && <p className="list-error sr-only">{error}</p>}
       </div>
     </div>
   );

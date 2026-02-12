@@ -2,6 +2,7 @@ import { useCart } from "@/context/CartContext";
 import { toCartItem } from "@/helpers/toCartItem";
 import type { ProductDto } from "@/Services/productService";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export function useAddToCart(product: ProductDto | null | undefined, available: number) {
   const { addItem } = useCart();
@@ -20,8 +21,10 @@ export function useAddToCart(product: ProductDto | null | undefined, available: 
 
     try {
       await addItem(toCartItem(product), qty);
+      toast.success("Lagd i varukorgen!")
     } catch (e) {
-      setError((e as Error)?.message ?? "Kunde inte lägga till i varukorg");
+        toast.error("Kunde inte lägga till i varukorgen")
+        setError((e as Error)?.message ?? "Kunde inte lägga till i varukorg");
     } finally {
       setAdding(false);
     }
