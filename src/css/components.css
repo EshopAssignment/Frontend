@@ -867,15 +867,7 @@ button:hover{
     margin: 1rem 0;
 }
 /*#endregion */
-/*#region admin */
-.admin-order-details{
-    display: flex;
-    flex-direction: column;
-    gap:.5rem;
-    margin-left:.5rem;
 
-}
-/*#endregion */
 /*#region auth */
 .auth-form-container{
     margin:8rem auto 0 auto;
