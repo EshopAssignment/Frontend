@@ -90,6 +90,11 @@ export type AdminUpdateProductRequestDto = {
     isActive: boolean;
 };
 
+export type ConfirmEmailDto = {
+    userId: number | string;
+    token: string;
+};
+
 export type CreateIntentRequest = {
     orderNumber: string;
     cartId: string;
@@ -109,6 +114,10 @@ export type CreateOrderRequestDto = {
     cartId: string;
     currency?: string;
     reservationTtlMinutes?: number | string;
+};
+
+export type ForgotPasswordDto = {
+    email: string;
 };
 
 export type LoginDto = {
@@ -214,6 +223,16 @@ export type RegisterDto = {
     email: string;
     displayName: string;
     password: string;
+};
+
+export type ResendVerificationDto = {
+    email: string;
+};
+
+export type ResetPasswordDto = {
+    email: string;
+    token: string;
+    newPassword: string;
 };
 
 export type ServicePointDto = {
@@ -605,6 +624,62 @@ export type PostAuthRefreshData = {
 };
 
 export type PostAuthRefreshResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PostAuthForgotPasswordData = {
+    body: ForgotPasswordDto;
+    path?: never;
+    query?: never;
+    url: '/auth/forgot-password';
+};
+
+export type PostAuthForgotPasswordResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PostAuthResetPasswordData = {
+    body: ResetPasswordDto;
+    path?: never;
+    query?: never;
+    url: '/auth/reset-password';
+};
+
+export type PostAuthResetPasswordResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PostAuthResendVerificationData = {
+    body: ResendVerificationDto;
+    path?: never;
+    query?: never;
+    url: '/auth/resend-verification';
+};
+
+export type PostAuthResendVerificationResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PostAuthConfirmEmailData = {
+    body: ConfirmEmailDto;
+    path?: never;
+    query?: never;
+    url: '/auth/confirm-email';
+};
+
+export type PostAuthConfirmEmailResponses = {
     /**
      * OK
      */
