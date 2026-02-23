@@ -45,3 +45,35 @@ export async function getMe(opts?: {signal?: AbortSignal }): Promise<MeDto> {
     roles:d.roles ?? [],
   };
 }
+
+export async function resendVerification(email:string):  Promise<void> {
+  const res = await sdk.postAuthResendVerification({
+    client: api,
+    body: {email},
+  });
+  if (res.error) throw res.error  
+}
+
+export async function confirmEmail(userId: number, token: string): Promise<void> {
+  const res = await sdk.postAuthConfirmEmail({
+    client: api, 
+    body: {userId, token}
+  });
+  if (res.error) throw res.error
+}
+
+export async function forgotPassword(email: string): Promise<void> {
+  const res = await sdk.postAuthForgotPassword({
+    client: api,
+    body: {email}
+  });
+  if (res.error) throw res.error;
+}
+
+export async function resetPassword(email:string, token: string, newPassword:string): Promise<void> {
+  const res = await sdk.postAuthResetPassword({
+    client: api, 
+    body: {email, token, newPassword},
+  });
+  if(res.error) throw res.error;
+}
