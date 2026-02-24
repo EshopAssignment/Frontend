@@ -86,6 +86,16 @@ const onSubmit = async (data: FormValues) => {
           {errors.password && <p className="form-error">{errors.password.message}</p>}
         </div>
 
+        <div className="form-error-block" role="alert">
+
+        <div className="form-hint-links">
+          <Link to={"/forgot-password"}>
+            Glömt lösenord?
+          </Link>
+        </div>
+        
+      </div>
+
         {serverErr && <p className="form-error" role="alert">{serverErr}</p>}
 
         <button className="btn" type="submit" disabled={isSubmitting}>

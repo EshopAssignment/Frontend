@@ -22,6 +22,9 @@ import AdminOrders from "../pages/Admin/AdminOrders";
 import RequireAdmin from "./RequireAdmin";
 import RequireAuth from "./RequiresAuth";
 import Checkout from "@/components/Stripe/Checkout";
+import VerifyEmail from "@/pages/Auth/VerifyEmail";
+import ResetPassword from "@/pages/Auth/ResetPassword";
+import ForgotPasswordPage from "@/pages/Auth/ForgotPasswordPage";
 
 
 
@@ -61,6 +64,13 @@ const AppRouter = () => {
         <Route path="register" element={<SignUpForm />} />
         <Route path="company" element={<CompanyForm />} />
       </Route>
+
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/reset-password" element={<ResetPassword />}  />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />}  />
+      
+      
+      
     </Routes>
 
     
