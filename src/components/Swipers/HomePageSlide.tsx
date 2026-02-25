@@ -24,14 +24,18 @@ function PromoSwiper({
 
         <div className="promo-card">
           <div className="promo-card-media">
-            <Swiper
-              modules={[Autoplay, A11y, Pagination, Navigation]}
-              spaceBetween={12}
-              slidesPerView={2}
-              autoplay={hasMany ? { delay: 3000, disableOnInteraction: false } : false}
-              loop={hasMany}
-              
-            >
+          <Swiper
+            modules={[Autoplay, A11y, Pagination, Navigation]}
+            spaceBetween={12}
+            slidesPerView={1} 
+            breakpoints={{
+              992: {
+                slidesPerView: 2,
+              },
+            }}
+            autoplay={hasMany ? { delay: 3000, disableOnInteraction: false } : false}
+            loop={hasMany}
+          >
               {slide.image.map((src, i) => (
                 <SwiperSlide className="promo-card-slide" key={`${slide.title}-${i}`}>
                   <img loading="lazy" className="promo-card-image" src={src} alt={slide.alt} />
