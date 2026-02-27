@@ -1,4 +1,42 @@
 
+:root {
+  --vt-x: 50vw;
+  --vt-y: 50vh;
+}
+html {
+  view-transition-name: root;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(.2,.8,.2,1);
+}
+
+::view-transition-old(root) {
+  animation-name: vt-old-fade;
+}
+
+::view-transition-new(root) {
+  animation-name: vt-new-reveal;
+  clip-path: inset(0 100% 0 0);
+}
+
+@keyframes vt-old-fade {
+  to { opacity: 0.2; }
+}
+
+@keyframes vt-new-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
 /*#region dark*/
 :root[data-theme="dark"]{
   --background: radial-gradient( circle at top,#262626 0%, #1f1f1f 45%,#1b1b1b 100%  );
