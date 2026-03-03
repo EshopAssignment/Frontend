@@ -21,7 +21,7 @@ export type ProductFormLike = {
 }
 
 export type ProductFormErrors = Partial<Record<
-      "name" | "description" | "palletType" | "condition" | "priceExVat" | "vatRatePercent" | "onHand",
+      "name" | "description" | "palletType" | "condition" | "priceExVat" | "vatRatePercent" | "onHand" | "imgUrl",
   string>>;
 
 

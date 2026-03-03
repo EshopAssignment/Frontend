@@ -6,9 +6,7 @@ import {
   adminCreateProduct,
   adminListProducts,
   adminToggleActive,
-  adminUploadImageFetch,
   adminUpdateProduct,
-  adminUploadImage,
   type AdminCreateReq,
   type AdminUpdateReq,
   type AdminProduct,
@@ -23,12 +21,7 @@ const PAGE_SIZE = 20;
 
 function getErrMessage(err: unknown, fallback: string) {
   const anyErr = err as any;
-  return (
-    anyErr?.response?.data?.message ||
-    anyErr?.response?.data ||
-    anyErr?.message ||
-    fallback
-  );
+  return anyErr?.response?.data?.message || anyErr?.response?.data || anyErr?.message || fallback;
 }
 
 export default function AdminProducts() {
@@ -47,7 +40,7 @@ export default function AdminProducts() {
 
   const productById = useMemo(() => {
     const map = new Map<number, AdminProduct>();
-    for (const p of list.data?.items ?? []) map.set(p.id, p as any);
+    for (const p of list.data?.items ?? []) map.set(p.id, p);
     return map;
   }, [list.data?.items]);
 
@@ -62,10 +55,8 @@ export default function AdminProducts() {
   });
 
   const updateMut = useMutation({
-    mutationFn: async ({ id, body, file }: { id: number; body: AdminUpdateReq; file?: File }) => {
-      const updated = await adminUpdateProduct(id, body);
-      if (file) await adminUploadImageFetch(id, file);
-      return updated;
+    mutationFn: async ({ id, body }: { id: number; body: AdminUpdateReq }) => {
+      return adminUpdateProduct(id, body);
     },
     onSuccess: (_updated, vars) => {
       toast.success("Produkt uppdaterad.");
@@ -85,18 +76,10 @@ export default function AdminProducts() {
     onError: (err) => toast.error(getErrMessage(err, "Kunde inte ändra aktiv status.")),
   });
 
-  const uploadMut = useMutation({
-    mutationFn: ({ id, file }: { id: number; file: File }) => adminUploadImage(id, file),
-    onSuccess: () => {
-      toast.success("Bild uppladdad.");
-      qc.invalidateQueries({ queryKey: ["admin-products"] });
-    },
-    onError: (err) => toast.error(getErrMessage(err, "Kunde inte ladda upp bild.")),
-  });
-
   function handleToggle(id: number, current: boolean) {
     const next = !current;
 
+    // Extra guard: blocka aktivering om required saknas
     if (next) {
       const p = productById.get(id);
       if (!p) {
@@ -109,14 +92,14 @@ export default function AdminProducts() {
         description: p.description,
         palletType: p.palletType,
         condition: p.condition,
+        imgUrl: p.imgUrl,
         priceExVat: p.priceExVat,
-        vatRatePercent: (p as any).vatRatePercent,
+        vatRatePercent: p.vatRatePercent,
         onHand: p.onHand,
       });
 
-
-      if (missing){
-        toast.error("Kan inte aktivera, information saknas till prdukten");
+      if (missing) {
+        toast.error("Kan inte aktivera, information saknas för produkten.");
         return;
       }
     }
@@ -124,13 +107,15 @@ export default function AdminProducts() {
     toggleMut.mutate({ id, isActive: next });
   }
 
+  const busy = createMut.isPending || updateMut.isPending || toggleMut.isPending;
+
   return (
     <section>
       <div className="container">
         <div className="center-content">
           <h1 className="header-text">Produkter</h1>
           <div className="admin-actions">
-            <button className="btn" onClick={() => setCreating(true)}>
+            <button className="btn" onClick={() => setCreating(true)} disabled={busy}>
               Ny produkt
             </button>
           </div>
@@ -150,7 +135,6 @@ export default function AdminProducts() {
             onNext={() => setPage((p) => Math.min(list.data.totalPages ?? 1, p + 1))}
             onEdit={(id) => setEditing(Number(id))}
             onToggle={handleToggle}
-            onUpload={(id, file) => uploadMut.mutate({ id, file })}
           />
 
           {creating && (
@@ -158,7 +142,7 @@ export default function AdminProducts() {
               title="Skapa produkt"
               onCancel={() => setCreating(false)}
               onSubmit={(body) => {
-                const safe = { ...(body as any), isActive: false };
+                const safe: AdminCreateReq = { ...(body as AdminCreateReq), isActive: false };
                 createMut.mutate(safe);
               }}
               loading={createMut.isPending}
@@ -170,8 +154,8 @@ export default function AdminProducts() {
               title="Uppdatera produkt"
               productId={editing}
               onCancel={() => setEditing(null)}
-              onSubmit={(body, file) => {
-                updateMut.mutate({ id: editing, body: body as AdminUpdateReq, file });
+              onSubmit={(body) => {
+                updateMut.mutate({ id: editing, body: body as AdminUpdateReq });
               }}
               loading={updateMut.isPending}
             />

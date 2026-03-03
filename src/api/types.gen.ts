@@ -90,6 +90,11 @@ export type AdminUpdateProductRequestDto = {
     isActive: boolean;
 };
 
+export type BlobUploadRequestResponse = {
+    uploadUrl: string;
+    publicUrl: string;
+};
+
 export type ConfirmEmailDto = {
     userId: number | string;
     token: string;
@@ -223,6 +228,11 @@ export type RegisterDto = {
     email: string;
     displayName: string;
     password: string;
+};
+
+export type RequestUploadDto = {
+    fileName: string;
+    contentType: string;
 };
 
 export type ResendVerificationDto = {
@@ -517,31 +527,6 @@ export type PutApiAdminProductsByIdResponses = {
     200: unknown;
 };
 
-export type PutApiAdminProductsByIdImageData = {
-    body: {
-        ContentType?: string;
-        ContentDisposition?: string;
-        Headers?: {
-            [key: string]: Array<string>;
-        };
-        Length?: number | string;
-        Name?: string;
-        FileName?: string;
-    };
-    path: {
-        id: number;
-    };
-    query?: never;
-    url: '/api/admin/products/{id}/image';
-};
-
-export type PutApiAdminProductsByIdImageResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
 export type PatchApiAdminProductsByIdActivateData = {
     body?: null | ToggleActiveRequest;
     path: {
@@ -685,6 +670,22 @@ export type PostAuthConfirmEmailResponses = {
      */
     200: unknown;
 };
+
+export type PostApiBlobUploadRequestData = {
+    body: RequestUploadDto;
+    path?: never;
+    query?: never;
+    url: '/api/BlobUpload/request';
+};
+
+export type PostApiBlobUploadRequestResponses = {
+    /**
+     * OK
+     */
+    200: BlobUploadRequestResponse;
+};
+
+export type PostApiBlobUploadRequestResponse = PostApiBlobUploadRequestResponses[keyof PostApiBlobUploadRequestResponses];
 
 export type GetApiMeData = {
     body?: never;
