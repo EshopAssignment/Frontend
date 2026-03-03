@@ -1,24 +1,29 @@
 import { api } from "@/lib/http";
 import * as sdk from "@/api/sdk.gen";
+import { asNum, clampVatRatePercent } from "@/helpers/money";
 
-
-export type AdminProduct = {
+export type ProductDto = {
   id: number;
   name: string;
   description: string;
   imgUrl: string;
-  priceExVat: number;
-  vatRatePercent:number;
+  priceExVat: number;         
+  vatRatePercent: number;
+
   palletType: string;
   condition: string;
   stockStatus: string;
+
   onHand: number;
   reserved: number;
   available: number;
+
   isActive: boolean;
   sku: string | null;
   slug: string | null;
 };
+
+export type AdminProduct = ProductDto;
 
 export type AdminPagedProducts = {
   items: AdminProduct[];
@@ -27,7 +32,9 @@ export type AdminPagedProducts = {
   totalItems: number;
   totalPages: number;
 };
+
 export type EnumOption = { value: string; label: string; intValue: number };
+
 export type AdminProductOptions = {
   productTypes: EnumOption[];
   productConditions: EnumOption[];
@@ -40,41 +47,28 @@ export type AdminCreateReq =
 export type AdminUpdateReq =
   NonNullable<Parameters<typeof sdk.putApiAdminProductsById>[0]>["body"];
 
-const asNum = (v: unknown, fb = 0) => {
-  const n = typeof v === "number" ? v : typeof v === "string" ? Number(v) : NaN;
-  return Number.isFinite(n) ? n : fb;
-};
-
-const clampVat = (v: unknown) => {
-  const n = asNum(v, 25);
-  return n === 6 || n === 12 || n === 25 ? n : 25;
-};
-
-function mapProduct(raw: any): AdminProduct {
-  const vat = 
-  raw?.vatRatePercent ??
-  raw?.vatRatePercent ??
-  raw?.vatRate ??
-  raw?.vatRate ??
-  raw?.vat ??
-  raw?.vat;
+function mapProduct(raw: unknown): AdminProduct {
+  const r = (raw ?? {}) as Partial<ProductDto>;
 
   return {
-    id: asNum(raw.id, 0),
-    name: String(raw.name ?? ""),
-    description: String(raw.description ?? ""),
-    imgUrl: String(raw.imgUrl ?? ""),
-    priceExVat: asNum(raw.priceExVat, 0),
-    vatRatePercent: clampVat(vat),
-    palletType: String(raw.palletType ?? ""),
-    condition: String(raw.condition ?? ""),
-    stockStatus: String(raw.stockStatus ?? ""),
-    onHand: asNum(raw.onHand, 0),
-    reserved: asNum(raw.reserved, 0),
-    available: asNum(raw.available, 0),
-    isActive: Boolean(raw.isActive),
-    sku: raw.sku ?? null,
-    slug: raw.slug ?? null,
+    id: asNum(r.id, 0),
+    name: String(r.name ?? ""),
+    description: String(r.description ?? ""),
+    imgUrl: String(r.imgUrl ?? ""),
+    priceExVat: asNum(r.priceExVat, 0),
+    vatRatePercent: clampVatRatePercent(r.vatRatePercent, 25),
+
+    palletType: String(r.palletType ?? ""),
+    condition: String(r.condition ?? ""),
+    stockStatus: String(r.stockStatus ?? ""),
+
+    onHand: asNum(r.onHand, 0),
+    reserved: asNum(r.reserved, 0),
+    available: asNum(r.available, 0),
+
+    isActive: Boolean(r.isActive),
+    sku: r.sku ?? null,
+    slug: r.slug ?? null,
   };
 }
 
@@ -94,12 +88,14 @@ export async function adminListProductsQuery(params: {
 
   const d: any = res.data ?? {};
   const items = Array.isArray(d.items) ? d.items.map(mapProduct) : [];
+
   const page = asNum(d.page ?? d.currentPage ?? params.page ?? 1, 1);
   const pageSize = asNum(d.pageSize ?? d.perPage ?? params.pageSize ?? 20, 20);
   const totalItems = asNum(d.totalItems ?? d.total ?? items.length, items.length);
   const totalPages =
-    Number.isFinite(d?.totalPages) ? Number(d.totalPages)
-    : Math.max(1, Math.ceil(totalItems / Math.max(1, pageSize)));
+    Number.isFinite(d?.totalPages)
+      ? Number(d.totalPages)
+      : Math.max(1, Math.ceil(totalItems / Math.max(1, pageSize)));
 
   return { items, page, pageSize, totalItems, totalPages };
 }
@@ -127,7 +123,6 @@ export async function adminUpdateProduct(id: number, body: AdminUpdateReq): Prom
 }
 
 export async function adminToggleActive(id: number, isActive: boolean): Promise<void> {
-
   if ("patchApiAdminProductsByIdActivate" in sdk) {
     const res = await (sdk as any).patchApiAdminProductsByIdActivate({
       client: api,
@@ -137,7 +132,6 @@ export async function adminToggleActive(id: number, isActive: boolean): Promise<
     if (res.error) throw res.error;
     return;
   }
-
 
   if ("patchApiAdminProductsByIdActive" in sdk) {
     const res = await (sdk as any).patchApiAdminProductsByIdActive({
@@ -152,51 +146,9 @@ export async function adminToggleActive(id: number, isActive: boolean): Promise<
   throw new Error("Toggle endpoint saknas i SDK. Kontrollera OpenAPI och regenerera.");
 }
 
-export async function adminUploadImageFetch( id: number, file: File) :Promise<{imgUrl: string}> {
-  const form = new FormData();
-  form.append("file", file);
-
-  const res = await fetch(`https://localhost:7152/api/admin/products/${id}/image`, {
-    method: "PUT",
-    body: form,
-
-    credentials:"include",
-  });
-
-  if(!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-export async function adminUploadImage(id: number, file: File): Promise<{ imgUrl: string }> {
-  const form = new FormData();
-  form.append("file", file);
-
-  const candidates = [
-    "putApiAdminProductsByIdImage",
-    "postApiAdminProductsByIdImage",
-    "patchApiAdminProductsByIdImage",
-  ] as const;
-
-  for (const fn of candidates) {
-    if (fn in sdk) {
-      const res = await (sdk as any)[fn]({
-        client: api,
-        path: { id },
-        body: form,
-        mediaType: "multipart/form-data",
-      });
-      if (res.error) throw res.error;
-      return (res.data ?? { imgUrl: "" }) as { imgUrl: string };
-    }
-  }
-
-  throw new Error("Image-upload endpoint saknas i SDK. Kontrollera OpenAPI och regenerera.");
-}
-
 export async function adminGetProductOptions(): Promise<AdminProductOptions> {
   const res = await sdk.getApiAdminProductsOptions({ client: api });
   if (res.error) throw res.error;
-
 
   const data = (res.data ?? {}) as {
     productTypes?: unknown[];
@@ -208,21 +160,17 @@ export async function adminGetProductOptions(): Promise<AdminProductOptions> {
     Array.isArray(xs)
       ? xs.map((x) => {
           const anyx = x as any;
-          const intV =
-            typeof anyx?.intValue === "number" && Number.isFinite(anyx.intValue)
-              ? anyx.intValue
-              : Number(anyx?.intValue ?? 0) || 0;
           return {
             value: String(anyx?.value ?? ""),
             label: String(anyx?.label ?? ""),
-            intValue: intV,
+            intValue: asNum(anyx?.intValue ?? anyx?.value, 0),
           };
         })
       : [];
 
   return {
-    productTypes: sanitize(data.productTypes),         
+    productTypes: sanitize(data.productTypes),
     productConditions: sanitize(data.productConditions),
-    vatRates: sanitize(data.vatRates)
+    vatRates: sanitize(data.vatRates),
   };
 }

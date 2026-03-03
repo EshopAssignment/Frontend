@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+
 import {
   adminGetProduct,
   adminGetProductOptions,
@@ -18,13 +19,17 @@ import {
 } from "@/lib/productValidation";
 import { asNum, clampVatRatePercent, round2 } from "@/helpers/money";
 
+import { uploadImageAndGetPublicUrl } from "@/Services/uploadService"; 
+
 type Props = {
   title: string;
   productId?: number;
-  onSubmit: (body: AdminCreateReq | AdminUpdateReq, file?: File) => Promise<void> | void;
+  onSubmit: (body: AdminCreateReq | AdminUpdateReq) => Promise<void> | void;
   onCancel: () => void;
   loading?: boolean;
 };
+
+type TouchedMap = Partial<Record<keyof AdminCreateReq, boolean>>;
 
 export default function ProductForm({ title, productId, onSubmit, onCancel, loading }: Props) {
   const idNum = typeof productId === "number" ? productId : Number(productId);
@@ -52,13 +57,15 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
     priceExVat: 0,
     vatRatePercent: 25,
     onHand: 0,
-    isActive: false, 
+    isActive: false,
   });
 
-  const [file, setFile] = useState<File | undefined>(undefined);
-
   const [errors, setErrors] = useState<ProductFormErrors>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [touched, setTouched] = useState<TouchedMap>({});
+
+  const [localFile, setLocalFile] = useState<File | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const uploadAbortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (!isEdit || !data) return;
@@ -77,6 +84,10 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
 
     setErrors({});
     setTouched({});
+    setLocalFile(null);
+    setIsUploadingImage(false);
+    uploadAbortRef.current?.abort();
+    uploadAbortRef.current = null;
   }, [isEdit, data]);
 
   useEffect(() => {
@@ -97,7 +108,7 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
     }
   }, [form]);
 
-  const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : undefined), [file]);
+  const previewUrl = useMemo(() => (localFile ? URL.createObjectURL(localFile) : undefined), [localFile]);
   useEffect(() => {
     if (!previewUrl) return;
     return () => URL.revokeObjectURL(previewUrl);
@@ -121,7 +132,7 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
 
   function setField<K extends keyof AdminCreateReq>(key: K, value: AdminCreateReq[K]) {
     setForm((p) => ({ ...p, [key]: value }));
-    setTouched((t) => ({ ...t, [String(key)]: true }));
+    setTouched((t) => ({ ...t, [key]: true }));
   }
 
   function validateNow(nextForm = form) {
@@ -130,8 +141,46 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
     return nextErrors;
   }
 
+  async function onPickImage(file?: File) {
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Endast bildfiler är tillåtna.");
+      return;
+    }
+
+    const maxBytes = 5 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      toast.error("Bilden är för stor (max 5 MB).");
+      return;
+    }
+
+    uploadAbortRef.current?.abort();
+    uploadAbortRef.current = new AbortController();
+
+    setLocalFile(file);
+    setIsUploadingImage(true);
+
+    try {
+      const publicUrl = await uploadImageAndGetPublicUrl(file, { signal: uploadAbortRef.current.signal });
+      setField("imgUrl", publicUrl as any);
+      toast.success("Bild uppladdad.");
+    } catch (err: any) {
+      if (err?.name === "AbortError") return;
+      const msg = err?.message ?? "Kunde inte ladda upp bilden.";
+      toast.error(String(msg));
+    } finally {
+      setIsUploadingImage(false);
+    }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (isUploadingImage) {
+      toast.error("Vänta tills bilden är uppladdad.");
+      return;
+    }
 
     const payload: AdminCreateReq = {
       ...form,
@@ -141,13 +190,14 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
       vatRatePercent: clampVatRatePercent(form.vatRatePercent),
       onHand: Math.max(0, Math.floor(asNum(form.onHand, 0))),
       isActive: isEdit ? Boolean(form.isActive) : false,
+      imgUrl: String(form.imgUrl ?? "").trim(),
     };
 
     const nextErrors = validateNow(payload);
     const hasErrors = Object.keys(nextErrors).length > 0;
 
     if (hasErrors) {
-      toast.error("ett eller fler fält är ej giltiga");
+      toast.error("Ett eller fler fält är ej giltiga");
       setTouched({
         name: true,
         description: true,
@@ -156,6 +206,7 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
         priceExVat: true,
         vatRatePercent: true,
         onHand: true,
+        imgUrl: true,
       });
       return;
     }
@@ -167,21 +218,19 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
     try {
       if (isEdit) {
         const body: AdminUpdateReq = { id: productId!, ...payload } as AdminUpdateReq;
-        await onSubmit(body, file);
+        await onSubmit(body);
         toast.success("Produkt uppdaterad.");
       } else {
-        await onSubmit(payload, file);
+        await onSubmit(payload);
         toast.success("Produkt skapad som inaktiv.");
       }
     } catch (err: any) {
-      const msg =
-        err?.response?.data?.message ??
-        err?.message ??
-        "Kunde inte spara produkten.";
+      const msg = err?.response?.data?.message ?? err?.message ?? "Kunde inte spara produkten.";
       toast.error(String(msg));
     }
   }
 
+  const imageSrc = previewUrl || form.imgUrl || undefined;
 
   return (
     <div className="modal">
@@ -308,27 +357,33 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
             {touched.onHand && errors.onHand && <p className="field-error">{errors.onHand}</p>}
           </label>
 
-          {isEdit && (
-            <div className="row">
-              <label>
-                Byt bild (fil)
-                <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0])} />
-              </label>
+          <div className="row">
+            <label>
+              Produktbild
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => onPickImage(e.target.files?.[0])}
+                disabled={loading || isUploadingImage}
+              />
+              {isUploadingImage && <p className="muted">Laddar upp bild…</p>}
+              {touched.imgUrl && errors.imgUrl && <p className="field-error">{errors.imgUrl}</p>}
+              <i className="fa-solid fa-upload"></i>
+            </label>
 
-              {(previewUrl || form.imgUrl) && (
-                <div>
-                  <img src={previewUrl || form.imgUrl} alt="Preview" />
-                </div>
-              )}
-            </div>
-          )}
+            {imageSrc && (
+              <div>
+                <img src={imageSrc} alt="Preview" />
+              </div>
+            )}
+          </div>
 
           <div className="row actions">
-            <button type="button" className="btn" onClick={onCancel} disabled={loading}>
+            <button type="button" className="btn" onClick={onCancel} disabled={loading || isUploadingImage}>
               Avbryt
             </button>
-            <button type="submit" className="btn" disabled={loading}>
-              {loading ? "Sparar…" : "Spara"}
+            <button type="submit" className="btn" disabled={loading || isUploadingImage}>
+              {loading ? "Sparar…" : isUploadingImage ? "Laddar bild…" : "Spara"}
             </button>
           </div>
         </form>

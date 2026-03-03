@@ -8,7 +8,6 @@ type Props = {
   onNext: () => void;
   onEdit: (id: number) => void;
   onToggle: (id: number, current: boolean) => void;
-  onUpload: (id: number, file: File) => void;
 };
 
 function fmtSEK0(n: number): string {
