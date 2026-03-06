@@ -2,31 +2,23 @@ import { api } from "@/lib/http";
 import * as sdk from "@/api/sdk.gen";
 import type * as apiTypes from "@/api/types.gen";
 
-export type AdminPagedOrders =
-  NonNullable<Awaited<ReturnType<typeof sdk.getApiAdminOrders>>["data"]>;
-
-export type AdminOrderListItem =
-  NonNullable<AdminPagedOrders["items"]>[number];
-
-export type AdminOrderDetails =
-  NonNullable<Awaited<ReturnType<typeof sdk.getApiAdminOrdersById>>["data"]>;
-
-type UpdateStatusReq = Parameters<typeof sdk.patchApiAdminOrdersByIdStatus>[0]["body"];
-export type AdminOrderStatus = NonNullable<UpdateStatusReq>["orderStatus"];
-
-
-type PatchTrackingArgs = Parameters<typeof sdk.patchApiAdminOrdersByIdTracking>[0];
-type PatchTrackingBody = NonNullable<PatchTrackingArgs>["body"];
+export type AdminPagedOrders = apiTypes.PagedResultOfAdminOrderListItemDto;
+export type AdminOrderListItem = apiTypes.AdminOrderListItemDto;
+export type AdminOrderDetails = apiTypes.AdminOrderDetailsDto;
+export type UpdateOrderStatusReq = apiTypes.AdminUpdateOrderStatusRequest;
+export type SetTrackingReq = apiTypes.AdminSetTrackingRequest;
+export type AdminOrderStatus = UpdateOrderStatusReq["orderStatus"];
 
 export async function setTracking(
   id: number,
-  body: PatchTrackingBody
+  body: SetTrackingReq
 ): Promise<void> {
   const res = await sdk.patchApiAdminOrdersByIdTracking({
     client: api,
     path: { id },
     body,
   });
+
   if (res.error) throw res.error;
 }
 
@@ -49,8 +41,18 @@ export async function listOrders(opts: {
       to: opts.to ? new Date(opts.to).toISOString() : undefined,
     },
   });
+
   if (res.error) throw res.error;
-  return res.data!;
+
+  return (
+    res.data ?? {
+      items: [],
+      page: opts.page,
+      pageSize: opts.pageSize,
+      totalItems: 0,
+      totalPages: 0,
+    }
+  );
 }
 
 export async function getOrderById(id: number): Promise<AdminOrderDetails> {
@@ -58,15 +60,19 @@ export async function getOrderById(id: number): Promise<AdminOrderDetails> {
     client: api,
     path: { id },
   });
+
   if (res.error) throw res.error;
   return res.data!;
 }
 
 export async function updateOrderStatus(id: number, next: AdminOrderStatus): Promise<void> {
+  const body: UpdateOrderStatusReq = { orderStatus: next };
+
   const res = await sdk.patchApiAdminOrdersByIdStatus({
     client: api,
     path: { id },
-    body: { orderStatus: next },
+    body,
   });
+
   if (res.error) throw res.error;
 }
