@@ -1,5 +1,7 @@
 import { api } from "@/lib/http";
 import * as sdk from "@/api/sdk.gen";
+import type * as apiTypes from "@/api/types.gen";
+
 
 export type MeDto = NonNullable<
   Awaited<ReturnType<typeof sdk.getApiMe>>["data"]

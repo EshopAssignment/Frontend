@@ -1,6 +1,8 @@
 import { api } from "@/lib/http";
 import * as sdk from "@/api/sdk.gen";
 import type { CartItem } from "@/context/CartContext";
+import type * as apiTypes from "@/api/types.gen";
+
 
 export type CreateOrderRequest = Parameters<typeof sdk.postApiOrder>[0]["body"];
 export type OrderCreatedDto = NonNullable<Awaited<ReturnType<typeof sdk.postApiOrder>>["data"]>;

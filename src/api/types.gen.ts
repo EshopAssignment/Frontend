@@ -75,6 +75,12 @@ export type AdminProductImageRequestDto = {
     altText: null | string;
 };
 
+export type AdminProductOptionsDto = {
+    productTypes: Array<EnumOptionDto>;
+    productConditions: Array<EnumOptionDto>;
+    vatRates: Array<EnumOptionDto>;
+};
+
 export type AdminSetTrackingRequest = {
     trackingNumber: string;
     markAsShipped?: boolean;
@@ -126,6 +132,12 @@ export type CreateOrderRequestDto = {
     cartId: string;
     currency?: string;
     reservationTtlMinutes?: number | string;
+};
+
+export type EnumOptionDto = {
+    value: string;
+    label: string;
+    intValue: number | string;
 };
 
 export type ForgotPasswordDto = {
@@ -493,12 +505,23 @@ export type PostApiAdminProductsData = {
     url: '/api/admin/products';
 };
 
+export type PostApiAdminProductsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+};
+
+export type PostApiAdminProductsError = PostApiAdminProductsErrors[keyof PostApiAdminProductsErrors];
+
 export type PostApiAdminProductsResponses = {
     /**
-     * OK
+     * Created
      */
-    200: unknown;
+    201: ProductDto;
 };
+
+export type PostApiAdminProductsResponse = PostApiAdminProductsResponses[keyof PostApiAdminProductsResponses];
 
 export type GetProductByIdAdminData = {
     body?: never;
@@ -536,12 +559,27 @@ export type PutApiAdminProductsByIdData = {
     url: '/api/admin/products/{id}';
 };
 
+export type PutApiAdminProductsByIdErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutApiAdminProductsByIdError = PutApiAdminProductsByIdErrors[keyof PutApiAdminProductsByIdErrors];
+
 export type PutApiAdminProductsByIdResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: ProductDto;
 };
+
+export type PutApiAdminProductsByIdResponse = PutApiAdminProductsByIdResponses[keyof PutApiAdminProductsByIdResponses];
 
 export type PatchApiAdminProductsByIdActivateData = {
     body?: null | ToggleActiveRequest;
@@ -554,12 +592,27 @@ export type PatchApiAdminProductsByIdActivateData = {
     url: '/api/admin/products/{id}/activate';
 };
 
+export type PatchApiAdminProductsByIdActivateErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PatchApiAdminProductsByIdActivateError = PatchApiAdminProductsByIdActivateErrors[keyof PatchApiAdminProductsByIdActivateErrors];
+
 export type PatchApiAdminProductsByIdActivateResponses = {
     /**
-     * OK
+     * No Content
      */
-    200: unknown;
+    204: void;
 };
+
+export type PatchApiAdminProductsByIdActivateResponse = PatchApiAdminProductsByIdActivateResponses[keyof PatchApiAdminProductsByIdActivateResponses];
 
 export type GetApiAdminProductsOptionsData = {
     body?: never;
@@ -572,8 +625,10 @@ export type GetApiAdminProductsOptionsResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: AdminProductOptionsDto;
 };
+
+export type GetApiAdminProductsOptionsResponse = GetApiAdminProductsOptionsResponses[keyof GetApiAdminProductsOptionsResponses];
 
 export type PostAuthRegisterData = {
     body: RegisterDto;

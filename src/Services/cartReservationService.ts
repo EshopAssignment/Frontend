@@ -1,5 +1,7 @@
 import { api } from "@/lib/http"
 import * as sdk from "@/api/sdk.gen"
+import type * as apiTypes from "@/api/types.gen";
+
 
 export async function setCartReservation(
   cartId: string,

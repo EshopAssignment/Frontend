@@ -1,15 +1,11 @@
 import { api } from "@/lib/http";
 import * as sdk from '@/api/sdk.gen';
+import type * as apiTypes from "@/api/types.gen";
+
 
 export type LoginRes = NonNullable<Awaited<ReturnType<typeof sdk.postAuthLogin>>["data"]>;
 export type RegisterRes = NonNullable<Awaited<ReturnType<typeof sdk.postAuthRegister>>["data"]>;
 export type MeApiDto = NonNullable<Awaited<ReturnType<typeof sdk.getApiMe>>["data"]>;
-
-export type MeDto = {
-  email:string;
-  displayName?: string | null;
-  roles: string [];
-};
 
 export async function login(email: string, password: string): Promise<LoginRes> {
   const res = await sdk.postAuthLogin({
@@ -34,7 +30,7 @@ export async function logout():Promise<void>{
   if (res.error) throw res.error;
 }
 
-export async function getMe(opts?: {signal?: AbortSignal }): Promise<MeDto> {
+export async function getMe(opts?: {signal?: AbortSignal }): Promise<apiTypes.MeDto> {
   const res = await sdk.getApiMe({client: api, signal: opts?.signal });
   if (res.error) throw res.error;
 

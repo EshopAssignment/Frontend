@@ -1,5 +1,7 @@
 import {api} from "@/lib/http"
 import * as sdk from "@/api/sdk.gen";
+import type * as apiTypes from "@/api/types.gen";
+
 
 export type RequestUploadRes = 
     NonNullable<Awaited<ReturnType<typeof sdk.postApiBlobUploadRequest>>["data"]>;

@@ -6,7 +6,6 @@ import {
   adminGetProduct,
   adminGetProductOptions,
   type AdminCreateReq,
-  type AdminProductOptions,
   type AdminUpdateReq,
 } from "../../Services/adminProductService";
 
@@ -52,11 +51,10 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
     staleTime: 10_000,
   });
 
-  const { data: options } = useQuery<AdminProductOptions>({
-    queryKey: ["admin-product-options"],
-    queryFn: () => adminGetProductOptions(),
-    staleTime: 60 * 60 * 1000,
-  });
+const { data: options } = useQuery({
+  queryKey: ["admin-product-options"],
+  queryFn: adminGetProductOptions,
+});
 
   const [form, setForm] = useState<AdminCreateReq>({
     name: "",
