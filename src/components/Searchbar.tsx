@@ -3,7 +3,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { suggestProducts, type ProductSuggestionDto } from "../Services/productService";
-import { buildImageUrl } from "../helpers/url";
+import { resolveImageUrl } from "../helpers/ImageHelper";
 import placeholder from "../Images/placeholder.jpg";
 
 function toNumber(n: unknown): number | null {
@@ -29,7 +29,6 @@ const Searchbar = () => {
   const nav = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
 
-
   const enabled = debounced.trim().length >= 2;
 
   const { data = [], isFetching, isError } = useQuery({
@@ -54,7 +53,9 @@ const Searchbar = () => {
       typeof it.id === "number" && Number.isFinite(it.id)
         ? it.id
         : Number(String(it.id));
+
     if (!Number.isFinite(idNum)) return;
+
     setOpen(false);
     setQuery("");
     nav(`/product/${idNum}`);
@@ -62,13 +63,11 @@ const Searchbar = () => {
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if ((e.key === "ArrowDown" || e.key === "ArrowUp") && !open) setOpen(true);
-    if (e.key === "ArrowDown") setActive(a => Math.min(a + 1, Math.max(items.length - 1, 0)));
-    if (e.key === "ArrowUp")   setActive(a => Math.max(a - 1, 0));
+    if (e.key === "ArrowDown") setActive((a) => Math.min(a + 1, Math.max(items.length - 1, 0)));
+    if (e.key === "ArrowUp") setActive((a) => Math.max(a - 1, 0));
     if (e.key === "Enter" && open && items[active]) goto(items[active]);
     if (e.key === "Escape") setOpen(false);
   }
-
-
 
   return (
     <div
@@ -81,8 +80,14 @@ const Searchbar = () => {
     >
       <input
         value={query}
-        onChange={e => { setQuery(e.target.value); setOpen(true); setActive(0); }}
-        onFocus={() => { if (enabled) setOpen(true); }}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setOpen(true);
+          setActive(0);
+        }}
+        onFocus={() => {
+          if (enabled) setOpen(true);
+        }}
         onKeyDown={onKeyDown}
         placeholder="Sök efter den perfekta pallen..."
         className="searchbar"
@@ -105,9 +110,14 @@ const Searchbar = () => {
             items.length > 0 ? (
               <ul id="search-listbox" role="listbox" className="search-list">
                 {items.map((item, i) => {
-                  
-                  const imgSrc = buildImageUrl(item.imgUrl) || placeholder;
+                  const rawImage =
+                    (item as any).primaryImgUrl ??
+                    (item as any).imgUrl ??
+                    "";
+
+                  const imgSrc = resolveImageUrl(rawImage) || placeholder;
                   const skuOrSlug = item.sku ?? item.slug ?? `#${item.id}`;
+
                   return (
                     <li
                       key={item.id}
@@ -115,15 +125,18 @@ const Searchbar = () => {
                       role="option"
                       aria-selected={i === active}
                       onMouseEnter={() => setActive(i)}
-                      onMouseDown={e => e.preventDefault()}
+                      onMouseDown={(e) => e.preventDefault()}
                       onClick={() => goto(item)}
-                      className={`${i === active ? "search-item" : ""}`}
+                      className={i === active ? "search-item" : ""}
                     >
                       <div className="search-info">
-                      <img
-                        src={imgSrc}
-                        alt={item.name}
-                      />
+                        <img
+                          src={imgSrc}
+                          alt={item.name}
+                          onError={(e) => {
+                            e.currentTarget.src = placeholder;
+                          }}
+                        />
                         <p>Produkt: {item.name}</p>
                         <p>Produktnummer: {skuOrSlug}</p>
                         <p>Pris: {formatSEK(item.priceExVat)}</p>
@@ -133,7 +146,7 @@ const Searchbar = () => {
                 })}
               </ul>
             ) : (
-              <div className="">
+              <div>
                 {enabled ? <>Inga träffar på “{debounced}”.</> : <>Minst 2 tecken för att söka.</>}
               </div>
             )

@@ -6,7 +6,10 @@ export type ProductDto = {
   id: number;
   name: string;
   description: string;
-  imgUrl: string;
+
+  primaryImgUrl: string;
+  images: ProductImageDto[];
+
   priceExVat: number;         
   vatRatePercent: number;
 
@@ -21,6 +24,13 @@ export type ProductDto = {
   isActive: boolean;
   sku: string | null;
   slug: string | null;
+};
+
+export type ProductImageDto = {
+  url: string;
+  sortOrder: number;
+  isPrimary: boolean;
+  altText?: string | null;
 };
 
 export type AdminProduct = ProductDto;
@@ -47,30 +57,7 @@ export type AdminCreateReq =
 export type AdminUpdateReq =
   NonNullable<Parameters<typeof sdk.putApiAdminProductsById>[0]>["body"];
 
-function mapProduct(raw: unknown): AdminProduct {
-  const r = (raw ?? {}) as Partial<ProductDto>;
 
-  return {
-    id: asNum(r.id, 0),
-    name: String(r.name ?? ""),
-    description: String(r.description ?? ""),
-    imgUrl: String(r.imgUrl ?? ""),
-    priceExVat: asNum(r.priceExVat, 0),
-    vatRatePercent: clampVatRatePercent(r.vatRatePercent, 25),
-
-    palletType: String(r.palletType ?? ""),
-    condition: String(r.condition ?? ""),
-    stockStatus: String(r.stockStatus ?? ""),
-
-    onHand: asNum(r.onHand, 0),
-    reserved: asNum(r.reserved, 0),
-    available: asNum(r.available, 0),
-
-    isActive: Boolean(r.isActive),
-    sku: r.sku ?? null,
-    slug: r.slug ?? null,
-  };
-}
 
 export async function adminListProductsQuery(params: {
   page?: number;
@@ -173,4 +160,68 @@ export async function adminGetProductOptions(): Promise<AdminProductOptions> {
     productConditions: sanitize(data.productConditions),
     vatRates: sanitize(data.vatRates),
   };
+}
+//Helpers
+function mapProduct(raw: unknown): AdminProduct {
+  const r = (raw ?? {}) as any;
+
+  const images: ProductImageDto[] = Array.isArray(r.images)
+    ? r.images.map((x: any) => ({
+        url: String(x?.url ?? ""),
+        sortOrder: asNum(x?.sortOrder, 0),
+        isPrimary: Boolean(x?.isPrimary),
+        altText: x?.altText ?? null,
+      })).filter((x: ProductImageDto) => x.url)
+    : [];
+
+  const primary =
+    String(r.primaryImgUrl ?? "") ||
+    String(r.imgUrl ?? "") ||
+    images.slice().sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0) || a.sortOrder - b.sortOrder)[0]?.url ||
+    "";
+
+  const normalized = normalizeImages(images, primary);
+
+  return {
+    id: asNum(r.id, 0),
+    name: String(r.name ?? ""),
+    description: String(r.description ?? ""),
+    primaryImgUrl: normalized.primaryUrl,
+    images: normalized.images,
+    priceExVat: asNum(r.priceExVat, 0),
+    vatRatePercent: clampVatRatePercent(r.vatRatePercent, 25),
+
+    palletType: String(r.palletType ?? ""),
+    condition: String(r.condition ?? ""),
+    stockStatus: String(r.stockStatus ?? ""),
+
+    onHand: asNum(r.onHand, 0),
+    reserved: asNum(r.reserved, 0),
+    available: asNum(r.available, 0),
+
+    isActive: Boolean(r.isActive),
+    sku: r.sku ?? null,
+    slug: r.slug ?? null,
+  };
+}
+
+function normalizeImages(images: ProductImageDto[], fallbackPrimaryUrl: string) {
+  const list = images
+    .filter(i => i.url)
+    .slice()
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+
+  for (let i = 0; i < list.length; i++) list[i].sortOrder = i;
+
+  if (list.length === 0 && fallbackPrimaryUrl) {
+    list.push({ url: fallbackPrimaryUrl, sortOrder: 0, isPrimary: true, altText: null });
+  }
+
+  if (list.length > 0) {
+    const idx = Math.max(0, list.findIndex(x => x.isPrimary));
+    list.forEach((x, i) => (x.isPrimary = i === (idx === -1 ? 0 : idx)));
+  }
+
+  const primaryUrl = list.find(x => x.isPrimary)?.url ?? list[0]?.url ?? "";
+  return { images: list, primaryUrl };
 }
