@@ -1149,14 +1149,23 @@ export type GetApiProductsSuggestResponses = {
 
 export type GetApiProductsSuggestResponse = GetApiProductsSuggestResponses[keyof GetApiProductsSuggestResponses];
 
-export type PutApiReservationApiCartReservationsData = {
+export type PutApiCartReservationsData = {
     body: SetCartReservationDto;
     path?: never;
     query?: never;
-    url: '/api/Reservation/api/cart/reservations';
+    url: '/api/cart/reservations';
 };
 
-export type PutApiReservationApiCartReservationsResponses = {
+export type PutApiCartReservationsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+};
+
+export type PutApiCartReservationsError = PutApiCartReservationsErrors[keyof PutApiCartReservationsErrors];
+
+export type PutApiCartReservationsResponses = {
     /**
      * OK
      */

@@ -1,7 +1,5 @@
-import { api } from "@/lib/http"
-import * as sdk from "@/api/sdk.gen"
-import type * as apiTypes from "@/api/types.gen";
-
+import { api } from "@/lib/http";
+import * as sdk from "@/api/sdk.gen";
 
 export async function setCartReservation(
   cartId: string,
@@ -9,14 +7,15 @@ export async function setCartReservation(
   quantity: number,
   ttlMinutes = 30
 ): Promise<void> {
-    const res = await sdk.putApiReservationApiCartReservations({
-        client: api,
-        body: {
-            cartId,
-            productId,
-            quantity,
-            reservationTtlMinutes: ttlMinutes,
-        },
-    });
-    if (res.error) throw res.error;
+  const res = await sdk.putApiCartReservations({
+    client: api,
+    body: {
+      cartId,
+      productId,
+      quantity,
+      reservationTtlMinutes: ttlMinutes,
+    },
+  });
+
+  if (res.error) throw res.error;
 }
