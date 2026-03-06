@@ -1,22 +1,27 @@
-import {api} from "@/lib/http"
+import { api } from "@/lib/http";
 import * as sdk from "@/api/sdk.gen";
 import type * as apiTypes from "@/api/types.gen";
 
+export type BlobUploadRequestResponse = apiTypes.BlobUploadRequestResponse;
 
-export type RequestUploadRes = 
-    NonNullable<Awaited<ReturnType<typeof sdk.postApiBlobUploadRequest>>["data"]>;
-
-
-export async function requestProductImageUpload(fileName: string, contentType: string): Promise<RequestUploadRes> {
-    const res = await sdk.postApiBlobUploadRequest({
+export async function requestProductImageUpload(
+  fileName: string,
+  contentType: string
+): Promise<BlobUploadRequestResponse> {
+  const res = await sdk.postApiBlobUploadRequest({
     client: api,
     body: { fileName, contentType },
   });
+
   if (res.error) throw res.error;
   return res.data!;
 }
 
-export async function uploadToBlob(uploadUrl: string, file: File, opts?: { signal?: AbortSignal }) {
+export async function uploadToBlob(
+  uploadUrl: string,
+  file: File,
+  opts?: { signal?: AbortSignal }
+): Promise<void> {
   const res = await fetch(uploadUrl, {
     method: "PUT",
     headers: {
@@ -33,7 +38,10 @@ export async function uploadToBlob(uploadUrl: string, file: File, opts?: { signa
   }
 }
 
-export async function uploadImageAndGetPublicUrl(file: File, opts?: { signal?: AbortSignal }) {
+export async function uploadImageAndGetPublicUrl(
+  file: File,
+  opts?: { signal?: AbortSignal }
+): Promise<string> {
   const { uploadUrl, publicUrl } = await requestProductImageUpload(file.name, file.type);
   await uploadToBlob(uploadUrl, file, opts);
   return publicUrl;
