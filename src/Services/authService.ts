@@ -1,75 +1,80 @@
 import { api } from "@/lib/http";
-import * as sdk from '@/api/sdk.gen';
+import * as sdk from "@/api/sdk.gen";
 import type * as apiTypes from "@/api/types.gen";
 
-
-export type LoginRes = NonNullable<Awaited<ReturnType<typeof sdk.postAuthLogin>>["data"]>;
-export type RegisterRes = NonNullable<Awaited<ReturnType<typeof sdk.postAuthRegister>>["data"]>;
-export type MeApiDto = NonNullable<Awaited<ReturnType<typeof sdk.getApiMe>>["data"]>;
+export type LoginRes = apiTypes.AuthSessionResponseDto;
+export type MeDto = apiTypes.MeDto;
 
 export async function login(email: string, password: string): Promise<LoginRes> {
   const res = await sdk.postAuthLogin({
     client: api,
-    body:{email, password},
+    body: { email, password },
   });
+
   if (res.error) throw res.error;
   return res.data!;
 }
 
-export async function register(displayName: string, email: string, password: string): Promise<RegisterRes>{
+export async function register(displayName: string, email: string, password: string): Promise<void> {
   const res = await sdk.postAuthRegister({
     client: api,
-    body:{displayName, email, password},
+    body: { displayName, email, password },
   });
+
+  if (res.error) throw res.error;
+}
+
+export async function logout(): Promise<void> {
+  const res = await sdk.postAuthLogout({ client: api });
+  if (res.error) throw res.error;
+}
+
+export async function getMe(opts?: { signal?: AbortSignal }): Promise<MeDto> {
+  const res = await sdk.getApiMe({
+    client: api,
+    signal: opts?.signal,
+  });
+
   if (res.error) throw res.error;
   return res.data!;
 }
 
-export async function logout():Promise<void>{
-  const res = await sdk.postAuthLogout({client: api});
-  if (res.error) throw res.error;
-}
-
-export async function getMe(opts?: {signal?: AbortSignal }): Promise<apiTypes.MeDto> {
-  const res = await sdk.getApiMe({client: api, signal: opts?.signal });
-  if (res.error) throw res.error;
-
-  const d = res.data!;
-  return {
-    email:d.email,
-    displayName: d.displayName ?? null,
-    roles:d.roles ?? [],
-  };
-}
-
-export async function resendVerification(email:string):  Promise<void> {
+export async function resendVerification(email: string): Promise<void> {
   const res = await sdk.postAuthResendVerification({
     client: api,
-    body: {email},
+    body: { email },
   });
-  if (res.error) throw res.error  
+
+  if (res.error) throw res.error;
 }
 
 export async function confirmEmail(userId: number, token: string): Promise<void> {
   const res = await sdk.postAuthConfirmEmail({
-    client: api, 
-    body: {userId, token}
+    client: api,
+    body: { userId, token },
   });
-  if (res.error) throw res.error
+
+  if (res.error) throw res.error;
 }
 
 export async function forgotPassword(email: string): Promise<void> {
   const res = await sdk.postAuthForgotPassword({
     client: api,
-    body: {email}
+    body: { email },
   });
+
   if (res.error) throw res.error;
 }
 
-export async function resetPassword(email:string, token: string, newPassword:string): Promise<void> {
+export async function resetPassword(
+  email: string,
+  token: string,
+  newPassword: string
+): Promise<void> {
   const res = await sdk.postAuthResetPassword({
-    client: api, 
-    body: {email, token, newPassword},
+    client: api,
+    body: { email, token, newPassword },
   });
-  if(res.error) throw res.error;
+
+  if (res.error) throw res.error;
 }

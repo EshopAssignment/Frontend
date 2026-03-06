@@ -103,6 +103,10 @@ export type AdminUpdateProductRequestDto = {
     isActive: boolean;
 };
 
+export type AuthSessionResponseDto = {
+    expiresAt: string;
+};
+
 export type BlobUploadRequestResponse = {
     uploadUrl: string;
     publicUrl: string;
@@ -637,6 +641,15 @@ export type PostAuthRegisterData = {
     url: '/auth/register';
 };
 
+export type PostAuthRegisterErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+};
+
+export type PostAuthRegisterError = PostAuthRegisterErrors[keyof PostAuthRegisterErrors];
+
 export type PostAuthRegisterResponses = {
     /**
      * OK
@@ -651,12 +664,23 @@ export type PostAuthLoginData = {
     url: '/auth/login';
 };
 
+export type PostAuthLoginErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ProblemDetails;
+};
+
+export type PostAuthLoginError = PostAuthLoginErrors[keyof PostAuthLoginErrors];
+
 export type PostAuthLoginResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: AuthSessionResponseDto;
 };
+
+export type PostAuthLoginResponse = PostAuthLoginResponses[keyof PostAuthLoginResponses];
 
 export type PostAuthLogoutData = {
     body?: never;
@@ -679,12 +703,23 @@ export type PostAuthRefreshData = {
     url: '/auth/refresh';
 };
 
+export type PostAuthRefreshErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ProblemDetails;
+};
+
+export type PostAuthRefreshError = PostAuthRefreshErrors[keyof PostAuthRefreshErrors];
+
 export type PostAuthRefreshResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: AuthSessionResponseDto;
 };
+
+export type PostAuthRefreshResponse = PostAuthRefreshResponses[keyof PostAuthRefreshResponses];
 
 export type PostAuthForgotPasswordData = {
     body: ForgotPasswordDto;
@@ -748,6 +783,15 @@ export type PostApiBlobUploadRequestData = {
     query?: never;
     url: '/api/BlobUpload/request';
 };
+
+export type PostApiBlobUploadRequestErrors = {
+    /**
+     * Bad Request
+     */
+    400: string;
+};
+
+export type PostApiBlobUploadRequestError = PostApiBlobUploadRequestErrors[keyof PostApiBlobUploadRequestErrors];
 
 export type PostApiBlobUploadRequestResponses = {
     /**
