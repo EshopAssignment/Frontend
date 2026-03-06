@@ -12,7 +12,7 @@ export type AdminCreateProductRequestDto = {
     priceExVat: number | string;
     vatRatePercent: number | string;
     onHand: number | string;
-    imgUrl: string;
+    images: Array<AdminProductImageRequestDto>;
     isActive: boolean;
 };
 
@@ -68,6 +68,13 @@ export type AdminOrderListItemDto = {
     paymentMethod: string;
 };
 
+export type AdminProductImageRequestDto = {
+    url: string;
+    sortOrder: number | string;
+    isPrimary: boolean;
+    altText: null | string;
+};
+
 export type AdminSetTrackingRequest = {
     trackingNumber: string;
     markAsShipped?: boolean;
@@ -86,7 +93,7 @@ export type AdminUpdateProductRequestDto = {
     priceExVat: number | string;
     vatRatePercent: number | string;
     onHand: number | string;
-    imgUrl: string;
+    images: Array<AdminProductImageRequestDto>;
     isActive: boolean;
 };
 
@@ -201,7 +208,8 @@ export type ProductDto = {
     id: number | string;
     name: string;
     description: string;
-    imgUrl: string;
+    primaryImgUrl: null | string;
+    images: Array<ProductImageDto>;
     priceExVat: number | string;
     vatRatePercent: number | string;
     palletType: string;
@@ -215,11 +223,19 @@ export type ProductDto = {
     slug: null | string;
 };
 
+export type ProductImageDto = {
+    id: number | string;
+    url: string;
+    sortOrder: number | string;
+    isPrimary: boolean;
+    altText: null | string;
+};
+
 export type ProductSuggestionDto = {
     id: number | string;
     name: string;
     priceExVat: number | string;
-    imgUrl: string;
+    imgUrl: null | string;
     slug: null | string;
     sku: null | string;
 };

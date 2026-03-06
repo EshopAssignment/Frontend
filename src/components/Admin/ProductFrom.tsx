@@ -17,9 +17,19 @@ import {
   hasMissingRequiredForActive,
   type ProductFormErrors,
 } from "@/lib/productValidation";
-import { asNum, clampVatRatePercent, round2 } from "@/helpers/money";
 
-import { uploadImageAndGetPublicUrl } from "@/Services/uploadService"; 
+import { asNum, clampVatRatePercent, round2 } from "@/helpers/money";
+import { uploadImageAndGetPublicUrl } from "@/Services/uploadService";
+
+import {
+  addImage,
+  normalizeImages,
+  removeImageAt,
+  setAltText,
+  setPrimaryImage,
+  getPrimaryUrl,
+  resolveImageUrl,
+} from "@/helpers/ImageHelper";
 
 type Props = {
   title: string;
@@ -53,7 +63,7 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
     description: "",
     palletType: "",
     condition: "",
-    imgUrl: "",
+    images: [],
     priceExVat: 0,
     vatRatePercent: 25,
     onHand: 0,
@@ -67,21 +77,34 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const uploadAbortRef = useRef<AbortController | null>(null);
 
+  const [selectedUrl, setSelectedUrl] = useState<string>("");
+
   useEffect(() => {
     if (!isEdit || !data) return;
+
+    const incomingImages =
+      normalizeImages(
+        (data.images ?? []).map((x: any) => ({
+          url: x.url,
+          sortOrder: x.sortOrder,
+          isPrimary: x.isPrimary,
+          altText: x.altText ?? null,
+        }))
+      ) as any;
 
     setForm({
       name: data.name,
       description: data.description,
       palletType: data.palletType,
       condition: data.condition,
-      imgUrl: data.imgUrl ?? "",
+      images: incomingImages,
       priceExVat: asNum(data.priceExVat, 0),
       vatRatePercent: clampVatRatePercent(data.vatRatePercent),
       onHand: asNum(data.onHand, 0),
       isActive: Boolean(data.isActive),
     });
 
+    setSelectedUrl(getPrimaryUrl(incomingImages) || incomingImages?.[0]?.url || "");
     setErrors({});
     setTouched({});
     setLocalFile(null);
@@ -149,8 +172,7 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
       return;
     }
 
-    const maxBytes = 5 * 1024 * 1024;
-    if (file.size > maxBytes) {
+    if (file.size > 5 * 1024 * 1024) {
       toast.error("Bilden är för stor (max 5 MB).");
       return;
     }
@@ -163,15 +185,48 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
 
     try {
       const publicUrl = await uploadImageAndGetPublicUrl(file, { signal: uploadAbortRef.current.signal });
-      setField("imgUrl", publicUrl as any);
+
+      setForm((p) => {
+        const nextImages = addImage(p.images ?? [], publicUrl) as any;
+        setSelectedUrl(publicUrl);
+        return { ...p, images: nextImages };
+      });
+
+      setTouched((t) => ({ ...t, images: true as any }));
       toast.success("Bild uppladdad.");
     } catch (err: any) {
       if (err?.name === "AbortError") return;
-      const msg = err?.message ?? "Kunde inte ladda upp bilden.";
-      toast.error(String(msg));
+      toast.error(String(err?.message ?? "Kunde inte ladda upp bilden."));
     } finally {
       setIsUploadingImage(false);
+      setLocalFile(null);
     }
+  }
+
+  function onRemoveImage(idx: number) {
+    setForm((p) => {
+      const nextImages = removeImageAt(p.images ?? [], idx) as any;
+      const nextSelected = selectedUrl && nextImages.some((x: any) => x.url === selectedUrl)
+        ? selectedUrl
+        : getPrimaryUrl(nextImages) || nextImages?.[0]?.url || "";
+      setSelectedUrl(nextSelected);
+      return { ...p, images: nextImages };
+    });
+    setTouched((t) => ({ ...t, images: true as any }));
+  }
+
+  function onMakePrimary(idx: number) {
+    setForm((p) => {
+      const nextImages = setPrimaryImage(p.images ?? [], idx) as any;
+      setSelectedUrl(getPrimaryUrl(nextImages) || selectedUrl);
+      return { ...p, images: nextImages };
+    });
+    setTouched((t) => ({ ...t, images: true as any }));
+  }
+
+  function onAltChange(idx: number, alt: string) {
+    setForm((p) => ({ ...p, images: setAltText(p.images ?? [], idx, alt) as any }));
+    setTouched((t) => ({ ...t, images: true as any }));
   }
 
   async function submit(e: React.FormEvent) {
@@ -190,13 +245,11 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
       vatRatePercent: clampVatRatePercent(form.vatRatePercent),
       onHand: Math.max(0, Math.floor(asNum(form.onHand, 0))),
       isActive: isEdit ? Boolean(form.isActive) : false,
-      imgUrl: String(form.imgUrl ?? "").trim(),
+      images: normalizeImages(form.images ?? []) as any,
     };
 
     const nextErrors = validateNow(payload);
-    const hasErrors = Object.keys(nextErrors).length > 0;
-
-    if (hasErrors) {
+    if (Object.keys(nextErrors).length > 0) {
       toast.error("Ett eller fler fält är ej giltiga");
       setTouched({
         name: true,
@@ -206,7 +259,7 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
         priceExVat: true,
         vatRatePercent: true,
         onHand: true,
-        imgUrl: true,
+        images: true as any,
       });
       return;
     }
@@ -230,7 +283,7 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
     }
   }
 
-  const imageSrc = previewUrl || form.imgUrl || undefined;
+  const heroUrl = resolveImageUrl(selectedUrl || getPrimaryUrl(form.images as any) || "") || previewUrl || "";
 
   return (
     <div className="modal">
@@ -359,7 +412,7 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
 
           <div className="row">
             <label>
-              Produktbild
+              Produktbilder
               <input
                 type="file"
                 accept="image/*"
@@ -367,16 +420,58 @@ export default function ProductForm({ title, productId, onSubmit, onCancel, load
                 disabled={loading || isUploadingImage}
               />
               {isUploadingImage && <p className="muted">Laddar upp bild…</p>}
-              {touched.imgUrl && errors.imgUrl && <p className="field-error">{errors.imgUrl}</p>}
-              <i className="fa-solid fa-upload"></i>
+              {(touched as any).images && (errors as any).images && <p className="field-error">{(errors as any).images}</p>}
             </label>
 
-            {imageSrc && (
-              <div>
-                <img src={imageSrc} alt="Preview" />
-              </div>
-            )}
+            <div>
+              {heroUrl ? <img src={heroUrl} alt="Preview" /> : <p className="muted">Ingen bild vald</p>}
+            </div>
           </div>
+
+          {!!(form.images?.length ?? 0) && (
+            <div className="image-grid">
+              {(form.images as any).map((img: any, idx: number) => {
+                const src = resolveImageUrl(img.url);
+                const isPrimary = Boolean(img.isPrimary);
+
+                return (
+                  <div key={`${img.url}-${idx}`} className={`image-tile ${isPrimary ? "is-primary" : ""}`}>
+                    <button type="button" className="thumb" onClick={() => setSelectedUrl(img.url)}>
+                      <img src={src} alt={img.altText ?? form.name ?? "Product image"} />
+                    </button>
+
+                    <div className="image-actions">
+                      <button
+                        type="button"
+                        className="btn"
+                        onClick={() => onMakePrimary(idx)}
+                        disabled={loading || isUploadingImage}
+                      >
+                        {isPrimary ? "Primär" : "Gör primär"}
+                      </button>
+
+                      <button
+                        type="button"
+                        className="btn"
+                        onClick={() => onRemoveImage(idx)}
+                        disabled={loading || isUploadingImage}
+                      >
+                        Ta bort
+                      </button>
+                    </div>
+
+                    <input
+                      className="input"
+                      placeholder="Alt-text (valfritt)"
+                      value={img.altText ?? ""}
+                      onChange={(e) => onAltChange(idx, e.target.value)}
+                      disabled={loading || isUploadingImage}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           <div className="row actions">
             <button type="button" className="btn" onClick={onCancel} disabled={loading || isUploadingImage}>

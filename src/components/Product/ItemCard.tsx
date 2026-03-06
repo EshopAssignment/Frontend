@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 import type { ProductDto } from "../../Services/productService";
-import { buildImageUrl } from "../../helpers/url";
+import { resolveImageUrl } from "../../helpers/ImageHelper";
 import { priceIncVat } from "@/helpers/money";
 import { fmtSEK } from "@/helpers/orderFormat";
 import { getStockBadgeClass, getStockBadgeText } from "@/helpers/stockBadge";
@@ -15,9 +15,9 @@ interface Props {
 
 const ItemCard = ({ product }: Props) => {
 
-  const imgSrc = buildImageUrl(product.imgUrl) || placeholder;
+  const imgSrc = resolveImageUrl(product.primaryImgUrl) || placeholder;
 
-  const available = Number((product as any).available) || 0;
+  const available = Number(product.available ?? 0);
 
 
   const priceInc = priceIncVat(product.priceExVat, product.vatRatePercent);
