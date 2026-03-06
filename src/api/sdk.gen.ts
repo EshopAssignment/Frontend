@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { GetApiAdminOrdersByIdData, GetApiAdminOrdersByIdErrors, GetApiAdminOrdersByIdResponses, GetApiAdminOrdersData, GetApiAdminOrdersResponses, GetApiAdminProductsData, GetApiAdminProductsOptionsData, GetApiAdminProductsOptionsResponses, GetApiAdminProductsResponses, GetApiMeData, GetApiMeOrdersByOrderNumberData, GetApiMeOrdersByOrderNumberErrors, GetApiMeOrdersByOrderNumberResponses, GetApiMeOrdersData, GetApiMeOrdersResponses, GetApiMeResponses, GetApiOrderByIdData, GetApiOrderByIdErrors, GetApiOrderByIdResponses, GetApiOrderByNumberByOrderNumberData, GetApiOrderByNumberByOrderNumberErrors, GetApiOrderByNumberByOrderNumberResponses, GetApiProductsByIdData, GetApiProductsByIdErrors, GetApiProductsByIdResponses, GetApiProductsData, GetApiProductsResponses, GetApiProductsSuggestData, GetApiProductsSuggestResponses, GetApiShippingServicePointsData, GetApiShippingServicePointsResponses, GetProductByIdAdminData, GetProductByIdAdminErrors, GetProductByIdAdminResponses, PatchApiAdminOrdersByIdStatusData, PatchApiAdminOrdersByIdStatusErrors, PatchApiAdminOrdersByIdStatusResponses, PatchApiAdminOrdersByIdTrackingData, PatchApiAdminOrdersByIdTrackingErrors, PatchApiAdminOrdersByIdTrackingResponses, PatchApiAdminProductsByIdActivateData, PatchApiAdminProductsByIdActivateResponses, PatchApiMeProfileDefaultAddressData, PatchApiMeProfileDefaultAddressResponses, PatchApiOrderByNumberByOrderNumberCustomerData, PatchApiOrderByNumberByOrderNumberCustomerErrors, PatchApiOrderByNumberByOrderNumberCustomerResponses, PatchApiOrderByNumberByOrderNumberShippingAddressData, PatchApiOrderByNumberByOrderNumberShippingAddressErrors, PatchApiOrderByNumberByOrderNumberShippingAddressResponses, PostApiAdminProductsData, PostApiAdminProductsResponses, PostApiBlobUploadRequestData, PostApiBlobUploadRequestResponses, PostApiMeAddressesData, PostApiMeAddressesResponses, PostApiOrderData, PostApiOrderErrors, PostApiOrderResponses, PostApiPaymentsCreateIntentData, PostApiPaymentsCreateIntentResponses, PostApiPaymentsWebhookData, PostApiPaymentsWebhookResponses, PostAuthConfirmEmailData, PostAuthConfirmEmailResponses, PostAuthForgotPasswordData, PostAuthForgotPasswordResponses, PostAuthLoginData, PostAuthLoginResponses, PostAuthLogoutData, PostAuthLogoutResponses, PostAuthRefreshData, PostAuthRefreshResponses, PostAuthRegisterData, PostAuthRegisterResponses, PostAuthResendVerificationData, PostAuthResendVerificationResponses, PostAuthResetPasswordData, PostAuthResetPasswordResponses, PutApiAdminProductsByIdData, PutApiAdminProductsByIdResponses, PutApiMeProfileData, PutApiMeProfileResponses, PutApiReservationApiCartReservationsData, PutApiReservationApiCartReservationsResponses, PutApiShippingOrdersByOrderNumberSelectionData, PutApiShippingOrdersByOrderNumberSelectionResponses } from './types.gen';
+import type { GetApiAdminOrdersByIdData, GetApiAdminOrdersByIdErrors, GetApiAdminOrdersByIdResponses, GetApiAdminOrdersData, GetApiAdminOrdersResponses, GetApiAdminProductsData, GetApiAdminProductsOptionsData, GetApiAdminProductsOptionsResponses, GetApiAdminProductsResponses, GetApiMeData, GetApiMeOrdersByOrderNumberData, GetApiMeOrdersByOrderNumberErrors, GetApiMeOrdersByOrderNumberResponses, GetApiMeOrdersData, GetApiMeOrdersResponses, GetApiMeResponses, GetApiOrderByIdData, GetApiOrderByIdErrors, GetApiOrderByIdResponses, GetApiOrderByNumberByOrderNumberData, GetApiOrderByNumberByOrderNumberErrors, GetApiOrderByNumberByOrderNumberResponses, GetApiProductsByIdData, GetApiProductsByIdErrors, GetApiProductsByIdResponses, GetApiProductsData, GetApiProductsResponses, GetApiProductsSuggestData, GetApiProductsSuggestResponses, GetApiShippingServicePointsData, GetApiShippingServicePointsResponses, GetProductByIdAdminData, GetProductByIdAdminErrors, GetProductByIdAdminResponses, PatchApiAdminOrdersByIdStatusData, PatchApiAdminOrdersByIdStatusErrors, PatchApiAdminOrdersByIdStatusResponses, PatchApiAdminOrdersByIdTrackingData, PatchApiAdminOrdersByIdTrackingErrors, PatchApiAdminOrdersByIdTrackingResponses, PatchApiAdminProductsByIdActivateData, PatchApiAdminProductsByIdActivateErrors, PatchApiAdminProductsByIdActivateResponses, PatchApiMeProfileDefaultAddressData, PatchApiMeProfileDefaultAddressResponses, PatchApiOrderByNumberByOrderNumberCustomerData, PatchApiOrderByNumberByOrderNumberCustomerErrors, PatchApiOrderByNumberByOrderNumberCustomerResponses, PatchApiOrderByNumberByOrderNumberShippingAddressData, PatchApiOrderByNumberByOrderNumberShippingAddressErrors, PatchApiOrderByNumberByOrderNumberShippingAddressResponses, PostApiAdminProductsData, PostApiAdminProductsErrors, PostApiAdminProductsResponses, PostApiBlobUploadRequestData, PostApiBlobUploadRequestErrors, PostApiBlobUploadRequestResponses, PostApiMeAddressesData, PostApiMeAddressesResponses, PostApiOrderData, PostApiOrderErrors, PostApiOrderResponses, PostApiPaymentsCreateIntentData, PostApiPaymentsCreateIntentResponses, PostApiPaymentsWebhookData, PostApiPaymentsWebhookResponses, PostAuthConfirmEmailData, PostAuthConfirmEmailResponses, PostAuthForgotPasswordData, PostAuthForgotPasswordResponses, PostAuthLoginData, PostAuthLoginErrors, PostAuthLoginResponses, PostAuthLogoutData, PostAuthLogoutResponses, PostAuthRefreshData, PostAuthRefreshErrors, PostAuthRefreshResponses, PostAuthRegisterData, PostAuthRegisterErrors, PostAuthRegisterResponses, PostAuthResendVerificationData, PostAuthResendVerificationResponses, PostAuthResetPasswordData, PostAuthResetPasswordResponses, PutApiAdminProductsByIdData, PutApiAdminProductsByIdErrors, PutApiAdminProductsByIdResponses, PutApiCartReservationsData, PutApiCartReservationsErrors, PutApiCartReservationsResponses, PutApiMeProfileData, PutApiMeProfileResponses, PutApiShippingOrdersByOrderNumberSelectionData, PutApiShippingOrdersByOrderNumberSelectionResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -42,7 +42,7 @@ export const patchApiAdminOrdersByIdTracking = <ThrowOnError extends boolean = f
 
 export const getApiAdminProducts = <ThrowOnError extends boolean = false>(options?: Options<GetApiAdminProductsData, ThrowOnError>) => (options?.client ?? client).get<GetApiAdminProductsResponses, unknown, ThrowOnError>({ url: '/api/admin/products', ...options });
 
-export const postApiAdminProducts = <ThrowOnError extends boolean = false>(options: Options<PostApiAdminProductsData, ThrowOnError>) => (options.client ?? client).post<PostApiAdminProductsResponses, unknown, ThrowOnError>({
+export const postApiAdminProducts = <ThrowOnError extends boolean = false>(options: Options<PostApiAdminProductsData, ThrowOnError>) => (options.client ?? client).post<PostApiAdminProductsResponses, PostApiAdminProductsErrors, ThrowOnError>({
     url: '/api/admin/products',
     ...options,
     headers: {
@@ -53,7 +53,7 @@ export const postApiAdminProducts = <ThrowOnError extends boolean = false>(optio
 
 export const getProductByIdAdmin = <ThrowOnError extends boolean = false>(options: Options<GetProductByIdAdminData, ThrowOnError>) => (options.client ?? client).get<GetProductByIdAdminResponses, GetProductByIdAdminErrors, ThrowOnError>({ url: '/api/admin/products/{id}', ...options });
 
-export const putApiAdminProductsById = <ThrowOnError extends boolean = false>(options: Options<PutApiAdminProductsByIdData, ThrowOnError>) => (options.client ?? client).put<PutApiAdminProductsByIdResponses, unknown, ThrowOnError>({
+export const putApiAdminProductsById = <ThrowOnError extends boolean = false>(options: Options<PutApiAdminProductsByIdData, ThrowOnError>) => (options.client ?? client).put<PutApiAdminProductsByIdResponses, PutApiAdminProductsByIdErrors, ThrowOnError>({
     url: '/api/admin/products/{id}',
     ...options,
     headers: {
@@ -62,7 +62,7 @@ export const putApiAdminProductsById = <ThrowOnError extends boolean = false>(op
     }
 });
 
-export const patchApiAdminProductsByIdActivate = <ThrowOnError extends boolean = false>(options: Options<PatchApiAdminProductsByIdActivateData, ThrowOnError>) => (options.client ?? client).patch<PatchApiAdminProductsByIdActivateResponses, unknown, ThrowOnError>({
+export const patchApiAdminProductsByIdActivate = <ThrowOnError extends boolean = false>(options: Options<PatchApiAdminProductsByIdActivateData, ThrowOnError>) => (options.client ?? client).patch<PatchApiAdminProductsByIdActivateResponses, PatchApiAdminProductsByIdActivateErrors, ThrowOnError>({
     url: '/api/admin/products/{id}/activate',
     ...options,
     headers: {
@@ -73,7 +73,7 @@ export const patchApiAdminProductsByIdActivate = <ThrowOnError extends boolean =
 
 export const getApiAdminProductsOptions = <ThrowOnError extends boolean = false>(options?: Options<GetApiAdminProductsOptionsData, ThrowOnError>) => (options?.client ?? client).get<GetApiAdminProductsOptionsResponses, unknown, ThrowOnError>({ url: '/api/admin/products/options', ...options });
 
-export const postAuthRegister = <ThrowOnError extends boolean = false>(options: Options<PostAuthRegisterData, ThrowOnError>) => (options.client ?? client).post<PostAuthRegisterResponses, unknown, ThrowOnError>({
+export const postAuthRegister = <ThrowOnError extends boolean = false>(options: Options<PostAuthRegisterData, ThrowOnError>) => (options.client ?? client).post<PostAuthRegisterResponses, PostAuthRegisterErrors, ThrowOnError>({
     url: '/auth/register',
     ...options,
     headers: {
@@ -82,7 +82,7 @@ export const postAuthRegister = <ThrowOnError extends boolean = false>(options: 
     }
 });
 
-export const postAuthLogin = <ThrowOnError extends boolean = false>(options: Options<PostAuthLoginData, ThrowOnError>) => (options.client ?? client).post<PostAuthLoginResponses, unknown, ThrowOnError>({
+export const postAuthLogin = <ThrowOnError extends boolean = false>(options: Options<PostAuthLoginData, ThrowOnError>) => (options.client ?? client).post<PostAuthLoginResponses, PostAuthLoginErrors, ThrowOnError>({
     url: '/auth/login',
     ...options,
     headers: {
@@ -93,7 +93,7 @@ export const postAuthLogin = <ThrowOnError extends boolean = false>(options: Opt
 
 export const postAuthLogout = <ThrowOnError extends boolean = false>(options?: Options<PostAuthLogoutData, ThrowOnError>) => (options?.client ?? client).post<PostAuthLogoutResponses, unknown, ThrowOnError>({ url: '/auth/logout', ...options });
 
-export const postAuthRefresh = <ThrowOnError extends boolean = false>(options?: Options<PostAuthRefreshData, ThrowOnError>) => (options?.client ?? client).post<PostAuthRefreshResponses, unknown, ThrowOnError>({ url: '/auth/refresh', ...options });
+export const postAuthRefresh = <ThrowOnError extends boolean = false>(options?: Options<PostAuthRefreshData, ThrowOnError>) => (options?.client ?? client).post<PostAuthRefreshResponses, PostAuthRefreshErrors, ThrowOnError>({ url: '/auth/refresh', ...options });
 
 export const postAuthForgotPassword = <ThrowOnError extends boolean = false>(options: Options<PostAuthForgotPasswordData, ThrowOnError>) => (options.client ?? client).post<PostAuthForgotPasswordResponses, unknown, ThrowOnError>({
     url: '/auth/forgot-password',
@@ -131,7 +131,7 @@ export const postAuthConfirmEmail = <ThrowOnError extends boolean = false>(optio
     }
 });
 
-export const postApiBlobUploadRequest = <ThrowOnError extends boolean = false>(options: Options<PostApiBlobUploadRequestData, ThrowOnError>) => (options.client ?? client).post<PostApiBlobUploadRequestResponses, unknown, ThrowOnError>({
+export const postApiBlobUploadRequest = <ThrowOnError extends boolean = false>(options: Options<PostApiBlobUploadRequestData, ThrowOnError>) => (options.client ?? client).post<PostApiBlobUploadRequestResponses, PostApiBlobUploadRequestErrors, ThrowOnError>({
     url: '/api/BlobUpload/request',
     ...options,
     headers: {
@@ -221,8 +221,8 @@ export const getApiProductsById = <ThrowOnError extends boolean = false>(options
 
 export const getApiProductsSuggest = <ThrowOnError extends boolean = false>(options?: Options<GetApiProductsSuggestData, ThrowOnError>) => (options?.client ?? client).get<GetApiProductsSuggestResponses, unknown, ThrowOnError>({ url: '/api/Products/suggest', ...options });
 
-export const putApiReservationApiCartReservations = <ThrowOnError extends boolean = false>(options: Options<PutApiReservationApiCartReservationsData, ThrowOnError>) => (options.client ?? client).put<PutApiReservationApiCartReservationsResponses, unknown, ThrowOnError>({
-    url: '/api/Reservation/api/cart/reservations',
+export const putApiCartReservations = <ThrowOnError extends boolean = false>(options: Options<PutApiCartReservationsData, ThrowOnError>) => (options.client ?? client).put<PutApiCartReservationsResponses, PutApiCartReservationsErrors, ThrowOnError>({
+    url: '/api/cart/reservations',
     ...options,
     headers: {
         'Content-Type': 'application/json',

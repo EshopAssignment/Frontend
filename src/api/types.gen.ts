@@ -75,6 +75,12 @@ export type AdminProductImageRequestDto = {
     altText: null | string;
 };
 
+export type AdminProductOptionsDto = {
+    productTypes: Array<EnumOptionDto>;
+    productConditions: Array<EnumOptionDto>;
+    vatRates: Array<EnumOptionDto>;
+};
+
 export type AdminSetTrackingRequest = {
     trackingNumber: string;
     markAsShipped?: boolean;
@@ -95,6 +101,10 @@ export type AdminUpdateProductRequestDto = {
     onHand: number | string;
     images: Array<AdminProductImageRequestDto>;
     isActive: boolean;
+};
+
+export type AuthSessionResponseDto = {
+    expiresAt: string;
 };
 
 export type BlobUploadRequestResponse = {
@@ -126,6 +136,12 @@ export type CreateOrderRequestDto = {
     cartId: string;
     currency?: string;
     reservationTtlMinutes?: number | string;
+};
+
+export type EnumOptionDto = {
+    value: string;
+    label: string;
+    intValue: number | string;
 };
 
 export type ForgotPasswordDto = {
@@ -493,12 +509,23 @@ export type PostApiAdminProductsData = {
     url: '/api/admin/products';
 };
 
+export type PostApiAdminProductsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+};
+
+export type PostApiAdminProductsError = PostApiAdminProductsErrors[keyof PostApiAdminProductsErrors];
+
 export type PostApiAdminProductsResponses = {
     /**
-     * OK
+     * Created
      */
-    200: unknown;
+    201: ProductDto;
 };
+
+export type PostApiAdminProductsResponse = PostApiAdminProductsResponses[keyof PostApiAdminProductsResponses];
 
 export type GetProductByIdAdminData = {
     body?: never;
@@ -536,12 +563,27 @@ export type PutApiAdminProductsByIdData = {
     url: '/api/admin/products/{id}';
 };
 
+export type PutApiAdminProductsByIdErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutApiAdminProductsByIdError = PutApiAdminProductsByIdErrors[keyof PutApiAdminProductsByIdErrors];
+
 export type PutApiAdminProductsByIdResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: ProductDto;
 };
+
+export type PutApiAdminProductsByIdResponse = PutApiAdminProductsByIdResponses[keyof PutApiAdminProductsByIdResponses];
 
 export type PatchApiAdminProductsByIdActivateData = {
     body?: null | ToggleActiveRequest;
@@ -554,12 +596,27 @@ export type PatchApiAdminProductsByIdActivateData = {
     url: '/api/admin/products/{id}/activate';
 };
 
+export type PatchApiAdminProductsByIdActivateErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PatchApiAdminProductsByIdActivateError = PatchApiAdminProductsByIdActivateErrors[keyof PatchApiAdminProductsByIdActivateErrors];
+
 export type PatchApiAdminProductsByIdActivateResponses = {
     /**
-     * OK
+     * No Content
      */
-    200: unknown;
+    204: void;
 };
+
+export type PatchApiAdminProductsByIdActivateResponse = PatchApiAdminProductsByIdActivateResponses[keyof PatchApiAdminProductsByIdActivateResponses];
 
 export type GetApiAdminProductsOptionsData = {
     body?: never;
@@ -572,8 +629,10 @@ export type GetApiAdminProductsOptionsResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: AdminProductOptionsDto;
 };
+
+export type GetApiAdminProductsOptionsResponse = GetApiAdminProductsOptionsResponses[keyof GetApiAdminProductsOptionsResponses];
 
 export type PostAuthRegisterData = {
     body: RegisterDto;
@@ -581,6 +640,15 @@ export type PostAuthRegisterData = {
     query?: never;
     url: '/auth/register';
 };
+
+export type PostAuthRegisterErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+};
+
+export type PostAuthRegisterError = PostAuthRegisterErrors[keyof PostAuthRegisterErrors];
 
 export type PostAuthRegisterResponses = {
     /**
@@ -596,12 +664,23 @@ export type PostAuthLoginData = {
     url: '/auth/login';
 };
 
+export type PostAuthLoginErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ProblemDetails;
+};
+
+export type PostAuthLoginError = PostAuthLoginErrors[keyof PostAuthLoginErrors];
+
 export type PostAuthLoginResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: AuthSessionResponseDto;
 };
+
+export type PostAuthLoginResponse = PostAuthLoginResponses[keyof PostAuthLoginResponses];
 
 export type PostAuthLogoutData = {
     body?: never;
@@ -624,12 +703,23 @@ export type PostAuthRefreshData = {
     url: '/auth/refresh';
 };
 
+export type PostAuthRefreshErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ProblemDetails;
+};
+
+export type PostAuthRefreshError = PostAuthRefreshErrors[keyof PostAuthRefreshErrors];
+
 export type PostAuthRefreshResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: AuthSessionResponseDto;
 };
+
+export type PostAuthRefreshResponse = PostAuthRefreshResponses[keyof PostAuthRefreshResponses];
 
 export type PostAuthForgotPasswordData = {
     body: ForgotPasswordDto;
@@ -693,6 +783,15 @@ export type PostApiBlobUploadRequestData = {
     query?: never;
     url: '/api/BlobUpload/request';
 };
+
+export type PostApiBlobUploadRequestErrors = {
+    /**
+     * Bad Request
+     */
+    400: string;
+};
+
+export type PostApiBlobUploadRequestError = PostApiBlobUploadRequestErrors[keyof PostApiBlobUploadRequestErrors];
 
 export type PostApiBlobUploadRequestResponses = {
     /**
@@ -1050,14 +1149,23 @@ export type GetApiProductsSuggestResponses = {
 
 export type GetApiProductsSuggestResponse = GetApiProductsSuggestResponses[keyof GetApiProductsSuggestResponses];
 
-export type PutApiReservationApiCartReservationsData = {
+export type PutApiCartReservationsData = {
     body: SetCartReservationDto;
     path?: never;
     query?: never;
-    url: '/api/Reservation/api/cart/reservations';
+    url: '/api/cart/reservations';
 };
 
-export type PutApiReservationApiCartReservationsResponses = {
+export type PutApiCartReservationsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+};
+
+export type PutApiCartReservationsError = PutApiCartReservationsErrors[keyof PutApiCartReservationsErrors];
+
+export type PutApiCartReservationsResponses = {
     /**
      * OK
      */
