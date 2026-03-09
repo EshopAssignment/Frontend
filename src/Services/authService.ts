@@ -2,10 +2,7 @@ import { api } from "@/lib/http";
 import * as sdk from "@/api/sdk.gen";
 import type * as apiTypes from "@/api/types.gen";
 
-export type LoginRes = apiTypes.AuthSessionResponseDto;
-export type MeDto = apiTypes.MeDto;
-
-export async function login(email: string, password: string): Promise<LoginRes> {
+export async function login(email: string, password: string): Promise<apiTypes.AuthSessionResponseDto> {
   const res = await sdk.postAuthLogin({
     client: api,
     body: { email, password },
@@ -29,7 +26,7 @@ export async function logout(): Promise<void> {
   if (res.error) throw res.error;
 }
 
-export async function getMe(opts?: { signal?: AbortSignal }): Promise<MeDto> {
+export async function getMe(opts?: { signal?: AbortSignal }): Promise<apiTypes.MeDto> {
   const res = await sdk.getApiMe({
     client: api,
     signal: opts?.signal,
