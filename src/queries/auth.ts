@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getMe, login, logout, register } from "@/Services/authService";
-import { qk } from "./queryKeys";
+import { meQk } from "@/constants/queryKeys";
 
 
 export function useMe() {
