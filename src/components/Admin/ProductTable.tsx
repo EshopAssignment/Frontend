@@ -1,5 +1,7 @@
-import type { AdminProduct } from "../../Services/adminProductService";
-//cleaned using gpt5.2
+import type { AdminProduct } from "@/Services/adminProductService";
+import { priceIncVat } from "@/helpers/money";
+import { fmtSEK } from "@/helpers/orderFormat";
+
 type Props = {
   data: AdminProduct[];
   page: number;
@@ -10,26 +12,6 @@ type Props = {
   onToggle: (id: number, current: boolean) => void;
 };
 
-function fmtSEK0(n: number): string {
-  return new Intl.NumberFormat("sv-SE", {
-    style: "currency",
-    currency: "SEK",
-    maximumFractionDigits: 0,
-  }).format(Number.isFinite(n) ? n : 0);
-}
-
-function vatSafe(v: unknown): number {
-  const n = typeof v === "number" ? v : typeof v === "string" ? Number(v) : NaN;
-  if (n === 6 || n === 12 || n === 25) return n;
-  return 25;
-}
-
-function priceIncVat(priceExVat: number, vatRatePercent: number): number {
-  const ex = Number.isFinite(priceExVat) ? priceExVat : 0;
-  const vat = vatSafe(vatRatePercent);
-  return Math.round(ex * (1 + vat / 100)); 
-}
-
 export default function ProductTable({
   data,
   page,
@@ -39,6 +21,8 @@ export default function ProductTable({
   onEdit,
   onToggle,
 }: Props) {
+  const safeTotalPages = Math.max(1, totalPages);
+
   return (
     <>
       <table className="admin-table">
@@ -55,32 +39,35 @@ export default function ProductTable({
         </thead>
 
         <tbody>
-          {data.map((p) => {
-            const idNum = p.id;
-            const inc = priceIncVat(p.priceExVat, p.vatRatePercent);
+          {data.map((product) => {
+            const priceIncludingVat = priceIncVat(product.priceExVat, product.vatRatePercent);
 
             return (
-              <tr key={String(p.id)}>
-                <td>{p.id}</td>
-                <td>{p.name}</td>
+              <tr key={product.id}>
+                <td>{product.id}</td>
+                <td>{product.name}</td>
 
                 <td>
                   <label className="switch">
                     <input
                       type="checkbox"
-                      checked={p.isActive}
-                      onChange={() => onToggle(idNum, p.isActive)}
+                      checked={product.isActive}
+                      onChange={() => onToggle(product.id, product.isActive)}
                     />
                     <span className="slider" />
                   </label>
                 </td>
 
-                <td>{fmtSEK0(inc)}</td>
-                <td>{vatSafe(p.vatRatePercent)}%</td>
-                <td>{p.available}</td>
+                <td>{fmtSEK(priceIncludingVat)}</td>
+                <td>{product.vatRatePercent}%</td>
+                <td>{product.available}</td>
 
                 <td>
-                  <button className="btn" onClick={() => onEdit(idNum)}>
+                  <button
+                    type="button"
+                    className="btn"
+                    onClick={() => onEdit(product.id)}
+                  >
                     Redigera
                   </button>
                 </td>
@@ -91,13 +78,15 @@ export default function ProductTable({
       </table>
 
       <div className="pagination">
-        <button onClick={onPrev} disabled={page === 1}>
+        <button type="button" onClick={onPrev} disabled={page <= 1}>
           {"<"}
         </button>
+
         <span>
-          Sida {page} av {totalPages}
+          Sida {page} av {safeTotalPages}
         </span>
-        <button onClick={onNext} disabled={page === totalPages}>
+
+        <button type="button" onClick={onNext} disabled={page >= safeTotalPages}>
           {">"}
         </button>
       </div>
