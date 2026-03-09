@@ -809,6 +809,15 @@ export type GetApiMeData = {
     url: '/api/me';
 };
 
+export type GetApiMeErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ProblemDetails;
+};
+
+export type GetApiMeError = GetApiMeErrors[keyof GetApiMeErrors];
+
 export type GetApiMeResponses = {
     /**
      * OK
@@ -825,12 +834,23 @@ export type PutApiMeProfileData = {
     url: '/api/me/profile';
 };
 
+export type PutApiMeProfileErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ProblemDetails;
+};
+
+export type PutApiMeProfileError = PutApiMeProfileErrors[keyof PutApiMeProfileErrors];
+
 export type PutApiMeProfileResponses = {
     /**
-     * OK
+     * No Content
      */
-    200: unknown;
+    204: void;
 };
+
+export type PutApiMeProfileResponse = PutApiMeProfileResponses[keyof PutApiMeProfileResponses];
 
 export type PostApiMeAddressesData = {
     body: UpsertAddressDto;
@@ -839,11 +859,20 @@ export type PostApiMeAddressesData = {
     url: '/api/me/addresses';
 };
 
+export type PostApiMeAddressesErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ProblemDetails;
+};
+
+export type PostApiMeAddressesError = PostApiMeAddressesErrors[keyof PostApiMeAddressesErrors];
+
 export type PostApiMeAddressesResponses = {
     /**
-     * OK
+     * Created
      */
-    200: unknown;
+    201: unknown;
 };
 
 export type PatchApiMeProfileDefaultAddressData = {
@@ -853,12 +882,27 @@ export type PatchApiMeProfileDefaultAddressData = {
     url: '/api/me/profile/default-address';
 };
 
+export type PatchApiMeProfileDefaultAddressErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * Unauthorized
+     */
+    401: ProblemDetails;
+};
+
+export type PatchApiMeProfileDefaultAddressError = PatchApiMeProfileDefaultAddressErrors[keyof PatchApiMeProfileDefaultAddressErrors];
+
 export type PatchApiMeProfileDefaultAddressResponses = {
     /**
-     * OK
+     * No Content
      */
-    200: unknown;
+    204: void;
 };
+
+export type PatchApiMeProfileDefaultAddressResponse = PatchApiMeProfileDefaultAddressResponses[keyof PatchApiMeProfileDefaultAddressResponses];
 
 export type GetApiMeOrdersData = {
     body?: never;

@@ -2,27 +2,19 @@ import { api } from "@/lib/http";
 import * as sdk from "@/api/sdk.gen";
 import type * as apiTypes from "@/api/types.gen";
 
-
-export type MeDto = NonNullable<
-  Awaited<ReturnType<typeof sdk.getApiMe>>["data"]
->;
-
-export type UpdateProfileDto = Parameters<typeof sdk.putApiMeProfile>[0]["body"];
-
-export type UpsertAddressDto = Parameters<typeof sdk.postApiMeAddresses>[0]["body"];
-
-export type SetDefaultAddressDto =
-  Parameters<typeof sdk.patchApiMeProfileDefaultAddress>[0]["body"];
+export type MeDto = apiTypes.MeDto;
+export type UpdateProfileDto = apiTypes.UpdateProfileDto;
+export type UpsertAddressDto = apiTypes.UpsertAddressDto;
+export type SetDefaultAddressDto = apiTypes.SetDefaultAddressDto;
 
 export async function getMe(opts?: { signal?: AbortSignal }): Promise<MeDto> {
   const res = await sdk.getApiMe({
     client: api,
     signal: opts?.signal,
   });
+
   if (res.error) throw res.error;
-  const data = res.data!;
-  data.roles ??= [];
-  return data;
+  return res.data!;
 }
 
 export async function updateProfile(
@@ -34,6 +26,7 @@ export async function updateProfile(
     body,
     signal: opts?.signal,
   });
+
   if (res.error) throw res.error;
 }
 
@@ -46,6 +39,7 @@ export async function addAddress(
     body,
     signal: opts?.signal,
   });
+
   if (res.error) throw res.error;
 }
 
@@ -60,14 +54,14 @@ export async function setDefaultShippingAddress(
     body,
     signal: opts?.signal,
   });
+
   if (res.error) throw res.error;
 }
 
-//generetade: GPT 5.2
 export async function addAddressAndReload(
   body: UpsertAddressDto,
   opts?: { signal?: AbortSignal }
 ): Promise<MeDto> {
   await addAddress(body, opts);
-  return await getMe(opts);
+  return getMe(opts);
 }
