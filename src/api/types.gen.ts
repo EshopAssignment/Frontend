@@ -1235,6 +1235,15 @@ export type GetApiShippingServicePointsData = {
     url: '/api/Shipping/service-points';
 };
 
+export type GetApiShippingServicePointsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+};
+
+export type GetApiShippingServicePointsError = GetApiShippingServicePointsErrors[keyof GetApiShippingServicePointsErrors];
+
 export type GetApiShippingServicePointsResponses = {
     /**
      * OK
@@ -1253,9 +1262,24 @@ export type PutApiShippingOrdersByOrderNumberSelectionData = {
     url: '/api/Shipping/orders/{orderNumber}/selection';
 };
 
+export type PutApiShippingOrdersByOrderNumberSelectionErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutApiShippingOrdersByOrderNumberSelectionError = PutApiShippingOrdersByOrderNumberSelectionErrors[keyof PutApiShippingOrdersByOrderNumberSelectionErrors];
+
 export type PutApiShippingOrdersByOrderNumberSelectionResponses = {
     /**
-     * OK
+     * No Content
      */
-    200: unknown;
+    204: void;
 };
+
+export type PutApiShippingOrdersByOrderNumberSelectionResponse = PutApiShippingOrdersByOrderNumberSelectionResponses[keyof PutApiShippingOrdersByOrderNumberSelectionResponses];
