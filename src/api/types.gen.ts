@@ -1094,6 +1094,15 @@ export type GetApiProductsData = {
     url: '/api/Products';
 };
 
+export type GetApiProductsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+};
+
+export type GetApiProductsError = GetApiProductsErrors[keyof GetApiProductsErrors];
+
 export type GetApiProductsResponses = {
     /**
      * OK
