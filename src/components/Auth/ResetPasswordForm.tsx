@@ -1,4 +1,5 @@
-import { useResetPassword } from "@/hooks/Auth/useResetPassword";
+import { resetPassword } from "@/Services/authService";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -8,70 +9,95 @@ interface Props {
 }
 
 export default function ResetPasswordForm({ email, token }: Props) {
-    const { state, submit } = useResetPassword();
     const [password, setPassword] = useState("");
     const [confirm, setConfirm] = useState("");
 
-    const valid = password.length >= 6 && password === confirm;
+    const resetPasswordMutation = useMutation({
+        mutationFn: async(vars: {email: string, token: string, newPassword: string}) => {
+            await resetPassword(vars.email, vars.token, vars.newPassword);
+        } ,
+    })
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!email || !token || !valid) return;
-        submit(email, token, password);
-    };
+    const valid = password.length >= 8 && password === confirm;
 
-    if (!email || !token) {
-        return (
-            <div>
-                <h1>ogiltig länk!</h1>
-                <Link to="/auth/login">Tillbaka till Login</Link>
-            </div>
-        );
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
+    if (!email || !token || !valid) return;
+
+    await resetPasswordMutation.mutateAsync({
+      email,
+      token,
+      newPassword: password,
+    });
+  };
+
+  if (!email || !token) {
     return (
-        <div className="auth-form-container">
-            <div className="form-header">
-                <Link className="btn-return" to="/auth/login" aria-label="Tillbaka till inloggning">
-                    <i className="fa-solid fa-backward" />
-                </Link>
-                <h1>Återställ lösenord</h1>
-            </div>
-
-            {state.status === "success" ? (
-                <>
-                    <p>Lösenord uppdaterat.</p>
-                    <Link to="/auth/login">Logga in</Link>
-                </>
-            ) : (
-                <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="input-group">
-                        <input
-                            className="input"
-                            type="password"
-                            placeholder="Nytt lösenord"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="input-group">
-                        <input
-                            className="input"
-                            type="password"
-                            placeholder="Upprepa lösenord"
-                            value={confirm}
-                            onChange={(e) => setConfirm(e.target.value)}
-                        />
-                    </div>
-
-                    <button className="btn" disabled={!valid || state.status === "loading"}>
-                        {state.status === "loading" ? "Sparar…" : "Spara"}
-                    </button>
-
-                    {state.status === "error" && <p className="error">{state.message}</p>}
-                </form>
-            )}
-        </div>
+      <div>
+        <h1>Ogiltig länk!</h1>
+        <Link to="/auth/login">Tillbaka till login</Link>
+      </div>
     );
+  }
+
+  if (resetPasswordMutation.isSuccess) {
+    return (
+      <div className="auth-form-container">
+        <div className="form-header">
+          <Link className="btn-return" to="/auth/login" aria-label="Tillbaka till inloggning">
+            <i className="fa-solid fa-backward" />
+          </Link>
+          <h1>Återställ lösenord</h1>
+        </div>
+
+        <p>Lösenord uppdaterat.</p>
+        <Link to="/auth/login">Logga in</Link>
+      </div>
+    );
+  }
+
+  const errorMessage =
+    resetPasswordMutation.error instanceof Error
+      ? resetPasswordMutation.error.message
+      : "Återställning misslyckades.";
+
+  return (
+    <div className="auth-form-container">
+      <div className="form-header">
+        <Link className="btn-return" to="/auth/login" aria-label="Tillbaka till inloggning">
+          <i className="fa-solid fa-backward" />
+        </Link>
+        <h1>Återställ lösenord</h1>
+      </div>
+
+      <form onSubmit={handleSubmit} className="auth-form">
+        <div className="input-group">
+          <input
+            className="input"
+            type="password"
+            placeholder="Nytt lösenord"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+
+        <div className="input-group">
+          <input
+            className="input"
+            type="password"
+            placeholder="Upprepa lösenord"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+          />
+        </div>
+
+        <button className="btn" disabled={!valid || resetPasswordMutation.isPending}>
+          {resetPasswordMutation.isPending ? "Sparar…" : "Spara"}
+        </button>
+
+        {resetPasswordMutation.isError && <p className="error">{errorMessage}</p>}
+      </form>
+    </div>
+    )
 }
