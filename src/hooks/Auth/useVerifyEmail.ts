@@ -1,37 +1,52 @@
 import { confirmEmail } from "@/Services/authService";
-import { useEffect, useState } from "react";
-
-export type VerifyState = 
-| { status: "idle"}
-| { status: "loading"}
-| { status: "success"}
-| { status: "error"; message: string}
+import { useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 export function useVerifyEmail(userId?: number, token?: string) {
-  const [state, setState] = useState<VerifyState>({ status: "idle" });
+  const mutation = useMutation({
+    mutationFn: async () => {
+      if (!userId || !token) {
+        throw new Error("Ogiltig verifieringslänk.");
+      }
+
+      await confirmEmail(userId, token);
+    },
+  });
 
   useEffect(() => {
     if (!userId || !token) {
-      setState({ status: "error", message: "Ogiltig verifieringslänk." });
       return;
     }
 
-    const run = async () => {
-      setState({ status: "loading" });
+    if (mutation.status === "idle") {
+      mutation.mutate();
+    }
+  }, [userId, token, mutation]);
 
-      try {
-        await confirmEmail(userId, token);
-        setState({ status: "success" });
-      } catch (err: any) {
-        setState({
-          status: "error",
-          message: err?.message ?? "Verifiering misslyckades.",
-        });
-      }
+  if (!userId || !token) {
+    return {
+      status: "error" as const,
+      message: "Ogiltig verifieringslänk.",
     };
+  }
 
-    run();
-  }, [userId, token]);
+  if (mutation.status === "pending") {
+    return { status: "loading" as const };
+  }
 
-  return state;
+  if (mutation.status === "success") {
+    return { status: "success" as const };
+  }
+
+  if (mutation.status === "error") {
+    return {
+      status: "error" as const,
+      message:
+        mutation.error instanceof Error
+          ? mutation.error.message
+          : "Verifiering misslyckades.",
+    };
+  }
+
+  return { status: "idle" as const };
 }

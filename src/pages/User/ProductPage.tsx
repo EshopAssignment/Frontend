@@ -10,7 +10,7 @@ import ProductListView from "@/components/Product/ProductListView";
 import { parseProductFilters } from "@/helpers/productFilters";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { usePagedState } from "@/hooks/usePagedState";
-import { useProductsPaged } from "@/queries/products/useProductsPaged";
+import { useProductsPaged } from "@/hooks/Products/useProducts";
 
 const PAGE_SIZE = 15;
 type ViewMode = "grid" | "list";

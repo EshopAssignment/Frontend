@@ -1,6 +1,6 @@
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import { useMyProfileQuery } from "@/hooks/useMyProfileQuery";
+import { useMyProfile } from "@/hooks/useMyProfileQuery";
 
 const MyProfile = () => {
   const {
@@ -23,7 +23,7 @@ const MyProfile = () => {
     selectedDefault,
     savingDefault,
     chooseDefault,
-  } = useMyProfileQuery();
+  } = useMyProfile();
 
   if (loading) return <section><div>Laddar...</div></section>;
 

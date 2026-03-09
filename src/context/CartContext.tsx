@@ -26,29 +26,34 @@ type Action =
 
 const STORAGE_KEY = "pallshoppen:cart:v2";
 
-function uuid(): string {
-  return ([1e7] as any + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c: any) =>
-    (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)
-  );
+function createCartId(): string {
+  return crypto.randomUUID();
 }
 
-function isValidItem(x: any): x is CartItem {
+function isValidItem(x: unknown): x is CartItem {
+  if (!x || typeof x !== "object") return false;
+
+  const item = x as CartItem;
+
   return (
-    x &&
-    Number.isFinite(Number(x.productId)) &&
-    typeof x.name === "string" &&
-    Number.isFinite(Number(x.priceExVat)) &&
-    Number.isFinite(Number(x.vatRatePercent)) &&
-    Number.isFinite(Number(x.quantity))
+    Number.isFinite(Number(item.productId)) &&
+    typeof item.name === "string" &&
+    Number.isFinite(Number(item.priceExVat)) &&
+    Number.isFinite(Number(item.vatRatePercent)) &&
+    Number.isFinite(Number(item.quantity))
   );
 }
 
 function isValidState(maybe: unknown): maybe is CartState {
   if (!maybe || typeof maybe !== "object") return false;
-  const s = maybe as any;
-  if (typeof s.cartId !== "string") return false;
-  if (!Array.isArray(s.items)) return false;
-  return s.items.every(isValidItem);
+
+  const state = maybe as CartState;
+
+  return (
+    typeof state.cartId === "string" &&
+    Array.isArray(state.items) &&
+    state.items.every(isValidItem)
+  );
 }
 
 function loadInitialState(): CartState {
@@ -58,8 +63,10 @@ function loadInitialState(): CartState {
       const parsed = JSON.parse(raw);
       if (isValidState(parsed)) return parsed;
     }
-  } catch {}
-  return { cartId: uuid(), items: [] };
+  } catch {
+  }
+
+  return { cartId: createCartId(), items: [] };
 }
 
 function coerceItem(i: Omit<CartItem, "quantity">): Omit<CartItem, "quantity"> {
@@ -128,15 +135,7 @@ function reducer(state: CartState, action: Action): CartState {
       return { ...state, items: [] };
 
     case "HYDRATE":
-      return {
-        cartId: action.payload.cartId || state.cartId || uuid(),
-        items: Array.isArray(action.payload.items)
-          ? action.payload.items.map((x: any) => ({
-              ...x,
-              vatRatePercent: Number.isFinite(Number(x.vatRatePercent)) ? Number(x.vatRatePercent) : 25,
-            }))
-          : [],
-      };
+      return action.payload;
 
     default:
       return state;
@@ -164,7 +163,7 @@ const CartContext = createContext<{
 } | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, undefined as any, loadInitialState);
+ const [state, dispatch] = useReducer(reducer, undefined, () => loadInitialState());
 
   useEffect(() => {
     try {
@@ -265,6 +264,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 export function useCart() {
   const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("must wrapp with cartProvider");
+  if (!ctx) throw new Error("useCart must be used within CartProvider");
   return ctx;
 }

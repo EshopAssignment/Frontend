@@ -1,8 +1,8 @@
-import type { MyOrderListItem } from "@/Services/orderService"
-import { fmtSEK, fmtUtc, toStatusLable } from "@/helpers/orderFormat"
+import type { MyOrderListItemDto } from "@/api/types.gen";
+import { fmtUtc, toStatusLable } from "@/helpers/orderFormat"
 
 type Props =  {
-    items: MyOrderListItem []
+    items: MyOrderListItemDto []
     onDetails: (orderNumber: string) => void
 };
 
@@ -23,7 +23,7 @@ export function OrdersTable({items, onDetails}: Props) {
             <tbody>
                 {items.map((o) => (
                     <tr key={o.orderNumber}>
-                        <td className="table-desktop">{fmtUtc(o.date)}</td>
+                        <td className="table-desktop">{fmtUtc(o.createdAtUtc)}</td>
                         <td className="table-order-num">{o.orderNumber}</td>
                         <td className="table-desktop">
                             {o.trackingUrl ? (
@@ -43,8 +43,8 @@ export function OrdersTable({items, onDetails}: Props) {
                                 <span>-</span>
                             )}
                         </td>
-                        <td>{toStatusLable(o.status)}</td>
-                        <td className="table-phone">{fmtSEK(o.total)}</td>
+                        <td>{toStatusLable(o.orderStatus)}</td>
+                        <td className="table-phone">{o.grandTotal}</td>
                         <td className="table-details">
                             <button className="btn" type="button" onClick={() => onDetails(o.orderNumber)}>
                                 <i className="fa-solid fa-ellipsis"></i>

@@ -8,20 +8,23 @@ import {
   type UpdateProfileDto,
   type UpsertAddressDto,
 } from "@/Services/profileService";
-import { qk } from "@/queries/queryKeys";
+import { meQk } from "@/constants/queryKeys";
 import { findSelectedDefault, toAddressOptions, toDefaultId } from "@/helpers/profileVm";
 import toast from "react-hot-toast";
 import { toFieldErrors } from "@/lib/FieldErrors";
 
 type FieldErrors = Record<string, string>;
-
 type ProfileFormVm = Omit<UpdateProfileDto, "phone"> & { phone: string };
 
-export function useMyProfileQuery() {
+function getErrorMessage(error: unknown): string | null {
+  return error instanceof Error ? error.message : null;
+}
+
+export function useMyProfile() {
   const qc = useQueryClient();
 
   const meQuery = useQuery({
-    queryKey: qk.meProfile,
+    queryKey: meQk.profile(),
     queryFn: getMe,
     staleTime: 0,
     refetchOnMount: "always",
@@ -91,7 +94,7 @@ export function useMyProfileQuery() {
     mutationFn: (dto: UpdateProfileDto) => updateProfile(dto),
     onSuccess: async () => {
       didInitProfile.current = false;
-      await qc.invalidateQueries({ queryKey: qk.meProfile });
+      await qc.invalidateQueries({ queryKey: meQk.profile() });
     },
   });
 
@@ -105,14 +108,14 @@ export function useMyProfileQuery() {
         postalCode: "",
         country: "SE",
       });
-      await qc.invalidateQueries({ queryKey: qk.meProfile });
+      await qc.invalidateQueries({ queryKey: meQk.profile() });
     },
   });
 
   const setDefaultMut = useMutation({
     mutationFn: (id: number | null) => setDefaultShippingAddress(id),
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: qk.meProfile });
+      await qc.invalidateQueries({ queryKey: meQk.profile() });
     },
   });
 
@@ -130,7 +133,7 @@ export function useMyProfileQuery() {
     } catch (e) {
       const fe = toFieldErrors(e);
       if (fe) setProfileErrors(fe);
-      toast.error("Något gick fel");
+      toast.error("Något gick fel.");
       throw e;
     }
   }
@@ -144,7 +147,7 @@ export function useMyProfileQuery() {
     } catch (e) {
       const fe = toFieldErrors(e);
       if (fe) setAddressErrors(fe);
-      toast.error("Något gick fel");
+      toast.error("Något gick fel.");
       throw e;
     }
   }
@@ -154,17 +157,16 @@ export function useMyProfileQuery() {
       await setDefaultMut.mutateAsync(id);
       toast.success("Standardadress uppdaterad.");
     } catch (e) {
-      toast.error("Något gick fel");
-      
+      toast.error("Något gick fel.");
       throw e;
     }
   }
 
   const error =
-    (meQuery.error as any)?.message ??
-    (updateProfileMut.error as any)?.message ??
-    (addAddressMut.error as any)?.message ??
-    (setDefaultMut.error as any)?.message ??
+    getErrorMessage(meQuery.error) ??
+    getErrorMessage(updateProfileMut.error) ??
+    getErrorMessage(addAddressMut.error) ??
+    getErrorMessage(setDefaultMut.error) ??
     null;
 
   return {
@@ -172,7 +174,6 @@ export function useMyProfileQuery() {
 
     loading: meQuery.isLoading,
     fetching: meQuery.isFetching,
-
     error,
 
     profileForm,

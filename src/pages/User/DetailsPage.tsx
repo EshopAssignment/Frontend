@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import placeholder from "../../images/placeholder.jpg";
 import Breadcrumbs from "../../components/Breadcrumbs";
-import { useProduct } from "../../queries/useProducts";
+import { useProduct } from "../../hooks/Products/useProducts";
 import { resolveImageUrl } from "../../helpers/ImageHelper";
 import { priceIncVat } from "@/helpers/money";
 import { fmtSEK } from "@/helpers/orderFormat";

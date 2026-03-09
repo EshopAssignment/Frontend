@@ -1,4 +1,4 @@
-import { useMe } from "@/queries/auth";
+import { useMe } from "@/hooks/Auth/useAuth";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 export default function RequireAuth()  {

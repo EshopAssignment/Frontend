@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useLogin, useRegister } from "@/queries/auth";
+import { useLogin, useRegister } from "@/hooks/Auth/useAuth";
 import toast from "react-hot-toast";
 import { toFieldErrors } from "@/lib/FieldErrors";
 import { setRedirectToast } from "@/lib/redirectToast";

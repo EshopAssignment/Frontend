@@ -1,6 +1,6 @@
 import { OrderDetailsModal } from "@/components/Orders/OrderDetailsModal";
 import { OrdersTable } from "@/components/Orders/OrderTable";
-import { useMyOrders } from "@/queries/orders/useMyOrder";
+import { useMyOrders } from "@/hooks/orders/useMyOrder";
 import { useState } from "react";
 
 const UserOrders = () => {

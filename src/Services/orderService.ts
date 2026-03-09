@@ -3,14 +3,9 @@ import * as sdk from "@/api/sdk.gen";
 import type { CartItem } from "@/context/CartContext";
 import type * as apiTypes from "@/api/types.gen";
 
-export type CreateOrderRequest = apiTypes.CreateOrderRequestDto;
-export type OrderCreatedDto = apiTypes.OrderCreatedDto;
-export type UpdateOrderCustomerRequest = apiTypes.UpdateOrderCustomerDto;
-export type UpdateOrderShippingAddressRequest = apiTypes.UpdateOrderShippingAddressDto;
-export type MyOrdersDto = apiTypes.MyOrderListItemDto[];
-export type MyOrderDetailsDto = apiTypes.OrderCreatedDto;
 
-export async function createOrder(body: CreateOrderRequest): Promise<OrderCreatedDto> {
+
+export async function createOrder(body: apiTypes.CreateOrderRequestDto): Promise<apiTypes.OrderCreatedDto> {
   const res = await sdk.postApiOrder({ client: api, body });
   if (res.error) throw res.error;
   return res.data!;
@@ -19,8 +14,8 @@ export async function createOrder(body: CreateOrderRequest): Promise<OrderCreate
 export async function createOrderFromCart(
   cartItems: CartItem[],
   cartId: string
-): Promise<OrderCreatedDto> {
-  const body: CreateOrderRequest = {
+): Promise<apiTypes.OrderCreatedDto> {
+  const body: apiTypes.CreateOrderRequestDto = {
     items: cartItems.map((x) => ({
       productId: x.productId,
       quantity: x.quantity,
@@ -36,7 +31,7 @@ export async function createOrderFromCart(
 export async function getOrderById(
   id: number,
   opts?: { signal?: AbortSignal }
-): Promise<OrderCreatedDto> {
+): Promise<apiTypes.OrderCreatedDto> {
   const res = await sdk.getApiOrderById({
     client: api,
     path: { id },
@@ -50,7 +45,7 @@ export async function getOrderById(
 export async function getOrderByNumber(
   orderNumber: string,
   opts?: { signal?: AbortSignal }
-): Promise<OrderCreatedDto> {
+): Promise<apiTypes.OrderCreatedDto> {
   const res = await sdk.getApiOrderByNumberByOrderNumber({
     client: api,
     path: { orderNumber },
@@ -63,7 +58,7 @@ export async function getOrderByNumber(
 
 export async function updateOrderCustomer(
   orderNumber: string,
-  body: UpdateOrderCustomerRequest
+  body: apiTypes.UpdateOrderCustomerDto
 ): Promise<void> {
   const res = await sdk.patchApiOrderByNumberByOrderNumberCustomer({
     client: api,
@@ -76,7 +71,7 @@ export async function updateOrderCustomer(
 
 export async function updateOrderShippingAddress(
   orderNumber: string,
-  body: UpdateOrderShippingAddressRequest
+  body: apiTypes.UpdateOrderShippingAddressDto
 ): Promise<void> {
   const res = await sdk.patchApiOrderByNumberByOrderNumberShippingAddress({
     client: api,
@@ -91,7 +86,7 @@ export async function getMyOrders(args?: {
   skip?: number;
   take?: number;
   signal?: AbortSignal;
-}): Promise<MyOrdersDto> {
+}): Promise<apiTypes.MyOrderListItemDto[]> {
   const skip = Math.max(0, args?.skip ?? 0);
   const take = Math.max(1, Math.min(100, args?.take ?? 20));
 
@@ -108,7 +103,7 @@ export async function getMyOrders(args?: {
 export async function getMyOrderDetailsByNumber(
   orderNumber: string,
   opts?: { signal?: AbortSignal }
-): Promise<MyOrderDetailsDto> {
+): Promise<apiTypes.OrderCreatedDto> {
   const res = await sdk.getApiMeOrdersByOrderNumber({
     client: api,
     path: { orderNumber },

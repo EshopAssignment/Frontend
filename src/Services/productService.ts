@@ -1,28 +1,24 @@
-import { api } from '@/lib/http';
-import * as sdk from '@/api/sdk.gen';
+import { api } from "@/lib/http";
+import * as sdk from "@/api/sdk.gen";
 import type * as apiTypes from "@/api/types.gen";
 
-export type PagedProducts = NonNullable<
-  Awaited<ReturnType<typeof sdk.getApiProducts>>['data']
->;
-export type ProductDto = NonNullable<PagedProducts['items']>[number];
-export type ProductSuggestionDto =
-  NonNullable<Awaited<ReturnType<typeof sdk.getApiProductsSuggest>>['data']>[number];
-export type SortUi = 'price_asc' | 'price_desc' | 'name_asc' | 'name_desc';
+export type PagedProducts = apiTypes.PagedResultOfProductDto;
+export type ProductDto = apiTypes.ProductDto;
+export type ProductSuggestionDto = apiTypes.ProductSuggestionDto;
+export type SortUi = "price_asc" | "price_desc" | "name_asc" | "name_desc";
 
+function cleanQueryParams<T extends object>(obj: T): Partial<T> {
+  const out: Partial<T> = {};
 
+  for (const [key, value] of Object.entries(obj) as [keyof T, T[keyof T]][]) {
+    if (value === undefined || value === null) continue;
+    if (typeof value === "string" && value.trim() === "") continue;
+    if (Array.isArray(value) && value.length === 0) continue;
+    if (typeof value === "number" && Number.isNaN(value)) continue;
 
-
-
-function defined<T extends object>(o: T): Partial<T> {
-  const out: any = {};
-  for (const [k, v] of Object.entries(o)) {
-    if (v === undefined || v === null) continue;
-    if (typeof v === 'string' && v.trim() === '') continue;
-    if (Array.isArray(v) && v.length === 0) continue;
-    if (Number.isNaN(v)) continue;
-    out[k] = v;
+    out[key] = value;
   }
+
   return out;
 }
 
@@ -40,13 +36,13 @@ export async function getProductsPaged(
     inStock?: boolean;
   } = {}
 ): Promise<PagedProducts> {
-  const { signal, sort, ...rest } = opts;
+  const { signal, ...rest } = opts;
 
-  const query = defined({
+  const query = cleanQueryParams({
     page,
     pageSize,
     query: rest.query,
-    sort,
+    sort: rest.sort,
     type: rest.type,
     condition: rest.condition,
     minPrice: rest.minPrice,
@@ -54,31 +50,47 @@ export async function getProductsPaged(
     inStock: rest.inStock,
   });
 
-  const res = await sdk.getApiProducts({ client: api, query, signal });
+  const res = await sdk.getApiProducts({
+    client: api,
+    query,
+    signal,
+  });
 
-  if ('response' in res && !res.response.ok) {
-    const text = await res.response.text().catch(() => '');
-    throw new Error(`Failed to fetch products: ${res.response.status} ${text}`);
-  }
-  return res.data!;
+  if (res.error) throw res.error;
+
+  return (
+    res.data ?? {
+      items: [],
+      page,
+      pageSize,
+      totalItems: 0,
+      totalPages: 0,
+    }
+  );
 }
 
 export async function getProductById(id: number): Promise<ProductDto> {
-  const res = await sdk.getApiProductsById({ client: api, path: { id } });
-  if ('response' in res && !res.response.ok) {
-    const text = await res.response.text().catch(() => '');
-    throw new Error(`Not Found: ${res.response.status} ${text}`);
-  }
+  const res = await sdk.getApiProductsById({
+    client: api,
+    path: { id },
+  });
+
+  if (res.error) throw res.error;
   return res.data!;
 }
 
-export async function suggestProducts(q: string, take = 8): Promise<ProductSuggestionDto[]> {
-  const qq = q.trim();
-  if (!qq) return [];
-  const res = await sdk.getApiProductsSuggest({ client: api, query: { q: qq, take } });
-  if ('response' in res && !res.response.ok) {
-    const text = await res.response.text().catch(() => '');
-    throw new Error(`Suggest failed: ${res.response.status} ${text}`);
-  }
+export async function suggestProducts(
+  q: string,
+  take = 8
+): Promise<ProductSuggestionDto[]> {
+  const query = q.trim();
+  if (!query) return [];
+
+  const res = await sdk.getApiProductsSuggest({
+    client: api,
+    query: { q: query, take },
+  });
+
+  if (res.error) throw res.error;
   return res.data ?? [];
 }

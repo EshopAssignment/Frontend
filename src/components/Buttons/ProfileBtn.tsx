@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { useLogout, useMe } from "@/queries/auth";
+import { useLogout, useMe } from "@/hooks/Auth/useAuth";
 
 export default function ProfileBtn() {
     const { data: me, isLoading } = useMe();
