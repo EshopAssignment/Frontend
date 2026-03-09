@@ -1,5 +1,5 @@
 import { setRedirectToast } from "@/lib/redirectToast";
-import { useLogin } from "@/queries/auth";
+import { useLogin } from "@/hooks/Auth/useAuth";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";

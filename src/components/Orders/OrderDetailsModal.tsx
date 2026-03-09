@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useMyOrderDetails } from "@/queries/orders/useMyOrderDetails";
+import { useMyOrderDetails } from "@/hooks/orders/useMyOrderDetails";
 import { fmtSEK, fmtUtc, toStatusLable } from "@/helpers/orderFormat";
 
 type Props = {

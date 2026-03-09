@@ -1,4 +1,4 @@
-import { useLogout } from "@/queries/auth";
+import { useLogout } from "@/hooks/Auth/useAuth";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
 

@@ -9,22 +9,28 @@ export function useAddToCart(product: ProductDto | null | undefined, available: 
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const disabledByStock = !product || available === 0;
+  const disabledByStock = !product || available <= 0;
   const disabled = disabledByStock || adding;
 
+  const clearError = () => setError(null);
+
   const add = async (qty = 1) => {
-    if (!product) return;         
-    if (disabled) return;
+    if (!product) return;
+    if (available <= 0) return;
+    if (adding) return;
 
     setError(null);
     setAdding(true);
 
     try {
       await addItem(toCartItem(product), qty);
-      toast.success("Lagd i varukorgen!")
-    } catch (e) {
-        toast.error("Kunde inte lägga till i varukorgen")
-        setError((e as Error)?.message ?? "Kunde inte lägga till i varukorg");
+      toast.success("Lagd i varukorgen!");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Kunde inte lägga till i varukorgen.";
+
+      setError(message);
+      toast.error("Kunde inte lägga till i varukorgen.");
     } finally {
       setAdding(false);
     }
@@ -36,6 +42,6 @@ export function useAddToCart(product: ProductDto | null | undefined, available: 
     disabled,
     disabledByStock,
     error,
-    clearError: () => setError(null),
+    clearError,
   };
 }

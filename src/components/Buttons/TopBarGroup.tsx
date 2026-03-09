@@ -5,7 +5,7 @@ import HelpBtn from "./HelpBtn";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { useLocation } from "react-router-dom";
 import AdminBtn from "./AdminBtn";
-import { useMe } from "@/queries/auth";
+import { useMe } from "@/hooks/Auth/useAuth";
 
 const TopBarGroup = () => {
     const { state } = useCart();
