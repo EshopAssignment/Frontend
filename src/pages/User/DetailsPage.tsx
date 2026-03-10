@@ -1,14 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { A11y, Navigation, Pagination } from "swiper/modules";
+import type { Swiper as SwiperType } from "swiper";
+
 import placeholder from "../../images/placeholder.jpg";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import { useProduct } from "../../hooks/Products/useProducts";
 import { resolveImageUrl } from "../../helpers/ImageHelper";
 import { priceIncVat } from "@/helpers/money";
 import { fmtSEK } from "@/helpers/orderFormat";
-
 import { getStockBadgeClass, getStockBadgeText } from "@/helpers/stockBadge";
 import { useAddToCart } from "@/hooks/useAddCart";
+
+
+type ProductImageVm = {
+  url: string;
+  altText: string | null;
+  isPrimary: boolean;
+  sortOrder: number;
+};
 
 const DetailsPage = () => {
   const { id } = useParams();
@@ -23,51 +34,76 @@ const DetailsPage = () => {
 
   const { add, disabled, disabledByStock, adding, error } = useAddToCart(product, available);
 
-  const images = useMemo(() => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [swiper, setSwiper] = useState<SwiperType | null>(null);
+
+  const images = useMemo<ProductImageVm[]>(() => {
     if (!product) return [];
 
-    const list = Array.isArray(product.images)
-      ? product.images
-          .filter((img) => String(img?.url ?? "").trim())
-          .slice()
-          .sort(
-            (a, b) =>
-              (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0) ||
-              Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0)
-          )
-      : [];
+    const mapped =
+      Array.isArray(product.images) && product.images.length > 0
+        ? product.images
+            .filter((img) => String(img?.url ?? "").trim())
+            .map((img) => ({
+              url: String(img.url),
+              altText: img.altText ?? null,
+              isPrimary: Boolean(img.isPrimary),
+              sortOrder: Number(img.sortOrder ?? 0),
+            }))
+            .sort(
+              (a, b) =>
+                Number(b.isPrimary) - Number(a.isPrimary) ||
+                a.sortOrder - b.sortOrder
+            )
+        : [];
 
-    if (list.length === 0 && product.primaryImgUrl) {
+    if (mapped.length > 0) return mapped;
+
+    if (product.primaryImgUrl) {
       return [
         {
           url: product.primaryImgUrl,
+          altText: product.name,
           isPrimary: true,
           sortOrder: 0,
-          altText: product.name,
         },
       ];
     }
 
-    return list;
+    return [];
   }, [product]);
 
-  const [selectedUrl, setSelectedUrl] = useState("");
+  const imageUrls = useMemo(() => {
+    const urls = images
+      .map((img) => ({
+        ...img,
+        resolvedUrl: resolveImageUrl(img.url) || placeholder,
+      }))
+      .filter((img) => img.resolvedUrl);
+
+    if (urls.length > 0) return urls;
+
+    return [
+      {
+        url: "",
+        altText: product?.name ?? "Produktbild",
+        isPrimary: true,
+        sortOrder: 0,
+        resolvedUrl: placeholder,
+      },
+    ];
+  }, [images, product]);
 
   useEffect(() => {
-    if (!isValidPid) navigate("/", { replace: true });
+    if (!isValidPid) {
+      navigate("/", { replace: true });
+    }
   }, [isValidPid, navigate]);
 
   useEffect(() => {
-    if (!product) return;
-
-    const primary =
-      images.find((img) => img.isPrimary)?.url ||
-      images[0]?.url ||
-      product.primaryImgUrl ||
-      "";
-
-    setSelectedUrl(primary);
-  }, [product, images]);
+    setActiveIndex(0);
+    swiper?.slideTo(0);
+  }, [product, swiper]);
 
   if (!isValidPid) return null;
 
@@ -83,22 +119,17 @@ const DetailsPage = () => {
     return (
       <section className="container product-details">
         <p>Produkten kunde inte hämtas.</p>
-        <button onClick={() => navigate(-1)}>Tillbaka</button>
+        <button type="button" onClick={() => navigate(-1)}>
+          Tillbaka
+        </button>
       </section>
     );
   }
 
-
-  const heroUrl =
-    resolveImageUrl(selectedUrl) ||
-    resolveImageUrl(product.primaryImgUrl) ||
-    placeholder;
-
   const badgeClass = getStockBadgeClass(available);
   const badgeText = getStockBadgeText(available, "low");
-
   const priceInc = priceIncVat(product.priceExVat, product.vatRatePercent);
-
+  const hasManyImages = imageUrls.length > 1;
 
   return (
     <div className="container">
@@ -131,6 +162,7 @@ const DetailsPage = () => {
           </div>
 
           <button
+            type="button"
             className={`btn-add-wide${disabled ? " is-disabled" : ""}`}
             disabled={disabled}
             aria-disabled={disabled}
@@ -152,38 +184,49 @@ const DetailsPage = () => {
         <div className="divider" />
 
         <div className="details-img">
-          <img
-            src={heroUrl}
-            alt={product.name}
-            onError={(e) => {
-              e.currentTarget.src = placeholder;
-            }}
-          />
+          <Swiper
+            modules={[Navigation, Pagination, A11y]}
+            slidesPerView={1}
+            spaceBetween={12}
+            navigation={hasManyImages}
+            pagination={hasManyImages ? { clickable: true } : false}
+            onSwiper={setSwiper}
+            onSlideChange={(instance) => setActiveIndex(instance.activeIndex)}
+            className="details-swiper"
+          >
+            {imageUrls.map((img, idx) => (
+              <SwiperSlide key={`${img.url}-${idx}`}>
+                <img
+                  className="details-swiper-image"
+                  src={img.resolvedUrl}
+                  alt={img.altText ?? `${product.name} bild ${idx + 1}`}
+                  onError={(e) => {
+                    e.currentTarget.src = placeholder;
+                  }}
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
 
-          {!!images.length && (
+          {hasManyImages && (
             <div className="details-thumbs">
-              {images.map((img, idx) => {
-                const thumbSrc = resolveImageUrl(img.url) || placeholder;
-                const isSelected = img.url === selectedUrl;
-
-                return (
-                  <button
-                    key={`${img.url}-${idx}`}
-                    type="button"
-                    className={`details-thumb${isSelected ? " is-active" : ""}`}
-                    onClick={() => setSelectedUrl(img.url)}
-                    aria-label={`Visa bild ${idx + 1} för ${product.name}`}
-                  >
-                    <img
-                      src={thumbSrc}
-                      alt={img.altText ?? `${product.name} bild ${idx + 1}`}
-                      onError={(e) => {
-                        e.currentTarget.src = placeholder;
-                      }}
-                    />
-                  </button>
-                );
-              })}
+              {imageUrls.map((img, idx) => (
+                <button
+                  key={`${img.url}-thumb-${idx}`}
+                  type="button"
+                  className={`details-thumb${idx === activeIndex ? " is-active" : ""}`}
+                  onClick={() => swiper?.slideTo(idx)}
+                  aria-label={`Visa bild ${idx + 1} för ${product.name}`}
+                >
+                  <img
+                    src={img.resolvedUrl}
+                    alt={img.altText ?? `${product.name} miniatyr ${idx + 1}`}
+                    onError={(e) => {
+                      e.currentTarget.src = placeholder;
+                    }}
+                  />
+                </button>
+              ))}
             </div>
           )}
         </div>
