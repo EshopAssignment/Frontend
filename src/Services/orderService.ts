@@ -31,7 +31,7 @@ export async function createOrderFromCart(
 export async function getOrderById(
   id: number,
   opts?: { signal?: AbortSignal }
-): Promise<apiTypes.OrderCreatedDto> {
+): Promise<apiTypes.OrderDetailsDto> {
   const res = await sdk.getApiOrderById({
     client: api,
     path: { id },
@@ -45,7 +45,7 @@ export async function getOrderById(
 export async function getOrderByNumber(
   orderNumber: string,
   opts?: { signal?: AbortSignal }
-): Promise<apiTypes.OrderCreatedDto> {
+): Promise<apiTypes.OrderDetailsDto> {
   const res = await sdk.getApiOrderByNumberByOrderNumber({
     client: api,
     path: { orderNumber },
@@ -103,7 +103,7 @@ export async function getMyOrders(args?: {
 export async function getMyOrderDetailsByNumber(
   orderNumber: string,
   opts?: { signal?: AbortSignal }
-): Promise<apiTypes.OrderCreatedDto> {
+): Promise<apiTypes.OrderDetailsDto> {
   const res = await sdk.getApiMeOrdersByOrderNumber({
     client: api,
     path: { orderNumber },

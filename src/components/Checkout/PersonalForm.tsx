@@ -1,10 +1,12 @@
-import { updateOrderCustomer, type OrderDto } from "@/Services/orderService";
+import { updateOrderCustomer} from "@/Services/orderService";
 import { useEffect, useState } from "react";
+import type * as apiTypes from "@/api/types.gen";
+
 
 
 type Props = {
     orderNumber:string;
-    order: OrderDto;
+    order: apiTypes.OrderDetailsDto;
     onSaved:() => void
 };
 

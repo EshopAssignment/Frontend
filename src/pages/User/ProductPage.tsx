@@ -7,10 +7,10 @@ import RequestOrder from "../../components/Orders/RequestOrder";
 import ViewModeBtn from "@/components/Buttons/ViewModeBtn";
 import ProductListView from "@/components/Product/ProductListView";
 
-import { parseProductFilters } from "@/helpers/productFilters";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { usePagedState } from "@/hooks/usePagedState";
 import { useProductsPaged } from "@/hooks/Products/useProducts";
+import { parseProductFilters } from "@/helpers/productFilterParams";
 
 const PAGE_SIZE = 15;
 type ViewMode = "grid" | "list";

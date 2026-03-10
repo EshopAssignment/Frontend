@@ -7,6 +7,16 @@ export const adminOrderQk = {
   detail: (id: number) => [...adminOrderQk.details(), id] as const,
 };
 
+export const adminProductQk = {
+  all: ["admin-products"] as const,
+  lists: () => [...adminProductQk.all, "list"] as const,
+  list: (page: number, pageSize: number) =>
+    [...adminProductQk.lists(), { page, pageSize }] as const,
+  details: () => [...adminProductQk.all, "detail"] as const,
+  detail: (id: number) => [...adminProductQk.details(), id] as const,
+  options: () => [...adminProductQk.all, "options"] as const,
+};
+
 export const meQk = {
   all: ["me"] as const,
   profile: () => [...meQk.all, "profile"] as const,

@@ -1,6 +1,6 @@
 import { asNum } from "@/helpers/money";
 import { fmtSEK, fmtUtc } from "@/helpers/orderFormat";
-import { STATUS_TO_NUM, STATUSES, toStatusKey, type StatusKey } from "@/helpers/orderStataus";
+import { STATUS_TO_NUM, STATUSES, type StatusKey } from "@/helpers/orderStataus";
 import type { AdminOrderListItem, AdminOrderStatus } from "@/Services/adminOrderService";
 
 export function AdminOrderTable(props: {

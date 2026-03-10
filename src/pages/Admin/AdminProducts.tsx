@@ -16,12 +16,37 @@ import ProductTable from "../../components/Admin/ProductTable";
 import ProductForm from "../../components/Admin/ProductFrom";
 
 import { hasMissingRequiredForActive } from "@/lib/productValidation";
+import { adminProductQk } from "@/constants/queryKeys";
+import { asNum } from "@/helpers/money";
 
 const PAGE_SIZE = 20;
 
-function getErrMessage(err: unknown, fallback: string) {
-  const anyErr = err as any;
-  return anyErr?.response?.data?.message || anyErr?.response?.data || anyErr?.message || fallback;
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) return error.message;
+
+  if (typeof error === "object" && error !== null) {
+    const err = error as {
+      response?: {
+        data?: unknown;
+      };
+      message?: string;
+    };
+
+    if (typeof err.response?.data === "string") return err.response.data;
+
+    if (
+      typeof err.response?.data === "object" &&
+      err.response?.data !== null &&
+      "message" in err.response.data &&
+      typeof (err.response.data as { message?: unknown }).message === "string"
+    ) {
+      return (err.response.data as { message: string }).message;
+    }
+
+    if (typeof err.message === "string") return err.message;
+  }
+
+  return fallback;
 }
 
 export default function AdminProducts() {
@@ -32,7 +57,7 @@ export default function AdminProducts() {
   const [creating, setCreating] = useState(false);
 
   const list = useQuery({
-    queryKey: ["admin-products", page],
+    queryKey: adminProductQk.list(page, PAGE_SIZE),
     queryFn: () => adminListProducts(page, PAGE_SIZE),
     placeholderData: keepPreviousData,
     staleTime: 10_000,
@@ -40,66 +65,100 @@ export default function AdminProducts() {
 
   const productById = useMemo(() => {
     const map = new Map<number, AdminProduct>();
-    for (const p of list.data?.items ?? []) map.set(p.id, p);
+
+    for (const product of list.data?.items ?? []) {
+      map.set(product.id, product);
+    }
+
     return map;
   }, [list.data?.items]);
 
   const createMut = useMutation({
     mutationFn: (body: AdminCreateReq) => adminCreateProduct(body),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Produkt skapad.");
       setCreating(false);
-      qc.invalidateQueries({ queryKey: ["admin-products"] });
+      await qc.invalidateQueries({ queryKey: adminProductQk.all });
     },
-    onError: (err) => toast.error(getErrMessage(err, "Kunde inte skapa produkt.")),
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "Kunde inte skapa produkt."));
+    },
   });
 
   const updateMut = useMutation({
-    mutationFn: async ({ id, body }: { id: number; body: AdminUpdateReq }) => {
-      return adminUpdateProduct(id, body);
-    },
-    onSuccess: (_updated, vars) => {
+    mutationFn: ({ id, body }: { id: number; body: AdminUpdateReq }) =>
+      adminUpdateProduct(id, body),
+
+    onSuccess: async (_updated, variables) => {
       toast.success("Produkt uppdaterad.");
       setEditing(null);
-      qc.invalidateQueries({ queryKey: ["admin-products"] });
-      qc.invalidateQueries({ queryKey: ["admin-product", vars.id] });
+
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: adminProductQk.all }),
+        qc.invalidateQueries({ queryKey: adminProductQk.detail(variables.id) }),
+      ]);
     },
-    onError: (err) => toast.error(getErrMessage(err, "Kunde inte uppdatera produkt.")),
+
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "Kunde inte uppdatera produkt."));
+    },
   });
 
   const toggleMut = useMutation({
-    mutationFn: ({ id, isActive }: { id: number; isActive: boolean }) => adminToggleActive(id, isActive),
-    onSuccess: (_data, vars) => {
-      toast.success(vars.isActive ? "Produkt aktiverad." : "Produkt inaktiverad.");
-      qc.invalidateQueries({ queryKey: ["admin-products"] });
+    mutationFn: ({ id, isActive }: { id: number; isActive: boolean }) =>
+      adminToggleActive(id, isActive),
+
+    onSuccess: async (_data, variables) => {
+      toast.success(variables.isActive ? "Produkt aktiverad." : "Produkt inaktiverad.");
+      await qc.invalidateQueries({ queryKey: adminProductQk.all });
     },
-    onError: (err) => toast.error(getErrMessage(err, "Kunde inte ändra aktiv status.")),
+
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "Kunde inte ändra aktiv status."));
+    },
   });
+
+  function handleCreate() {
+    setCreating(true);
+  }
+
+  function handleEdit(id: number) {
+    setEditing(id);
+  }
+
+  function handleCloseCreate() {
+    setCreating(false);
+  }
+
+  function handleCloseEdit() {
+    setEditing(null);
+  }
 
   function handleToggle(id: number, current: boolean) {
     const next = !current;
 
-    // Extra guard: blocka aktivering om required saknas
     if (next) {
-      const p = productById.get(id);
-      if (!p) {
+      const product = productById.get(id);
+
+      if (!product) {
         toast.error("Kunde inte hitta produkten i listan. Uppdatera sidan.");
         return;
       }
 
       const missing = hasMissingRequiredForActive({
-        name: p.name,
-        description: p.description,
-        palletType: p.palletType,
-        condition: p.condition,
-        imgUrl: p.imgUrl,
-        priceExVat: p.priceExVat,
-        vatRatePercent: p.vatRatePercent,
-        onHand: p.onHand,
+        name: product.name,
+        description: product.description,
+        palletType: product.palletType,
+        condition: product.condition,
+        images: product.images,
+        priceExVat: product.priceExVat,
+        vatRatePercent: product.vatRatePercent,
+        onHand: product.onHand,
+        isActive: product.isActive,
       });
 
       if (missing) {
-        toast.error("Kan inte aktivera, information saknas för produkten.");
+        toast.error("Kan inte aktivera. Information saknas för produkten.");
         return;
       }
     }
@@ -107,15 +166,33 @@ export default function AdminProducts() {
     toggleMut.mutate({ id, isActive: next });
   }
 
+  function handleCreateSubmit(body: AdminCreateReq | AdminUpdateReq) {
+    const payload: AdminCreateReq = {
+      ...(body as AdminCreateReq),
+      isActive: false,
+    };
+
+    createMut.mutate(payload);
+  }
+
+  function handleUpdateSubmit(body: AdminCreateReq | AdminUpdateReq) {
+    if (editing === null) return;
+
+    const payload: AdminUpdateReq = body as AdminUpdateReq;
+    updateMut.mutate({ id: editing, body: payload });
+  }
+
   const busy = createMut.isPending || updateMut.isPending || toggleMut.isPending;
+  const totalPages = Math.max(1, asNum(list.data?.totalPages ?? 1));
 
   return (
     <section>
       <div className="container">
         <div className="center-content">
           <h1 className="header-text">Produkter</h1>
+
           <div className="admin-actions">
-            <button className="btn" onClick={() => setCreating(true)} disabled={busy}>
+            <button type="button" className="btn" onClick={handleCreate} disabled={busy}>
               Ny produkt
             </button>
           </div>
@@ -130,21 +207,18 @@ export default function AdminProducts() {
           <ProductTable
             data={list.data.items ?? []}
             page={page}
-            totalPages={list.data.totalPages ?? 1}
-            onPrev={() => setPage((p) => Math.max(1, p - 1))}
-            onNext={() => setPage((p) => Math.min(list.data.totalPages ?? 1, p + 1))}
-            onEdit={(id) => setEditing(Number(id))}
+            totalPages={totalPages}
+            onPrev={() => setPage((prev) => Math.max(1, prev - 1))}
+            onNext={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+            onEdit={handleEdit}
             onToggle={handleToggle}
           />
 
           {creating && (
             <ProductForm
               title="Skapa produkt"
-              onCancel={() => setCreating(false)}
-              onSubmit={(body) => {
-                const safe: AdminCreateReq = { ...(body as AdminCreateReq), isActive: false };
-                createMut.mutate(safe);
-              }}
+              onCancel={handleCloseCreate}
+              onSubmit={handleCreateSubmit}
               loading={createMut.isPending}
             />
           )}
@@ -153,10 +227,8 @@ export default function AdminProducts() {
             <ProductForm
               title="Uppdatera produkt"
               productId={editing}
-              onCancel={() => setEditing(null)}
-              onSubmit={(body) => {
-                updateMut.mutate({ id: editing, body: body as AdminUpdateReq });
-              }}
+              onCancel={handleCloseEdit}
+              onSubmit={handleUpdateSubmit}
               loading={updateMut.isPending}
             />
           )}

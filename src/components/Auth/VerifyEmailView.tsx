@@ -1,4 +1,4 @@
-import type { VerifyState } from "@/hooks/Auth/useVerifyEmail";
+import type { VerifyState } from "@/types/VerifyState";
 import { Link } from "react-router-dom";
 
 interface Props {
