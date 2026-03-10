@@ -1,4 +1,5 @@
 import { API_ORIGIN } from "@/config";
+import { asNum } from "./money";
 
 export type ImageLike = {
   url: string;
@@ -6,11 +7,6 @@ export type ImageLike = {
   isPrimary: boolean;
   altText?: string | null;
 };
-
-function toNum(v: unknown, fallback = 0): number {
-  const n = typeof v === "number" ? v : typeof v === "string" ? Number(v) : NaN;
-  return Number.isFinite(n) ? n : fallback;
-}
 
 export function resolveImageUrl(raw?: string | null) {
   const val = (raw ?? "").trim();
@@ -29,10 +25,10 @@ export function normalizeImages<T extends ImageLike>(list: T[]): T[] {
     .map((x) => ({
       ...x,
       url: String(x.url).trim(),
-      sortOrder: toNum(x.sortOrder, 0),
+      sortOrder: asNum(x.sortOrder, 0),
     }))
     .slice()
-    .sort((a, b) => toNum(a.sortOrder, 0) - toNum(b.sortOrder, 0));
+    .sort((a, b) => asNum(a.sortOrder, 0) - asNum(b.sortOrder, 0));
 
   for (let i = 0; i < xs.length; i++) {
     xs[i] = { ...xs[i], sortOrder: i };

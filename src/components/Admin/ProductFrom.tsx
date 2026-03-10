@@ -28,7 +28,7 @@ import {
   setPrimaryImage,
   getPrimaryUrl,
   resolveImageUrl,
-} from "@/helpers/ImageHelper";
+} from "@/helpers/ImageHelpers";
 
 type Props = {
   title: string;

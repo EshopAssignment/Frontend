@@ -7,7 +7,7 @@ import type { Swiper as SwiperType } from "swiper";
 import placeholder from "../../images/placeholder.jpg";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import { useProduct } from "../../hooks/Products/useProducts";
-import { resolveImageUrl } from "../../helpers/ImageHelper";
+import { resolveImageUrl } from "../../helpers/ImageHelpers";
 import { priceIncVat } from "@/helpers/money";
 import { fmtSEK } from "@/helpers/orderFormat";
 import { getStockBadgeClass, getStockBadgeText } from "@/helpers/stockBadge";
