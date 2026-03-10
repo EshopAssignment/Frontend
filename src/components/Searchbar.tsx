@@ -3,7 +3,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { suggestProducts, type ProductSuggestionDto } from "../Services/productService";
-import { resolveImageUrl } from "../helpers/ImageHelper";
+import { resolveImageUrl } from "../helpers/ImageHelpers";
 import placeholder from "../Images/placeholder.jpg";
 
 function toNumber(n: unknown): number | null {

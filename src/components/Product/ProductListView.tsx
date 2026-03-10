@@ -1,7 +1,7 @@
 import type { ProductDto } from "../../Services/productService";
 import placeholder from "../../Images/placeholder.jpg";
 import { Link } from "react-router-dom";
-import { resolveImageUrl } from "../../helpers/ImageHelper";
+import { resolveImageUrl } from "../../helpers/ImageHelpers";
 import { priceIncVat } from "@/helpers/money";
 import { fmtSEK } from "@/helpers/orderFormat";
 

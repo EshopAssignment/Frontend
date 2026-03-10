@@ -1,11 +1,12 @@
 import type { CartItem } from "@/context/CartContext";
 import type { ProductDto } from "../Services/productService";
-import { resolveImageUrl } from "./ImageHelper";
+import { resolveImageUrl } from "./ImageHelpers";
+import { asNum } from "./money";
 
 export function toCartItem(p: ProductDto): Omit<CartItem, "quantity"> {
   const productId = Number(p.id);
   const priceExVat = Number(p.priceExVat);
-  const vatRatePercent = Number((p as any).vatRatePercent);
+  const vatRatePercent = asNum(p.vatRatePercent);
   const imgUrl = resolveImageUrl(p.primaryImgUrl) || "";
   return {
     productId: Number.isFinite(productId) ? productId : 0,

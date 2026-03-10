@@ -11,16 +11,16 @@ export const STATUS_TO_NUM = {
 
 export type StatusKey = keyof typeof STATUS_TO_NUM;
 
-export const NUM_TO_STATUS: Record<number, StatusKey> = {
-  0: "Pending",
-  1: "Confirmed",
-  2: "Processing",
-  3: "Shipped",
-  4: "Completed",
-  5: "Cancelled",
-  6: "Failed",
-  7: "Refunded",
-};
+// export const NUM_TO_STATUS: Record<number, StatusKey> = {
+//   0: "Pending",
+//   1: "Confirmed",
+//   2: "Processing",
+//   3: "Shipped",
+//   4: "Completed",
+//   5: "Cancelled",
+//   6: "Failed",
+//   7: "Refunded",
+// };
 
 export const STATUSES: readonly StatusKey[] = [
   "Pending",
@@ -33,8 +33,8 @@ export const STATUSES: readonly StatusKey[] = [
   "Cancelled",
 ] as const;
 
-export function toStatusKey(raw: unknown): StatusKey {
-  if (typeof raw === "string" && raw in STATUS_TO_NUM) return raw as StatusKey;
-  const n = typeof raw === "number" ? raw : Number(raw);
-  return Number.isFinite(n) ? (NUM_TO_STATUS[n] ?? "Pending") : "Pending";
-}
+// export function toStatusKey(raw: unknown): StatusKey {
+//   if (typeof raw === "string" && raw in STATUS_TO_NUM) return raw as StatusKey;
+//   const n = typeof raw === "number" ? raw : Number(raw);
+//   return Number.isFinite(n) ? (NUM_TO_STATUS[n] ?? "Pending") : "Pending";
+// }
