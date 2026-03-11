@@ -1,6 +1,6 @@
 import { priceIncVat, lineIncVat } from "@/helpers/money";
 import { fmtUtc, fmtSEK } from "@/helpers/orderFormat";
-import { toStatusKey } from "@/helpers/orderStataus";
+import { toStatusKey } from "@/helpers/orderStatus";
 import type { AdminOrderDetails } from "@/Services/adminOrderService";
 import { useEffect, useState } from "react";
 

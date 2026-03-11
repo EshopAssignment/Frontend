@@ -1,4 +1,4 @@
-import { STATUSES } from "@/helpers/orderStataus";
+import { STATUSES } from "@/helpers/orderStatus";
 
 export function OrdersFilters(props: {
     query: string;

@@ -225,7 +225,18 @@ export type OrderItemDto = {
     lineTotalExVat: number | string;
 };
 
-export type OrderStatus = number;
+export const OrderStatus = {
+    PENDING: 'Pending',
+    CONFIRMED: 'Confirmed',
+    PROCESSING: 'Processing',
+    SHIPPED: 'Shipped',
+    COMPLETED: 'Completed',
+    CANCELLED: 'Cancelled',
+    FAILED: 'Failed',
+    REFUNDED: 'Refunded'
+} as const;
+
+export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
 
 export type PagedResultOfAdminOrderListItemDto = {
     page?: number | string;
@@ -243,7 +254,17 @@ export type PagedResultOfProductDto = {
     items?: Array<ProductDto>;
 };
 
-export type PaymentStatus = number;
+export const PaymentStatus = {
+    NONE: 'None',
+    REQUIRES_PAYMENT: 'RequiresPayment',
+    AUTHORIZED: 'Authorized',
+    CAPTURED: 'Captured',
+    FAILED: 'Failed',
+    CANCELLED: 'Cancelled',
+    REFUNDED: 'Refunded'
+} as const;
+
+export type PaymentStatus = typeof PaymentStatus[keyof typeof PaymentStatus];
 
 export type ProblemDetails = {
     type?: null | string;
