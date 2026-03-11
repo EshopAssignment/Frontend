@@ -288,174 +288,277 @@ const { data: options } = useQuery({
       <div className="modal-panel">
         <h3>{title}</h3>
 
-        <form onSubmit={submit} className="form-grid" noValidate>
-          <label>
-            Namn
+<form onSubmit={submit} className="admin-product-form" noValidate>
+  <div className="product-editor-grid">
+    <section className="form-card form-card-main editor-child editor-child-1">
+      <div className="form-card-header">
+        <h3>Produktinformation</h3>
+        <p className="muted">Grundläggande information om produkten.</p>
+      </div>
+
+      <div className="field-stack">
+        <div className="field">
+          <label htmlFor="product-name" className="field-label">Namn</label>
+          <input
+            id="product-name"
+            className={`input ${touched.name && errors.name ? "input-error" : ""}`}
+            value={form.name}
+            onChange={(e) => setField("name", e.target.value as any)}
+            onBlur={() => validateNow()}
+            required
+          />
+          {touched.name && errors.name && <p className="field-error">{errors.name}</p>}
+        </div>
+
+        <div className="field">
+          <label htmlFor="product-description" className="field-label">Beskrivning</label>
+          <textarea
+            id="product-description"
+            className={`input textarea ${touched.description && errors.description ? "input-error" : ""}`}
+            value={form.description}
+            onChange={(e) => setField("description", e.target.value as any)}
+            onBlur={() => validateNow()}
+            rows={6}
+          />
+          {touched.description && errors.description && (
+            <p className="field-error">{errors.description}</p>
+          )}
+        </div>
+      </div>
+    </section>
+
+    <section className="form-card editor-child editor-child-2">
+      <div className="form-card-header">
+        <h3>Kategori</h3>
+        <p className="muted">Välj typ av pall och skick.</p>
+      </div>
+
+      <div className="field-grid field-grid-2">
+        <div className="field">
+          <label htmlFor="product-pallet-type" className="field-label">Palltyp</label>
+          <select
+            id="product-pallet-type"
+            className={`input ${touched.palletType && errors.palletType ? "input-error" : ""}`}
+            value={form.palletType}
+            onChange={(e) => setField("palletType", e.target.value as any)}
+            onBlur={() => validateNow()}
+            disabled={!options}
+            required
+          >
+            {options?.productTypes.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+          {touched.palletType && errors.palletType && (
+            <p className="field-error">{errors.palletType}</p>
+          )}
+        </div>
+
+        <div className="field">
+          <label htmlFor="product-condition" className="field-label">Skick</label>
+          <select
+            id="product-condition"
+            className={`input ${touched.condition && errors.condition ? "input-error" : ""}`}
+            value={form.condition}
+            onChange={(e) => setField("condition", e.target.value as any)}
+            onBlur={() => validateNow()}
+            disabled={!options}
+            required
+          >
+            {options?.productConditions.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+          {touched.condition && errors.condition && (
+            <p className="field-error">{errors.condition}</p>
+          )}
+        </div>
+      </div>
+    </section>
+
+    <section className="form-card editor-child editor-child-3">
+      <div className="form-card-header">
+        <h3>Pris och lager</h3>
+        <p className="muted">Sätt pris, moms och antal i lager.</p>
+      </div>
+
+      <div className="field-grid field-grid-3">
+        <div className="field">
+          <label htmlFor="product-price" className="field-label">Pris exkl. moms</label>
+          <div className="input-with-suffix">
             <input
-              className="input"
-              value={form.name}
-              onChange={(e) => setField("name", e.target.value as any)}
-              onBlur={() => validateNow()}
-              required
-            />
-            {touched.name && errors.name && <p className="field-error">{errors.name}</p>}
-          </label>
-
-          <label>
-            Beskrivning
-            <textarea
-              className="input"
-              value={form.description}
-              onChange={(e) => setField("description", e.target.value as any)}
-              onBlur={() => validateNow()}
-            />
-            {touched.description && errors.description && <p className="field-error">{errors.description}</p>}
-          </label>
-
-          <label>
-            Palltyp
-            <select
-              className="input"
-              value={form.palletType}
-              onChange={(e) => setField("palletType", e.target.value as any)}
-              onBlur={() => validateNow()}
-              disabled={!options}
-              required
-            >
-              {options?.productTypes.map((o) => (
-                <option className="options" key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-            {touched.palletType && errors.palletType && <p className="field-error">{errors.palletType}</p>}
-          </label>
-
-          <label>
-            Skick
-            <select
-              className="input"
-              value={form.condition}
-              onChange={(e) => setField("condition", e.target.value as any)}
-              onBlur={() => validateNow()}
-              disabled={!options}
-              required
-            >
-              {options?.productConditions.map((o) => (
-                <option className="options" key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-            {touched.condition && errors.condition && <p className="field-error">{errors.condition}</p>}
-          </label>
-
-          <label>
-            Pris exkl. moms
-            <input
-              className="input"
+              id="product-price"
+              className={`input ${touched.priceExVat && errors.priceExVat ? "input-error" : ""}`}
               type="number"
               step="0.01"
               min={0}
               value={form.priceExVat}
-              onChange={(e) => setField("priceExVat", e.target.value === "" ? 0 : (Number(e.target.value) as any))}
+              onChange={(e) =>
+                setField("priceExVat", e.target.value === "" ? 0 : (Number(e.target.value) as any))
+              }
               onBlur={() => validateNow()}
             />
-            {touched.priceExVat && errors.priceExVat && <p className="field-error">{errors.priceExVat}</p>}
-          </label>
+            <span className="input-suffix">kr</span>
+          </div>
+          {touched.priceExVat && errors.priceExVat && (
+            <p className="field-error">{errors.priceExVat}</p>
+          )}
+        </div>
 
-          <label>
-            Moms
-            <div className="vat-group">
-              <select
-                className="input"
-                value={String(clampVatRatePercent(form.vatRatePercent))}
-                onChange={(e) => setField("vatRatePercent", Number(e.target.value) as any)}
-                onBlur={() => validateNow()}
-                disabled={!options}
-                required
-              >
-                {vatOptions
-                  .slice()
-                  .sort((a: any, b: any) => (a.intValue ?? a.value) - (b.intValue ?? b.value))
-                  .map((o: any) => {
-                    const v = Number(o.intValue ?? o.value);
-                    return (
-                      <option className="options" key={v} value={v}>
-                        {o.label ?? `${v}%`}
-                      </option>
-                    );
-                  })}
-              </select>
+        <div className="field">
+          <label htmlFor="product-vat" className="field-label">Moms</label>
+          <select
+            id="product-vat"
+            className={`input ${touched.vatRatePercent && errors.vatRatePercent ? "input-error" : ""}`}
+            value={String(clampVatRatePercent(form.vatRatePercent))}
+            onChange={(e) => setField("vatRatePercent", Number(e.target.value) as any)}
+            onBlur={() => validateNow()}
+            disabled={!options}
+            required
+          >
+            {vatOptions
+              .slice()
+              .sort((a: any, b: any) => (a.intValue ?? a.value) - (b.intValue ?? b.value))
+              .map((o: any) => {
+                const v = Number(o.intValue ?? o.value);
+                return (
+                  <option key={v} value={v}>
+                    {o.label ?? `${v}%`}
+                  </option>
+                );
+              })}
+          </select>
 
-              <span className="muted" title="Beräknat från exkl. moms + momssats">
-                Inkl: {priceIncVat} kr
-              </span>
-            </div>
-            {touched.vatRatePercent && errors.vatRatePercent && <p className="field-error">{errors.vatRatePercent}</p>}
-          </label>
+          <div className="meta-pill" title="Beräknat från exkl. moms + momssats">
+            Inkl. moms: <strong>{priceIncVat} kr</strong>
+          </div>
 
-          <label>
-            Lager (On hand)
+          {touched.vatRatePercent && errors.vatRatePercent && (
+            <p className="field-error">{errors.vatRatePercent}</p>
+          )}
+        </div>
+
+        <div className="field">
+          <label htmlFor="product-stock" className="field-label">Lager (On hand)</label>
+          <div className="input-with-suffix">
             <input
-              className="input"
+              id="product-stock"
+              className={`input ${touched.onHand && errors.onHand ? "input-error" : ""}`}
               type="number"
               min={0}
               value={form.onHand}
-              onChange={(e) => setField("onHand", e.target.value === "" ? 0 : (Number(e.target.value) as any))}
+              onChange={(e) =>
+                setField("onHand", e.target.value === "" ? 0 : (Number(e.target.value) as any))
+              }
               onBlur={() => validateNow()}
             />
-            {touched.onHand && errors.onHand && <p className="field-error">{errors.onHand}</p>}
-          </label>
-
-          <div className="row">
-            <label>
-              Produktbilder
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => onPickImage(e.target.files?.[0])}
-                disabled={loading || isUploadingImage}
-              />
-              {isUploadingImage && <p className="muted">Laddar upp bild…</p>}
-              {(touched as any).images && (errors as any).images && <p className="field-error">{(errors as any).images}</p>}
-            </label>
-
-            <div>
-              {heroUrl ? <img src={heroUrl} alt="Preview" /> : <p className="muted">Ingen bild vald</p>}
-            </div>
+            <span className="input-suffix">st</span>
           </div>
+          {touched.onHand && errors.onHand && <p className="field-error">{errors.onHand}</p>}
+        </div>
+      </div>
+    </section>
 
-          {!!(form.images?.length ?? 0) && (
+    <section className="product-image-group editor-child editor-child-4">
+      <div className="product-image-header">
+        <label className="product-image-upload">
+          <span className="label">Produktbilder</span>
+
+          <input
+            className="sr-only"
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              onPickImage(e.target.files?.[0]);
+              e.currentTarget.value = "";
+            }}
+            disabled={loading || isUploadingImage}
+          />
+
+          <span className={`btn ${loading || isUploadingImage ? "is-disabled" : ""}`}>
+            {isUploadingImage ? "Laddar upp..." : "Ladda upp bild"}
+          </span>
+        </label>
+
+        {isUploadingImage && <p className="muted">Laddar upp bild...</p>}
+        {(touched as any).images && (errors as any).images && (
+          <p className="field-error">{(errors as any).images}</p>
+        )}
+      </div>
+
+      <div className="product-image-layout">
+        <section className="primary-image-panel">
+          <h4>Primärbild</h4>
+
+          {heroUrl ? (
+            <div className="primary-image-frame">
+              <img src={heroUrl} alt="Primär produktbild" />
+            </div>
+          ) : (
+            <div className="primary-image-empty">
+              <p className="muted">Ingen primärbild vald</p>
+            </div>
+          )}
+        </section>
+
+        <section className="secondary-images-panel">
+          <h4>Övriga bilder</h4>
+
+          {!!(form.images?.length ?? 0) ? (
             <div className="image-grid">
               {(form.images as any).map((img: any, idx: number) => {
                 const src = resolveImageUrl(img.url);
                 const isPrimary = Boolean(img.isPrimary);
 
                 return (
-                  <div key={`${img.url}-${idx}`} className={`image-tile ${isPrimary ? "is-primary" : ""}`}>
-                    <button type="button" className="thumb" onClick={() => setSelectedUrl(img.url)}>
-                      <img src={src} alt={img.altText ?? form.name ?? "Product image"} />
-                    </button>
-
-                    <div className="image-actions">
+                  <div
+                    key={`${img.url}-${idx}`}
+                    className={`image-tile ${isPrimary ? "is-primary" : ""}`}
+                  >
+                    <div className="image-tile-media">
                       <button
                         type="button"
-                        className="btn"
-                        onClick={() => onMakePrimary(idx)}
-                        disabled={loading || isUploadingImage}
+                        className="thumb"
+                        onClick={() => setSelectedUrl(img.url)}
+                        aria-label={`Visa bild ${idx + 1}`}
                       >
-                        {isPrimary ? "Primär" : "Gör primär"}
+                        <img
+                          src={src}
+                          alt={img.altText ?? form.name ?? `Produktbild ${idx + 1}`}
+                        />
                       </button>
 
-                      <button
-                        type="button"
-                        className="btn"
-                        onClick={() => onRemoveImage(idx)}
-                        disabled={loading || isUploadingImage}
-                      >
-                        Ta bort
-                      </button>
+                      <div className="image-overlay-actions">
+                        {!isPrimary && (
+                          <button
+                            type="button"
+                            className="icon-btn make-primary-btn"
+                            onClick={() => onMakePrimary(idx)}
+                            disabled={loading || isUploadingImage}
+                            title="Sätt som primärbild"
+                            aria-label="Sätt som primärbild"
+                          >
+                            ★
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          className="icon-btn delete-btn"
+                          onClick={() => onRemoveImage(idx)}
+                          disabled={loading || isUploadingImage}
+                          title="Ta bort bild"
+                          aria-label="Ta bort bild"
+                        >
+                          <i className="fa-solid fa-trash"></i>
+                        </button>
+                      </div>
+
+                      {isPrimary && <span className="primary-badge">Primär</span>}
                     </div>
 
                     <input
@@ -469,17 +572,33 @@ const { data: options } = useQuery({
                 );
               })}
             </div>
+          ) : (
+            <p className="muted">Inga bilder uppladdade ännu.</p>
           )}
+        </section>
+      </div>
 
-          <div className="row actions">
-            <button type="button" className="btn" onClick={onCancel} disabled={loading || isUploadingImage}>
-              Avbryt
-            </button>
-            <button type="submit" className="btn" disabled={loading || isUploadingImage}>
-              {loading ? "Sparar…" : isUploadingImage ? "Laddar bild…" : "Spara"}
-            </button>
-          </div>
-        </form>
+      <div className="row actions">
+        <button
+          type="button"
+          className="btn"
+          onClick={onCancel}
+          disabled={loading || isUploadingImage}
+        >
+          Avbryt
+        </button>
+
+        <button
+          type="submit"
+          className="btn"
+          disabled={loading || isUploadingImage}
+        >
+          {loading ? "Sparar..." : isUploadingImage ? "Laddar bild..." : "Spara"}
+        </button>
+      </div>
+    </section>
+  </div>
+</form>
       </div>
     </div>
   );
