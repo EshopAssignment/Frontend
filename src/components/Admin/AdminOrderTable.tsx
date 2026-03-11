@@ -1,5 +1,6 @@
+import { OrderStatus } from "@/api";
+import { asNum } from "@/helpers/money";
 import { fmtUtc } from "@/helpers/orderFormat";
-import { STATUS_TO_NUM, STATUSES, toStatusKey, type StatusKey } from "@/helpers/orderStatus";
 import type { AdminOrderListItem, AdminOrderStatus } from "@/Services/adminOrderService";
 
 type Props = {
@@ -9,12 +10,15 @@ type Props = {
   disabled?: boolean;
 };
 
+const STATUSES = Object.values(OrderStatus)
+
 export function AdminOrderTable({
   items,
   onOpenDetails,
   onChangeStatus,
   disabled = false,
-}: Props) {
+}: Props)
+ {
   return (
     <table className="admin-table">
       <thead>
@@ -31,7 +35,7 @@ export function AdminOrderTable({
 
       <tbody>
         {items.map((row) => {
-          const statusKey = toStatusKey(row.orderStatus);
+          const id = asNum(row.id, NaN);
 
           return (
             <tr key={row.id}>
@@ -41,16 +45,16 @@ export function AdminOrderTable({
               <td>{row.customerEmail}</td>
 
               <td>
-                <select
+<select
                   className="input"
-                  value={statusKey}
+                  value={row.orderStatus}
                   onChange={(e) => {
-                    const key = e.target.value as StatusKey;
-                    onChangeStatus(row.id, STATUS_TO_NUM[key] as AdminOrderStatus);
+                    if (!Number.isFinite(id)) return;
+                    onChangeStatus(id, e.target.value as AdminOrderStatus);
                   }}
-                  disabled={disabled}
+                  disabled={disabled || !Number.isFinite(id)}
                 >
-                  {STATUSES.map((status) => (
+                    {STATUSES.map((status) => (
                     <option className="options" key={status} value={status}>
                       {status}
                     </option>
@@ -64,7 +68,7 @@ export function AdminOrderTable({
                 <button
                   type="button"
                   className="btn"
-                  onClick={() => onOpenDetails(row.id)}
+                  onClick={() => onOpenDetails(id)}
                   disabled={disabled}
                 >
                   Detaljer

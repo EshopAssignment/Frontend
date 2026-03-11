@@ -1,6 +1,5 @@
 import { priceIncVat, lineIncVat } from "@/helpers/money";
 import { fmtUtc, fmtSEK } from "@/helpers/orderFormat";
-import { toStatusKey } from "@/helpers/orderStatus";
 import type { AdminOrderDetails } from "@/Services/adminOrderService";
 import { useEffect, useState } from "react";
 
@@ -61,7 +60,7 @@ export function OrderDetailsModal({
 
           <div className="admin-order-tracking">
             <span>Orderstatus</span>
-            <p>Status: {toStatusKey(order.orderStatus)}</p>
+            <p>Status: {order.orderStatus}</p>
             <p>Skapad: {fmtUtc(order.createdAtUtc)}</p>
           </div>
 
