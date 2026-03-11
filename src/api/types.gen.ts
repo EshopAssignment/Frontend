@@ -192,7 +192,51 @@ export type OrderCreatedDto = {
     userId: null | number | string;
 };
 
-export type OrderStatus = number;
+export type OrderDetailsDto = {
+    orderId: number | string;
+    orderNumber: string;
+    createdAtUtc: string;
+    currency: string;
+    productsSubtotal: number | string;
+    shippingCost: number | string;
+    vatTotal: number | string;
+    grandTotal: number | string;
+    orderStatus: OrderStatus;
+    paymentStatus: PaymentStatus;
+    customerFirstName: null | string;
+    customerLastName: null | string;
+    customerEmail: null | string;
+    customerPhoneNumber: null | string;
+    shippingAddress: null | ShippingAddressDto;
+    shippingCarrier: ShippingCarrier;
+    shippingMethod: ShippingMethod;
+    servicePointId: null | string;
+    trackingNumber: null | string;
+    trackingUrl: null | string;
+    items: Array<OrderItemDto>;
+    userId: null | number | string;
+};
+
+export type OrderItemDto = {
+    productId: number | string;
+    productName: string;
+    quantity: number | string;
+    unitPriceExVat: number | string;
+    lineTotalExVat: number | string;
+};
+
+export const OrderStatus = {
+    PENDING: 'Pending',
+    CONFIRMED: 'Confirmed',
+    PROCESSING: 'Processing',
+    SHIPPED: 'Shipped',
+    COMPLETED: 'Completed',
+    CANCELLED: 'Cancelled',
+    FAILED: 'Failed',
+    REFUNDED: 'Refunded'
+} as const;
+
+export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
 
 export type PagedResultOfAdminOrderListItemDto = {
     page?: number | string;
@@ -210,7 +254,17 @@ export type PagedResultOfProductDto = {
     items?: Array<ProductDto>;
 };
 
-export type PaymentStatus = number;
+export const PaymentStatus = {
+    NONE: 'None',
+    REQUIRES_PAYMENT: 'RequiresPayment',
+    AUTHORIZED: 'Authorized',
+    CAPTURED: 'Captured',
+    FAILED: 'Failed',
+    CANCELLED: 'Cancelled',
+    REFUNDED: 'Refunded'
+} as const;
+
+export type PaymentStatus = typeof PaymentStatus[keyof typeof PaymentStatus];
 
 export type ProblemDetails = {
     type?: null | string;
@@ -310,9 +364,17 @@ export type ShippingAddressDto = {
     country: string;
 };
 
-export type ShippingCarrier = number;
+export const ShippingCarrier = { NONE: 'None', POST_NORD: 'PostNord' } as const;
 
-export type ShippingMethod = number;
+export type ShippingCarrier = typeof ShippingCarrier[keyof typeof ShippingCarrier];
+
+export const ShippingMethod = {
+    NONE: 'None',
+    SERVICE_POINT: 'ServicePoint',
+    HOME_DELIVERY: 'HomeDelivery'
+} as const;
+
+export type ShippingMethod = typeof ShippingMethod[keyof typeof ShippingMethod];
 
 export type ToggleActiveRequest = {
     isActive: boolean;
@@ -945,7 +1007,7 @@ export type GetApiMeOrdersByOrderNumberResponses = {
     /**
      * OK
      */
-    200: OrderCreatedDto;
+    200: OrderDetailsDto;
 };
 
 export type GetApiMeOrdersByOrderNumberResponse = GetApiMeOrdersByOrderNumberResponses[keyof GetApiMeOrdersByOrderNumberResponses];
@@ -997,7 +1059,7 @@ export type GetApiOrderByIdResponses = {
     /**
      * OK
      */
-    200: OrderCreatedDto;
+    200: OrderDetailsDto;
 };
 
 export type GetApiOrderByIdResponse = GetApiOrderByIdResponses[keyof GetApiOrderByIdResponses];
@@ -1024,7 +1086,7 @@ export type GetApiOrderByNumberByOrderNumberResponses = {
     /**
      * OK
      */
-    200: OrderCreatedDto;
+    200: OrderDetailsDto;
 };
 
 export type GetApiOrderByNumberByOrderNumberResponse = GetApiOrderByNumberByOrderNumberResponses[keyof GetApiOrderByNumberByOrderNumberResponses];

@@ -1,10 +1,11 @@
-import { updateOrderShippingAddress, type OrderDto } from "@/Services/orderService";
+import { updateOrderShippingAddress} from "@/Services/orderService";
 import React, { useEffect, useMemo, useState } from "react";
+import type { OrderDetailsDto } from "@/api";
 
 
 type Props = {
     orderNumber:string;
-    order: OrderDto;
+    order: OrderDetailsDto;
     locked?: boolean;
     onSaved:() => void;
 }

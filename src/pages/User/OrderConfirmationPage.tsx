@@ -1,6 +1,6 @@
 import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import type { OrderCreatedDto } from "../../Services/orderService";
+import type { OrderCreatedDto } from "@/api/types.gen";
 import { getOrderById, getOrderByNumber } from "../../Services/orderService";
 import { useCart } from "@/context/CartContext";
 import { useEffect } from "react";

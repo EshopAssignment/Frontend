@@ -1,21 +1,26 @@
 import { useCart } from "@/context/CartContext";
 import { createPaymentIntent } from "@/Services/paymentService";
-import { getOrderByNumber, type OrderDto } from "@/Services/orderService";
+import { getOrderByNumber } from "@/Services/orderService";
 import ShippingPicker from "@/components/Shipping/ShippingPicker";
 
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 import PersonalForm from "../Checkout/PersonalForm";
 import DeliveryForm from "../Checkout/DeliveryForm";
 import CartSummary from "../Checkout/CartSummary";
+import { orderQk } from "@/constants/queryKeys";
+import { ShippingCarrier, ShippingMethod } from "@/api/types.gen";
 
 const pk = import.meta.env.VITE_STRIPE_PK;
 if (!pk) throw new Error("VITE_STRIPE_PK saknas i .env");
+
 const stripePromise = loadStripe(pk);
 
-function Form({ orderNumber }: { orderNumber: string }) {
+function PaymentForm({ orderNumber }: { orderNumber: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
@@ -25,19 +30,25 @@ function Form({ orderNumber }: { orderNumber: string }) {
     if (!stripe || !elements) return;
 
     setSubmitting(true);
+
     const { error } = await stripe.confirmPayment({
       elements,
-      confirmParams: { return_url: `${location.origin}/order/thank-you/${orderNumber}` },
+      confirmParams: {
+        return_url: `${location.origin}/order/thank-you/${orderNumber}`,
+      },
     });
+
     setSubmitting(false);
 
-    if (error) console.error(error.message);
+    if (error) {
+      console.error(error.message);
+    }
   }
 
   return (
     <form onSubmit={onSubmit}>
       <PaymentElement />
-      <button disabled={!stripe || submitting}>
+      <button type="submit" disabled={!stripe || submitting}>
         {submitting ? "Bearbetar…" : "Betala"}
       </button>
     </form>
@@ -46,37 +57,31 @@ function Form({ orderNumber }: { orderNumber: string }) {
 
 export default function Checkout() {
   const { cartId } = useCart();
+  const queryClient = useQueryClient();
   const { orderNumber } = useParams<{ orderNumber: string }>();
 
   const [err, setErr] = useState<string | null>(null);
-
-  const [order, setOrder] = useState<OrderDto | null>(null);
-  const [orderLoading, setOrderLoading] = useState(false);
-
   const [clientSecret, setClientSecret] = useState<string | undefined>(undefined);
   const [payLoading, setPayLoading] = useState(false);
 
+  const orderQuery = useQuery({
+    queryKey: orderNumber ? orderQk.byNumber(orderNumber) : orderQk.byNumber("missing"),
+    queryFn: ({ signal }) => getOrderByNumber(orderNumber!, { signal }),
+    enabled: !!orderNumber,
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+
+  const order = orderQuery.data;
+
   const refresh = useCallback(async () => {
     if (!orderNumber) return;
-    setErr(null);
-    setOrderLoading(true);
-    try{
-      const o = await getOrderByNumber(orderNumber);
-      console.log("[refresh normalized order]", o);
-      setOrder(o)
-    } catch (e:any) {
-      setErr(e?.message ?? "Kunde inte hämta oroder");
-    } finally {
-      setOrderLoading(false)
-    }
-  }, [orderNumber])
+    await queryClient.invalidateQueries({ queryKey: orderQk.byNumber(orderNumber) });
+  }, [orderNumber, queryClient]);
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  const customerReady = useMemo ( () => {
+  const customerReady = useMemo(() => {
     if (!order) return false;
+
     return !!(
       order.customerFirstName?.trim() &&
       order.customerLastName?.trim() &&
@@ -84,34 +89,33 @@ export default function Checkout() {
     );
   }, [order]);
 
-  const addressReady = useMemo (() => {
-    const a = order?.shippingAddress;
+  const addressReady = useMemo(() => {
+    const address = order?.shippingAddress;
+
     return !!(
-      a?.street?.trim() &&
-      a?.city?.trim() &&
-      a?.postalCode?.trim() &&
-      a?.country?.trim()
+      address?.street?.trim() &&
+      address?.city?.trim() &&
+      address?.postalCode?.trim() &&
+      address?.country?.trim()
     );
   }, [order]);
 
-  const postalCode = useMemo (() => {
+  const postalCode = useMemo(() => {
     return order?.shippingAddress?.postalCode?.trim() ?? "";
-  }, [order])
+  }, [order]);
 
   const shippingReady = useMemo(() => {
-    if (!order) return false
+    if (!order) return false;
 
-    if(order.shippingCarrier && order.shippingMethod) {
-      return order.shippingCarrier !== "None" && order.shippingMethod !== "None"
-    }
-
-    return Number(order.shippingCost ?? 0) > 0;
-  },  [order]);
+    return (
+      order.shippingCarrier !== ShippingCarrier.NONE &&
+      order.shippingMethod !== ShippingMethod.NONE
+    );
+  }, [order]);
 
   useEffect(() => {
-    if (!orderNumber) return;
-    if(!order) return;
-    if(!customerReady || !addressReady || !shippingReady) return
+    if (!orderNumber || !order) return;
+    if (!customerReady || !addressReady || !shippingReady) return;
     if (clientSecret) return;
 
     let alive = true;
@@ -119,47 +123,64 @@ export default function Checkout() {
     setPayLoading(true);
 
     createPaymentIntent(orderNumber, cartId)
-    .then((r) => {
-      if(!alive) return
-      setClientSecret(r.clientSecret);
-    })
-    .catch((e) =>{
-      if (!alive) return;
-      setErr(e?.message ?? "Kunde inte starta betalning")
-    })
-    .finally(() => {
-      if (!alive) return;
-      setPayLoading(false)
-    });
+      .then((result) => {
+        if (!alive) return;
+        setClientSecret(result.clientSecret);
+      })
+      .catch((error: unknown) => {
+        if (!alive) return;
+
+        setErr(
+          error instanceof Error
+            ? error.message
+            : "Kunde inte starta betalning."
+        );
+      })
+      .finally(() => {
+        if (!alive) return;
+        setPayLoading(false);
+      });
 
     return () => {
       alive = false;
     };
   }, [orderNumber, cartId, order, customerReady, addressReady, shippingReady, clientSecret]);
 
-  if (!orderNumber) return <p className="container">Ordernummer saknas.</p>;
-  if (err) return <p className="container">{err}</p>;
-  if (orderLoading || !order) return <p className="container">Laddar order…</p>;
+  if (!orderNumber) {
+    return <p className="container">Ordernummer saknas.</p>;
+  }
+
+  if (err) {
+    return <p className="container">{err}</p>;
+  }
+
+  if (orderQuery.isLoading) {
+    return <p className="container">Laddar order…</p>;
+  }
+
+  if (orderQuery.isError || !order) {
+    return <p className="container">Kunde inte hämta order.</p>;
+  }
 
   return (
     <section>
       <div className="container">
-
         <CartSummary />
-        
-        <PersonalForm
-        orderNumber={orderNumber}
-        order={order}
-        onSaved={() => refresh()} />
-        
-        <DeliveryForm
-        orderNumber={orderNumber}
-        order={order}
-        locked={!customerReady}
-        onSaved={() => refresh()}
-         />
 
-         {!shippingReady && (
+        <PersonalForm
+          orderNumber={orderNumber}
+          order={order}
+          onSaved={() => void refresh()}
+        />
+
+        <DeliveryForm
+          orderNumber={orderNumber}
+          order={order}
+          locked={!customerReady}
+          onSaved={() => void refresh()}
+        />
+
+        {!shippingReady && (
           <div>
             {!addressReady || !postalCode ? (
               <p>Fyll i leveransuppgifter (postnummer) för att välja frakt.</p>
@@ -167,7 +188,7 @@ export default function Checkout() {
               <ShippingPicker
                 orderNumber={orderNumber}
                 postalCode={postalCode}
-                onSelectionSaved={() => refresh()}
+                onSelectionSaved={() => void refresh()}
               />
             )}
           </div>
@@ -176,12 +197,16 @@ export default function Checkout() {
         {shippingReady && (
           <div className="stripe-container">
             {payLoading && !clientSecret && <p>Laddar betalning…</p>}
+
             {clientSecret && (
               <Elements
                 stripe={stripePromise}
-                options={{ clientSecret, appearance: { theme: "night" } }}
+                options={{
+                  clientSecret,
+                  appearance: { theme: "night" },
+                }}
               >
-                <Form orderNumber={orderNumber} />
+                <PaymentForm orderNumber={orderNumber} />
               </Elements>
             )}
           </div>
