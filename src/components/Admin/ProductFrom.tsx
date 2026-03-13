@@ -293,7 +293,6 @@ const { data: options } = useQuery({
     <section className="form-card form-card-main editor-child editor-child-1">
       <div className="form-card-header">
         <h3>Produktinformation</h3>
-        <p className="muted">Grundläggande information om produkten.</p>
       </div>
 
       <div className="field-stack">
@@ -330,7 +329,6 @@ const { data: options } = useQuery({
     <section className="form-card editor-child editor-child-2">
       <div className="form-card-header">
         <h3>Kategori</h3>
-        <p className="muted">Välj typ av pall och skick.</p>
       </div>
 
       <div className="field-grid field-grid-2">
@@ -383,7 +381,6 @@ const { data: options } = useQuery({
     <section className="form-card editor-child editor-child-3">
       <div className="form-card-header">
         <h3>Pris och lager</h3>
-        <p className="muted">Sätt pris, moms och antal i lager.</p>
       </div>
 
       <div className="field-grid field-grid-3">
