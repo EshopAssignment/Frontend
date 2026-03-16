@@ -2,27 +2,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding:4rem;
+    padding:4rem;min-height: 50px;
 }
 
 .footer{
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
+    padding: 2rem;min-height: 50px;
 }
 main {
   min-height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr auto;
-}
-
-header {
-  min-height: 50px;
-}
-
-footer {
-  min-height: 50px;
 }
 
 .confirmation-view{
