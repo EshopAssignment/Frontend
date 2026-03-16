@@ -15,8 +15,20 @@
 
 /* Tablet landscape */
 @media (min-width: 992px) and (max-width: 1199px) {
+    main{
+        max-width: 95svw;
+    }
     .product-image.phone-only{
         display: none;
+    }
+        .footer{
+        max-width: 95svw;
+    }
+    .header{
+        max-width: 95svw;
+    }
+    .btn-wrapper{
+        right: 4rem;
     }
 
 }
@@ -89,12 +101,20 @@
         gap:1rem;
         border-bottom: 1px solid var(--border);
     }
+    .details-content{
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 /* Phone */
 @media (max-width: 767px) {
+    .footer{
+        max-width: 95svw;
+    }
     .header{
-        padding:1rem;
+        padding:.2rem;
+        max-width: 95svw;
     }
     .top-bar{
         display: grid;
@@ -148,9 +168,8 @@
     .details-content{
         display: flex;
         flex-direction: column;
-        .details-hero{
-            display: flex;
-        }
+        max-width: 95svw;
+        margin:0 auto;
     }
     .details-name, .details-desc, .details-price{
         padding:0;

@@ -37,6 +37,6 @@
 /* Phone */
 @media (max-width: 767px) {
     .container {
-        max-width: 100%;
+        max-width: 95svw;
     }
 }
