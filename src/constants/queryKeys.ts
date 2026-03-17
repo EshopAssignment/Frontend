@@ -1,3 +1,6 @@
+import type { AdminProductListParams } from "@/Services/adminProductService";
+
+
 export const adminOrderQk = {
   all: ["admin-orders"] as const,
   lists: () => [...adminOrderQk.all, "list"] as const,
@@ -10,8 +13,8 @@ export const adminOrderQk = {
 export const adminProductQk = {
   all: ["admin-products"] as const,
   lists: () => [...adminProductQk.all, "list"] as const,
-  list: (page: number, pageSize: number) =>
-    [...adminProductQk.lists(), { page, pageSize }] as const,
+  list: (params: AdminProductListParams) =>
+    [...adminProductQk.lists(), params] as const,
   details: () => [...adminProductQk.all, "detail"] as const,
   detail: (id: number) => [...adminProductQk.details(), id] as const,
   options: () => [...adminProductQk.all, "options"] as const,

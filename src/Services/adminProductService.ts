@@ -23,6 +23,18 @@ export type AdminCreateReq = apiTypes.AdminCreateProductRequestDto;
 export type AdminUpdateReq = apiTypes.AdminUpdateProductRequestDto;
 export type ToggleActiveReq = apiTypes.ToggleActiveRequest;
 
+export type AdminProductListParams = {
+  page?: number;
+  pageSize?: number;
+  query?: string;
+  sort?: "price_asc" | "price_desc" | "name_asc" | "name_desc";
+  type?: string[];
+  condition?: string[];
+  minPrice?: number;
+  maxPrice?: number;
+  isActive?: boolean;
+};
+
 function toAdminProduct(product: apiTypes.ProductDto): AdminProduct {
   return {
     ...product,
@@ -35,17 +47,9 @@ function toAdminProduct(product: apiTypes.ProductDto): AdminProduct {
   };
 }
 
-export async function adminListProductsQuery(params: {
-  page?: number;
-  pageSize?: number;
-  query?: string;
-  sort?: "price_asc" | "price_desc" | "name_asc" | "name_desc";
-  type?: string[];
-  condition?: string[];
-  minPrice?: number;
-  maxPrice?: number;
-  isActive?: boolean;
-}): Promise<AdminPagedProducts> {
+export async function adminListProducts(
+  params: AdminProductListParams = {}
+): Promise<AdminPagedProducts> {
   const res = await sdk.getApiAdminProducts({ client: api, query: params });
   if (res.error) throw res.error;
 
@@ -62,13 +66,6 @@ export async function adminListProductsQuery(params: {
     ...data,
     items: (data.items ?? []).map(toAdminProduct),
   };
-}
-
-export async function adminListProducts(
-  page: number,
-  pageSize: number
-): Promise<AdminPagedProducts> {
-  return adminListProductsQuery({ page, pageSize });
 }
 
 export async function adminGetProduct(id: number): Promise<AdminProduct> {
