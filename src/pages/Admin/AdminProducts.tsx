@@ -1,21 +1,25 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import {
   adminListProducts,
   type AdminCreateReq,
   type AdminUpdateReq,
   type AdminProduct,
+  type AdminProductListParams,
 } from "../../Services/adminProductService";
 
 import ProductTable from "../../components/Admin/ProductTable";
 import ProductForm from "../../components/Admin/ProductFrom";
+import AdminProductFilterBar from "@/components/AdminProductFilter";
 
 import { hasMissingRequiredForActive } from "@/lib/productValidation";
 import { adminProductQk } from "@/constants/queryKeys";
 import { asNum } from "@/helpers/money";
 import { useAdminProductMutations } from "@/hooks/Products/useAdminProductMutations";
-import toast from "react-hot-toast";
+import { readAdminDraftFromSearchParams } from "@/helpers/adminProductFilterParams";
 
 const PAGE_SIZE = 20;
 
@@ -34,13 +38,32 @@ function canActivateProduct(product: AdminProduct) {
 }
 
 export default function AdminProducts() {
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [editing, setEditing] = useState<number | null>(null);
   const [creating, setCreating] = useState(false);
 
+  const page = Math.max(1, Number(searchParams.get("page") ?? "1") || 1);
+  const query = searchParams.get("q") ?? "";
+  const filters = readAdminDraftFromSearchParams(searchParams);
+
+  const params: AdminProductListParams = {
+    page,
+    pageSize: PAGE_SIZE,
+    query: query || undefined,
+    sort: filters.sort || undefined,
+    type: filters.type.length ? filters.type : undefined,
+    condition: filters.condition.length ? filters.condition : undefined,
+    minPrice: filters.minPrice ? Number(filters.minPrice) : undefined,
+    maxPrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,
+    isActive:
+      filters.isActive === ""
+        ? undefined
+        : filters.isActive === "true",
+  };
+
   const list = useQuery({
-    queryKey: adminProductQk.list(page, PAGE_SIZE),
-    queryFn: () => adminListProducts(page, PAGE_SIZE),
+    queryKey: adminProductQk.list(params),
+    queryFn: () => adminListProducts(params),
     placeholderData: keepPreviousData,
     staleTime: 10_000,
   });
@@ -57,6 +80,12 @@ export default function AdminProducts() {
     }
     return map;
   }, [list.data?.items]);
+
+  function setPage(nextPage: number) {
+    const next = new URLSearchParams(searchParams);
+    next.set("page", String(nextPage));
+    setSearchParams(next);
+  }
 
   function handleToggle(id: number, current: boolean) {
     const next = !current;
@@ -105,6 +134,8 @@ export default function AdminProducts() {
               Ny produkt
             </button>
           </div>
+
+          <AdminProductFilterBar />
         </div>
       </div>
 
@@ -117,8 +148,8 @@ export default function AdminProducts() {
             data={list.data.items ?? []}
             page={page}
             totalPages={totalPages}
-            onPrev={() => setPage((prev) => Math.max(1, prev - 1))}
-            onNext={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+            onPrev={() => setPage(Math.max(1, page - 1))}
+            onNext={() => setPage(Math.min(totalPages, page + 1))}
             onEdit={setEditing}
             onToggle={handleToggle}
           />
