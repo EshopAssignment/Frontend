@@ -15,8 +15,10 @@ export type ProductFilters = {
   sort?: SortUi;
   type?: string[];
   condition?: string[];
-  min?: number;
-  max?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+  key?: string;
 };
 
 function normalizeFilters(filters: ProductFilters) {
@@ -25,8 +27,9 @@ function normalizeFilters(filters: ProductFilters) {
     sort: filters.sort || undefined,
     type: filters.type?.length ? [...filters.type].sort() : undefined,
     condition: filters.condition?.length ? [...filters.condition].sort() : undefined,
-    min: Number.isFinite(filters.min as number) ? filters.min : undefined,
-    max: Number.isFinite(filters.max as number) ? filters.max : undefined,
+    minPrice: Number.isFinite(filters.minPrice as number) ? filters.minPrice : undefined,
+    maxPrice: Number.isFinite(filters.maxPrice as number) ? filters.maxPrice : undefined,
+    inStock: filters.inStock === true ? true : undefined,
   };
 }
 
@@ -34,7 +37,7 @@ export function useProductsPaged(page: number, pageSize: number, filters: Produc
   const normalized = normalizeFilters(filters);
 
   return useQuery<PagedProducts>({
-    queryKey: productQk.paged(page, pageSize, normalized),
+    queryKey: productQk.paged(page, pageSize, filters.key ?? normalized),
     queryFn: ({ signal }) =>
       getProductsPaged(page, pageSize, {
         signal,
@@ -42,8 +45,9 @@ export function useProductsPaged(page: number, pageSize: number, filters: Produc
         sort: normalized.sort,
         type: normalized.type,
         condition: normalized.condition,
-        minPrice: normalized.min,
-        maxPrice: normalized.max,
+        minPrice: normalized.minPrice,
+        maxPrice: normalized.maxPrice,
+        inStock: normalized.inStock,
       }),
     placeholderData: keepPreviousData,
     staleTime: 10_000,
