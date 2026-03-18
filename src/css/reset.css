@@ -3,6 +3,9 @@
     margin:0;
     box-sizing: border-box;
 }
+html{
+    accent-color: var(--sidebar-ring);
+}
 
 a{
     text-decoration: none;
