@@ -23,6 +23,8 @@ export function readDraftFromSearchParams(sp:URLSearchParams): ProductFilterDraf
 export function writeDraftToSearchParams(sp: URLSearchParams, draft: ProductFilterDraft): URLSearchParams {
     const next = new URLSearchParams(sp);
 
+    next.delete("page");
+
     if (draft.sort) next.set("sort", draft.sort);
     else next.delete("sort");
 
