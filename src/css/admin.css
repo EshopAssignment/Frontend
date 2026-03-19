@@ -107,6 +107,91 @@
     }
 }
 
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  width: 90%;
+  margin: 0 auto;
+  padding: 1rem 1rem 0.8rem 1rem;
+  gap: 1rem;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-nav-group {
+  display: flex;
+  gap: 1.2rem;
+}
+
+.admin-nav {
+  position: relative;
+  padding: 0.5rem 0.6rem;
+  text-decoration: none;
+
+  color: var(--foreground);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+
+  transition: all 0.2s ease;
+}
+
+.admin-nav::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+
+  width: 0%;
+  height: 2px;
+
+  background: var(--gradient-primary);
+
+  transition: width 0.25s ease;
+}
+
+/* hover */
+.admin-nav:hover {
+  color: var(--primary);
+}
+
+.admin-nav:hover::after {
+  width: 100%;
+}
+
+.admin-nav.active {
+  color: var(--primary);
+}
+
+.admin-nav.active::after {
+  width: 100%;
+}
+
+
+.admin-header button {
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius6);
+  border: 1px solid transparent;
+
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+
+  font-weight: 500;
+
+  transition: all 0.2s ease;
+}
+
+.admin-header button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--destructive) 40%, transparent);
+}
+
+.admin-header button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+
 
 
 
@@ -121,7 +206,7 @@
 .switch input { display:none }
 .slider { position:absolute; cursor:pointer; inset:0; background:#666; border-radius:999px; transition:.2s }
 .slider:before{ content:""; position:absolute; height:18px; width:18px; left:2px; top:2px; background:white; border-radius:50%; transition:.2s }
-.switch input:checked + .slider{ background:#2aa }
+.switch input:checked + .slider{ background:var(--accent) }
 .switch input:checked + .slider:before{ transform:translateX(18px) }
 
 .modal{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.45); z-index:1000 }
