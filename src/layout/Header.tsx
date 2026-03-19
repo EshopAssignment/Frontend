@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import TopBarGroup from "../components/Buttons/TopBarGroup";
 import Searchbar from "../components/Searchbar";
 
@@ -11,9 +11,9 @@ const Header = () => {
         <div className="top-bar">
 
           <div className="logo">
-            <Link to="/products">
-              <img src="./src/images/pallet-logo-placeholder.png" alt="Logga" />
-            </Link>
+            <NavLink to="/">
+              <img src="./src/images/logo.png" alt="Logga" />
+            </NavLink>
           </div>
           
           <Searchbar />

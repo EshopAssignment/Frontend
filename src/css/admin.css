@@ -190,7 +190,14 @@
   transform: translateY(0);
   box-shadow: none;
 }
+.admin-filters-toolbar{
+  display:grid;
+  justify-content:space-between;
+  align-items:center;
+  gap:1rem;
+  margin:.5rem 0;
 
+}
 
 
 
@@ -216,7 +223,7 @@
     border-radius:12px;
     padding:1rem;
     width: 90svw;
-    height: 90svh;
+    height: 95svh;
 }
 .modal-panel > :nth-child(1) {
     border-bottom: 1px solid var(--border);
@@ -312,9 +319,7 @@
   display: grid;
   gap: 1rem;
   padding: 1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius4);
-  box-shadow: var(--shadow)
+
 }
 
 .product-image-header {
