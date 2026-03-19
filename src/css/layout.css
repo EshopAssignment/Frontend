@@ -5,12 +5,7 @@
     padding:4rem;min-height: 50px;
 }
 
-.footer{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;min-height: 50px;
-}
+
 main {
   min-height: 100vh;
   display: grid;
