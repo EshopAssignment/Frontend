@@ -141,6 +141,9 @@
             font-size: 1.5rem;
         }
     }
+    .logo{
+        max-width: 100%;
+    }
     .form-group{
         display: flex;
         flex-direction: column;

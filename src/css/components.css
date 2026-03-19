@@ -14,8 +14,8 @@
     max-width: 100svw;
 }
 .header-text{
-    margin:0 auto;
     text-align: center;
+    font-size: 36px;
 }
 .options{
     background: transparent;
@@ -68,27 +68,18 @@
     padding:2rem;
 }
 .logo{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 80px;
-    width: 80px;
-    border-radius: var(--radius100);
-    overflow:hidden;
-    a{
-        img{
-            height: 80px;
-            width: 80px;
-        }
-
-    }
+    max-width: 20%;
 }
 .top-bar{
-    display: grid;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap:1rem
+    /* display: grid;
     grid-template-columns:auto 1fr auto;
     gap:2rem;
     align-items: center;
-    justify-content: start;
+    justify-content: start; */
 }
 .btn-group{
     display: flex;

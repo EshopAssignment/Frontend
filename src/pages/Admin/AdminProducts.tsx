@@ -126,7 +126,8 @@ export default function AdminProducts() {
   return (
     <section>
       <div className="container">
-        <div className="center-content">
+        <div className="product-toolbox">
+          
           <h1 className="header-text">Produkter</h1>
 
           <div className="admin-actions">
@@ -136,6 +137,7 @@ export default function AdminProducts() {
           </div>
 
           <AdminProductFilterBar />
+
         </div>
       </div>
 

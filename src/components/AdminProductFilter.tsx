@@ -114,7 +114,7 @@ export default function AdminProductFilterBar() {
 
   return (
     <>
-      <div className="filters-toolbar">
+      <div className="admin-filters-toolbar">
         <div className="filters-left">
           <button type="button" className="btn" onClick={openDialog}>
             Filtrera
