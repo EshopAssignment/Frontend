@@ -148,6 +148,8 @@ export type ForgotPasswordDto = {
     email: string;
 };
 
+export type IFormFile = Blob | File;
+
 export type LoginDto = {
     email: string;
     password: string;
@@ -863,6 +865,35 @@ export type PostApiBlobUploadRequestResponses = {
 };
 
 export type PostApiBlobUploadRequestResponse = PostApiBlobUploadRequestResponses[keyof PostApiBlobUploadRequestResponses];
+
+export type PostApiCustomRequestsData = {
+    body: {
+        Name?: string;
+        Email?: string;
+        Phone?: string;
+        Message?: string;
+        File?: IFormFile;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/custom-requests';
+};
+
+export type PostApiCustomRequestsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+};
+
+export type PostApiCustomRequestsError = PostApiCustomRequestsErrors[keyof PostApiCustomRequestsErrors];
+
+export type PostApiCustomRequestsResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type GetApiMeData = {
     body?: never;
