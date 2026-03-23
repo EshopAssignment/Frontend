@@ -276,4 +276,15 @@
         max-width: 100svw;
         width: auto;
     }
+
+    .form-group.custom-order-form{
+    align-items: center;
+    .input-group{
+        width: inherit;
+    }
+    .btn{
+        margin:1rem 0;
+    }
+    
+}
 }
