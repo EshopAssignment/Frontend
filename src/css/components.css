@@ -556,6 +556,14 @@ button:hover{
     align-items: center;
     gap:.5rem;
 }
+
+.form-group.custom-order-form{
+    width: 90%;
+    .input-group{
+        width: inherit;
+    }
+    
+}
 /*#endregion */
 /*#region details*/
 .details-content{
