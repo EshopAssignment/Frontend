@@ -27,7 +27,7 @@ export type AdminProductListParams = {
   page?: number;
   pageSize?: number;
   query?: string;
-  sort?: "price_asc" | "price_desc" | "name_asc" | "name_desc";
+  sort?: "price_asc" | "price_desc" | "name_asc" | "name_desc" | "popular";
   type?: string[];
   condition?: string[];
   minPrice?: number;
