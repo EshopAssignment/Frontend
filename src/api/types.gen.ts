@@ -16,6 +16,29 @@ export type AdminCreateProductRequestDto = {
     isActive: boolean;
 };
 
+export type AdminDashboardDto = {
+    summary: AdminDashboardSummaryDto;
+    revenueSeries: Array<AdminDashboardSeriesPointDto>;
+    topProductsByUnits: Array<AdminTopProductDto>;
+    topProductsByRevenue: Array<AdminTopProductDto>;
+    statusBreakdown: Array<AdminOrderStatusCountDto>;
+    recentOrders: Array<AdminOrderListItemDto>;
+};
+
+export type AdminDashboardSeriesPointDto = {
+    label: string;
+    revenue: number | string;
+    orders: number | string;
+    unitsSold: number | string;
+};
+
+export type AdminDashboardSummaryDto = {
+    revenue: number | string;
+    orderCount: number | string;
+    unitsSold: number | string;
+    averageOrderValue: number | string;
+};
+
 export type AdminOrderDetailsDto = {
     id: number | string;
     orderNumber: string;
@@ -68,6 +91,11 @@ export type AdminOrderListItemDto = {
     paymentMethod: string;
 };
 
+export type AdminOrderStatusCountDto = {
+    orderStatus: OrderStatus;
+    count: number | string;
+};
+
 export type AdminProductImageRequestDto = {
     url: string;
     sortOrder: number | string;
@@ -84,6 +112,14 @@ export type AdminProductOptionsDto = {
 export type AdminSetTrackingRequest = {
     trackingNumber: string;
     markAsShipped?: boolean;
+};
+
+export type AdminTopProductDto = {
+    productId: number | string;
+    productName: string;
+    sku: null | string;
+    unitsSold: number | string;
+    revenue: number | string;
 };
 
 export type AdminUpdateOrderStatusRequest = {
@@ -427,6 +463,26 @@ export type UserProfileDto = {
     defaultShippingAddressId: null | number | string;
     addresses: Array<UserAddressDto>;
 };
+
+export type GetApiAdminDashboardData = {
+    body?: never;
+    path?: never;
+    query?: {
+        range?: string;
+        fromUtc?: string;
+        toUtc?: string;
+    };
+    url: '/api/admin/dashboard';
+};
+
+export type GetApiAdminDashboardResponses = {
+    /**
+     * OK
+     */
+    200: AdminDashboardDto;
+};
+
+export type GetApiAdminDashboardResponse = GetApiAdminDashboardResponses[keyof GetApiAdminDashboardResponses];
 
 export type GetApiAdminOrdersData = {
     body?: never;

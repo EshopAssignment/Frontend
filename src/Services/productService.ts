@@ -5,7 +5,7 @@ import type * as apiTypes from "@/api/types.gen";
 export type PagedProducts = apiTypes.PagedResultOfProductDto;
 export type ProductDto = apiTypes.ProductDto;
 export type ProductSuggestionDto = apiTypes.ProductSuggestionDto;
-export type SortUi = "price_asc" | "price_desc" | "name_asc" | "name_desc";
+export type SortUi = "price_asc" | "price_desc" | "name_asc" | "name_desc" | "popular";
 
 function cleanQueryParams<T extends object>(obj: T): Partial<T> {
   const out: Partial<T> = {};

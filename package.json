@@ -23,6 +23,7 @@
     "react-hook-form": "^7.68.0",
     "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.9.6",
+    "recharts": "^3.8.0",
     "swiper": "^12.1.2",
     "tailwindcss": "^4.1.18"
   },

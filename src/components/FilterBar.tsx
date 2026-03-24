@@ -28,6 +28,7 @@ const SORT_OPTIONS = [
   { value: "price_desc", label: "Pris: högst först" },
   { value: "name_asc", label: "Namn: A–Ö" },
   { value: "name_desc", label: "Namn: Ö–A" },
+  { value: "popular", label: "Namn: Populärt" },
 ] as const;
 
 const PALLET_TYPES = [
