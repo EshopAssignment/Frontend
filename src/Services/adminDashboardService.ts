@@ -2,7 +2,7 @@ import {api} from "@/lib/http";
 import * as sdk from "@/api/sdk.gen";
 import type * as apiTypes from "@/api/types.gen";
 
-export type DashboardRange = "today" | "7d" | "30d" | "1y" | "custom"; 
+export type DashboardRange = "today" | "7d" | "30d" | "90d" | "1y" | "custom";
 
 export type AdminDashboard = apiTypes.AdminDashboardDto;
 
