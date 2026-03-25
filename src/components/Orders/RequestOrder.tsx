@@ -1,15 +1,20 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useState,
+  type ChangeEvent,
+  type FocusEvent,
+  type FormEvent,
+} from "react";
 import { createCustomRequest } from "@/Services/customRequestService";
+import {
+  type RequestOrderFormErrors,
+  type RequestOrderFormState,
+  type RequestOrderTouchedState,
+  requestOrderHasErrors,
+  validateRequestOrderField,
+  validateRequestOrderForm,
+} from "@/helpers/Validation/requestOrderValidation";
 
-type FormState = {
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
-  file: File | null;
-};
-
-const initialState: FormState = {
+const initialState: RequestOrderFormState = {
   name: "",
   email: "",
   phone: "",
@@ -18,46 +23,135 @@ const initialState: FormState = {
 };
 
 const RequestOrder = () => {
-  const [form, setForm] = useState<FormState>(initialState);
+  const [form, setForm] = useState<RequestOrderFormState>(initialState);
+  const [errors, setErrors] = useState<RequestOrderFormErrors>({});
+  const [touched, setTouched] = useState<RequestOrderTouchedState>({});
+  const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { id, value } = e.target;
+    const field = id as keyof RequestOrderFormState;
 
-    setForm((prev) => ({
+    setForm((prev) => {
+      const next = {
+        ...prev,
+        [field]: value,
+      };
+
+      if (touched[field]) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [field]: validateRequestOrderField(field, next[field]),
+        }));
+      }
+
+      return next;
+    });
+
+    if (isSuccess) setIsSuccess(false);
+    if (submitError) setSubmitError("");
+  }
+
+  function handleBlur(e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    const field = e.target.id as keyof RequestOrderFormState;
+
+    setTouched((prev) => ({
       ...prev,
-      [id]: value,
+      [field]: true,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [field]: validateRequestOrderField(field, form[field]),
     }));
   }
 
   function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
 
-    setForm((prev) => ({
+    setForm((prev) => {
+      const next = {
+        ...prev,
+        file,
+      };
+
+      if (touched.file) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          file: validateRequestOrderField("file", next.file),
+        }));
+      }
+
+      return next;
+    });
+
+    if (isSuccess) setIsSuccess(false);
+    if (submitError) setSubmitError("");
+  }
+
+  function handleFileBlur() {
+    setTouched((prev) => ({
       ...prev,
-      file,
+      file: true,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      file: validateRequestOrderField("file", form.file),
     }));
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    setIsSubmitting(true);
+    const nextTouched: RequestOrderTouchedState = {
+      name: true,
+      email: true,
+      phone: true,
+      message: true,
+      file: true,
+    };
+
+    const nextErrors = validateRequestOrderForm(form);
+
+    setTouched(nextTouched);
+    setErrors(nextErrors);
+    setSubmitError("");
     setIsSuccess(false);
 
-    await createCustomRequest({
-      Name: form.name,
-      Email: form.email,
-      Phone: form.phone,
-      Message: form.message,
-      File: form.file ?? undefined,
-    });
+    if (requestOrderHasErrors(nextErrors)) {
+      return;
+    }
 
-    setForm(initialState);
-    setIsSuccess(true);
-    setIsSubmitting(false);
+    try {
+      setIsSubmitting(true);
+
+      await createCustomRequest({
+        Name: form.name.trim(),
+        Email: form.email.trim(),
+        Phone: form.phone.trim(),
+        Message: form.message.trim(),
+        File: form.file ?? undefined,
+      });
+
+      setForm(initialState);
+      setErrors({});
+      setTouched({});
+      setIsSuccess(true);
+    } catch {
+      setSubmitError("Något gick fel när förfrågan skulle skickas. Försök igen.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
+
+  const nameError = touched.name ? errors.name : "";
+  const emailError = touched.email ? errors.email : "";
+  const phoneError = touched.phone ? errors.phone : "";
+  const messageError = touched.message ? errors.message : "";
+  const fileError = touched.file ? errors.file : "";
 
   return (
     <section className="container" aria-labelledby="request-order-heading">
@@ -73,7 +167,7 @@ const RequestOrder = () => {
         </p>
       </div>
 
-      <form className="form" onSubmit={handleSubmit}>
+      <form className="form" onSubmit={handleSubmit} noValidate>
         <div className="form-head">
           <h2>Special order</h2>
         </div>
@@ -85,12 +179,19 @@ const RequestOrder = () => {
             </label>
             <input
               id="name"
-              className="input"
+              className={`input ${nameError ? "input-error" : ""}`}
               type="text"
               value={form.name}
               onChange={handleChange}
-              required
+              onBlur={handleBlur}
+              aria-invalid={!!nameError}
+              aria-describedby={nameError ? "name-error" : undefined}
             />
+            {nameError && (
+              <p id="name-error" className="error" role="alert">
+                {nameError}
+              </p>
+            )}
           </div>
 
           <div className="input-group">
@@ -99,12 +200,19 @@ const RequestOrder = () => {
             </label>
             <input
               id="email"
-              className="input"
+              className={`input ${emailError ? "input-error" : ""}`}
               type="email"
               value={form.email}
               onChange={handleChange}
-              required
+              onBlur={handleBlur}
+              aria-invalid={!!emailError}
+              aria-describedby={emailError ? "email-error" : undefined}
             />
+            {emailError && (
+              <p id="email-error" className="error" role="alert">
+                {emailError}
+              </p>
+            )}
           </div>
 
           <div className="input-group">
@@ -113,11 +221,19 @@ const RequestOrder = () => {
             </label>
             <input
               id="phone"
-              className="input"
+              className={`input ${phoneError ? "input-error" : ""}`}
               type="tel"
               value={form.phone}
               onChange={handleChange}
+              onBlur={handleBlur}
+              aria-invalid={!!phoneError}
+              aria-describedby={phoneError ? "phone-error" : undefined}
             />
+            {phoneError && (
+              <p id="phone-error" className="error" role="alert">
+                {phoneError}
+              </p>
+            )}
           </div>
 
           <div className="input-group">
@@ -126,12 +242,19 @@ const RequestOrder = () => {
             </label>
             <textarea
               id="message"
-              className="input textarea"
+              className={`input textarea ${messageError ? "input-error" : ""}`}
               rows={6}
               value={form.message}
               onChange={handleChange}
-              required
+              onBlur={handleBlur}
+              aria-invalid={!!messageError}
+              aria-describedby={messageError ? "message-error" : undefined}
             />
+            {messageError && (
+              <p id="message-error" className="error" role="alert">
+                {messageError}
+              </p>
+            )}
           </div>
 
           <div className="input-group">
@@ -140,18 +263,35 @@ const RequestOrder = () => {
             </label>
             <input
               id="file"
-              className="input"
+              className={`input ${fileError ? "input-error" : ""}`}
               type="file"
               accept=".pdf,.png,.jpg,.jpeg,.webp"
               onChange={handleFileChange}
+              onBlur={handleFileBlur}
+              aria-invalid={!!fileError}
+              aria-describedby={fileError ? "file-error" : "file-help"}
             />
 
-            {form.file && (
-              <p className="file-name">
-                Vald fil: {form.file.name}
+            <p id="file-help" className="field-help">
+              Tillåtna format: PDF, PNG, JPG, JPEG, WEBP. Max 10 MB.
+            </p>
+
+            {form.file && !fileError && (
+              <p className="file-name">Vald fil: {form.file.name}</p>
+            )}
+
+            {fileError && (
+              <p id="file-error" className="error" role="alert">
+                {fileError}
               </p>
             )}
           </div>
+
+          {submitError && (
+            <p className="form-error" role="alert">
+              {submitError}
+            </p>
+          )}
 
           {isSuccess && (
             <p className="form-success" role="status" aria-live="polite">
