@@ -30,7 +30,14 @@ i{
     background-color:var(--destructive);
     font-size: 14px;
     color:white !important;
-    
+}
+.field-help {
+  margin-top: 0.35rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+.input-error {
+  border-color: var(--destructive)!important;
 }
 
 .loading-msg{
