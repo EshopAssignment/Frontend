@@ -13,6 +13,13 @@ const AdminHeader = () => {
       }
   return (
     <header className="admin-header">            
+      <div className="admin-logo">
+        <NavLink to="/">
+          <img src="./src/images/logo.png" alt="Logga" />
+        </NavLink>
+      </div>
+
+
 
     <nav className="admin-nav-group">
         <NavLink to="/" className="admin-nav">Back to start</NavLink>
@@ -20,9 +27,6 @@ const AdminHeader = () => {
         <NavLink to="admin-request" className="admin-nav" end>Quotes</NavLink>
         <NavLink to="admin-products" className="admin-nav">Products</NavLink>
         <NavLink to="admin-orders" className="admin-nav">Orders</NavLink>
-    </nav>
-
-
         <button
         type="button"
         onClick={handleLogout}
@@ -30,6 +34,9 @@ const AdminHeader = () => {
         >
         Logga ut
         </button>
+    </nav>
+
+
     </header>
   );
 };
