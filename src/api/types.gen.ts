@@ -374,14 +374,6 @@ export const OrderStatus = {
 
 export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
 
-export type PagedResultOfAdminCustomRequestDetailsDto = {
-    page?: number | string;
-    pageSize?: number | string;
-    totalItems?: number | string;
-    totalPages?: number | string;
-    items?: Array<AdminCustomRequestDetailsDto>;
-};
-
 export type PagedResultOfAdminCustomRequestListItemDto = {
     page?: number | string;
     pageSize?: number | string;
@@ -605,7 +597,7 @@ export type PostApiAdminCustomQuotesByIdSendResponses = {
 
 export type PostApiAdminCustomQuotesByIdSendResponse = PostApiAdminCustomQuotesByIdSendResponses[keyof PostApiAdminCustomQuotesByIdSendResponses];
 
-export type GetApiAdminCustomRequestData = {
+export type GetApiAdminCustomRequestsData = {
     body?: never;
     path?: never;
     query?: {
@@ -614,62 +606,62 @@ export type GetApiAdminCustomRequestData = {
         query?: string;
         status?: string;
     };
-    url: '/api/admin/custom-request';
+    url: '/api/admin/custom-requests';
 };
 
-export type GetApiAdminCustomRequestResponses = {
+export type GetApiAdminCustomRequestsResponses = {
     /**
      * OK
      */
     200: PagedResultOfAdminCustomRequestListItemDto;
 };
 
-export type GetApiAdminCustomRequestResponse = GetApiAdminCustomRequestResponses[keyof GetApiAdminCustomRequestResponses];
+export type GetApiAdminCustomRequestsResponse = GetApiAdminCustomRequestsResponses[keyof GetApiAdminCustomRequestsResponses];
 
-export type GetApiAdminCustomRequestByIdData = {
+export type GetApiAdminCustomRequestsByIdData = {
     body?: never;
     path: {
-        id: number | string;
+        id: number;
     };
     query?: never;
-    url: '/api/admin/custom-request/{id}';
+    url: '/api/admin/custom-requests/{id}';
 };
 
-export type GetApiAdminCustomRequestByIdErrors = {
+export type GetApiAdminCustomRequestsByIdErrors = {
     /**
      * Not Found
      */
     404: ProblemDetails;
 };
 
-export type GetApiAdminCustomRequestByIdError = GetApiAdminCustomRequestByIdErrors[keyof GetApiAdminCustomRequestByIdErrors];
+export type GetApiAdminCustomRequestsByIdError = GetApiAdminCustomRequestsByIdErrors[keyof GetApiAdminCustomRequestsByIdErrors];
 
-export type GetApiAdminCustomRequestByIdResponses = {
+export type GetApiAdminCustomRequestsByIdResponses = {
     /**
      * OK
      */
-    200: PagedResultOfAdminCustomRequestDetailsDto;
+    200: AdminCustomRequestDetailsDto;
 };
 
-export type GetApiAdminCustomRequestByIdResponse = GetApiAdminCustomRequestByIdResponses[keyof GetApiAdminCustomRequestByIdResponses];
+export type GetApiAdminCustomRequestsByIdResponse = GetApiAdminCustomRequestsByIdResponses[keyof GetApiAdminCustomRequestsByIdResponses];
 
-export type PostApiAdminCustomRequestByIdQuotesData = {
+export type PostApiAdminCustomRequestsByIdQuotesData = {
     body: AdminCreateCustomQuoteDto;
     path: {
         id: number;
     };
     query?: never;
-    url: '/api/admin/custom-request/{id}/quotes';
+    url: '/api/admin/custom-requests/{id}/quotes';
 };
 
-export type PostApiAdminCustomRequestByIdQuotesResponses = {
+export type PostApiAdminCustomRequestsByIdQuotesResponses = {
     /**
      * Created
      */
     201: AdminCustomQuoteDetailsDto;
 };
 
-export type PostApiAdminCustomRequestByIdQuotesResponse = PostApiAdminCustomRequestByIdQuotesResponses[keyof PostApiAdminCustomRequestByIdQuotesResponses];
+export type PostApiAdminCustomRequestsByIdQuotesResponse = PostApiAdminCustomRequestsByIdQuotesResponses[keyof PostApiAdminCustomRequestsByIdQuotesResponses];
 
 export type GetApiAdminDashboardData = {
     body?: never;
