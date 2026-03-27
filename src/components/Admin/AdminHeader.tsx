@@ -17,7 +17,8 @@ const AdminHeader = () => {
     <nav className="admin-nav-group">
         <NavLink to="/" className="admin-nav">Back to start</NavLink>
         <NavLink to="/admin" className="admin-nav" end>Dashbord</NavLink>
-        <NavLink to="adminproducts" className="admin-nav">Products</NavLink>
+        <NavLink to="admin-request" className="admin-nav" end>Quotes</NavLink>
+        <NavLink to="admin-products" className="admin-nav">Products</NavLink>
         <NavLink to="admin-orders" className="admin-nav">Orders</NavLink>
     </nav>
 

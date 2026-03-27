@@ -41,3 +41,9 @@ export const orderQk = {
   byNumber: (orderNumber: string) =>
     [...orderQk.all, "by-number", orderNumber] as const,
 };
+
+export const adminCustomRequestQk = {
+  all: ["admin-custom-requests"] as const,
+  list: (params: unknown) => ["admin-custom-requests", "list", params] as const,
+  detail: (id: number) => ["admin-custom-requests", "detail", id] as const,
+};

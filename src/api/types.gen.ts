@@ -4,6 +4,21 @@ export type ClientOptions = {
     baseUrl: 'https://localhost:7152/' | (string & {});
 };
 
+export type AdminCreateCustomQuoteDto = {
+    title: string;
+    customerMessage: null | string;
+    internalNote: null | string;
+    expiresAtUtc: null | string;
+    items: Array<AdminCreateCustomQuoteItemDto>;
+};
+
+export type AdminCreateCustomQuoteItemDto = {
+    description: string;
+    quantity: number | string;
+    unitPriceExVat: number | string;
+    vatRatePercent: number | string;
+};
+
 export type AdminCreateProductRequestDto = {
     name: string;
     description: string;
@@ -14,6 +29,69 @@ export type AdminCreateProductRequestDto = {
     onHand: number | string;
     images: Array<AdminProductImageRequestDto>;
     isActive: boolean;
+};
+
+export type AdminCustomQuoteDetailsDto = {
+    id: number | string;
+    customRequestId: number | string;
+    title: string;
+    currency: string;
+    customerMessage: null | string;
+    internalNote: null | string;
+    createdAtUtc: string;
+    sentAtUtc: null | string;
+    expiresAtUtc: null | string;
+    status: string;
+    subtotalExVat: number | string;
+    vatTotal: number | string;
+    totalIncVat: number | string;
+    items: Array<AdminCustomQuoteItemDto>;
+};
+
+export type AdminCustomQuoteItemDto = {
+    description: string;
+    quantity: number | string;
+    unitPriceExVat: number | string;
+    vatRatePercent: number | string;
+    unitVatAmount: number | string;
+    unitPriceIncVat: number | string;
+    lineTotalExVat: number | string;
+    lineTotalVat: number | string;
+    lineTotalIncVat: number | string;
+};
+
+export type AdminCustomQuoteListItemDto = {
+    id: number | string;
+    createdAtUtc: string;
+    title: string;
+    status: CustomQuoteStatus;
+    totalIncVat: number | string;
+    sentAtUtc: null | string;
+    expiresAtUtc: null | string;
+};
+
+export type AdminCustomRequestDetailsDto = {
+    id: number | string;
+    createdAtUtc: string;
+    name: string;
+    email: string;
+    phone: null | string;
+    message: string;
+    status: CustomRequestStatus;
+    attachmentFileName: null | string;
+    attachmentBlobPath: null | string;
+    internalNote: null | string;
+    quotes: Array<AdminCustomQuoteListItemDto>;
+};
+
+export type AdminCustomRequestListItemDto = {
+    id: number | string;
+    createdAtUtc: string;
+    name: string;
+    email: string;
+    phone: null | string;
+    status: CustomRequestStatus;
+    hasAttachment: boolean;
 };
 
 export type AdminDashboardDto = {
@@ -174,6 +252,26 @@ export type CreateOrderRequestDto = {
     reservationTtlMinutes?: number | string;
 };
 
+export const CustomQuoteStatus = {
+    DRAFT: 'Draft',
+    SENT: 'Sent',
+    ACCEPTED: 'Accepted',
+    REJECTED: 'Rejected',
+    EXPIRED: 'Expired'
+} as const;
+
+export type CustomQuoteStatus = typeof CustomQuoteStatus[keyof typeof CustomQuoteStatus];
+
+export const CustomRequestStatus = {
+    NEW: 'New',
+    REVIEWED: 'Reviewed',
+    QUOTED: 'Quoted',
+    CLOSED: 'Closed',
+    REJECTED: 'Rejected'
+} as const;
+
+export type CustomRequestStatus = typeof CustomRequestStatus[keyof typeof CustomRequestStatus];
+
 export type EnumOptionDto = {
     value: string;
     label: string;
@@ -275,6 +373,14 @@ export const OrderStatus = {
 } as const;
 
 export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
+
+export type PagedResultOfAdminCustomRequestListItemDto = {
+    page?: number | string;
+    pageSize?: number | string;
+    totalItems?: number | string;
+    totalPages?: number | string;
+    items?: Array<AdminCustomRequestListItemDto>;
+};
 
 export type PagedResultOfAdminOrderListItemDto = {
     page?: number | string;
@@ -463,6 +569,99 @@ export type UserProfileDto = {
     defaultShippingAddressId: null | number | string;
     addresses: Array<UserAddressDto>;
 };
+
+export type PostApiAdminCustomQuotesByIdSendData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/admin/custom-quotes/{id}/send';
+};
+
+export type PostApiAdminCustomQuotesByIdSendErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PostApiAdminCustomQuotesByIdSendError = PostApiAdminCustomQuotesByIdSendErrors[keyof PostApiAdminCustomQuotesByIdSendErrors];
+
+export type PostApiAdminCustomQuotesByIdSendResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type PostApiAdminCustomQuotesByIdSendResponse = PostApiAdminCustomQuotesByIdSendResponses[keyof PostApiAdminCustomQuotesByIdSendResponses];
+
+export type GetApiAdminCustomRequestsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number | string;
+        pageSize?: number | string;
+        query?: string;
+        status?: string;
+    };
+    url: '/api/admin/custom-requests';
+};
+
+export type GetApiAdminCustomRequestsResponses = {
+    /**
+     * OK
+     */
+    200: PagedResultOfAdminCustomRequestListItemDto;
+};
+
+export type GetApiAdminCustomRequestsResponse = GetApiAdminCustomRequestsResponses[keyof GetApiAdminCustomRequestsResponses];
+
+export type GetApiAdminCustomRequestsByIdData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/admin/custom-requests/{id}';
+};
+
+export type GetApiAdminCustomRequestsByIdErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetApiAdminCustomRequestsByIdError = GetApiAdminCustomRequestsByIdErrors[keyof GetApiAdminCustomRequestsByIdErrors];
+
+export type GetApiAdminCustomRequestsByIdResponses = {
+    /**
+     * OK
+     */
+    200: AdminCustomRequestDetailsDto;
+};
+
+export type GetApiAdminCustomRequestsByIdResponse = GetApiAdminCustomRequestsByIdResponses[keyof GetApiAdminCustomRequestsByIdResponses];
+
+export type PostApiAdminCustomRequestsByIdQuotesData = {
+    body: AdminCreateCustomQuoteDto;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/admin/custom-requests/{id}/quotes';
+};
+
+export type PostApiAdminCustomRequestsByIdQuotesResponses = {
+    /**
+     * Created
+     */
+    201: AdminCustomQuoteDetailsDto;
+};
+
+export type PostApiAdminCustomRequestsByIdQuotesResponse = PostApiAdminCustomRequestsByIdQuotesResponses[keyof PostApiAdminCustomRequestsByIdQuotesResponses];
 
 export type GetApiAdminDashboardData = {
     body?: never;
