@@ -45,9 +45,9 @@ const AppRouter = () => {
       <Route path="/admin" element={<AdminLayout />}>
         <Route element={<RequireAdmin />}> 
           <Route index element={<AdminDash />} /> 
-          <Route path="adminproducts" element={<AdminProducts />} />
+          <Route path="admin-products" element={<AdminProducts />} />
           <Route path="admin-orders" element={<AdminOrders />} />
-          <Route path="admin-custom-requests" element={<AdminCustomRequests />} />
+          <Route path="admin-request" element={<AdminCustomRequests />} />
         </Route> 
       </Route>
 
