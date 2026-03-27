@@ -11,24 +11,23 @@ import {
 import { adminCustomRequestQk } from "@/constants/queryKeys";
 import { getErrorMessage } from "@/helpers/getErrorMessage";
 
-export function useAdminCustomRequestList(params: AdminCustomRequestListParams) {
-    return useQuery({
-        queryKey: adminCustomRequestQk.list(params),
-        queryFn: () => adminListCustomRequests(params),
-        placeholderData: keepPreviousData,
-        staleTime: 10_000,
-    });
+export function useAdminCustomRequestsList(params: AdminCustomRequestListParams) {
+  return useQuery({
+    queryKey: adminCustomRequestQk.list(params),
+    queryFn: () => adminListCustomRequests(params),
+    placeholderData: keepPreviousData,
+    staleTime: 10_000,
+  });
 }
 
 export function useAdminCustomRequest(id: number | null) {
-    return useQuery({
-        queryKey: id != null ? adminCustomRequestQk.detail(id) : ["admin-custom-requests", "detail", "none"],
-        queryFn: () => adminGetCustomRequestById(id!),
-        enabled: id != null,
-        staleTime: 10_000,
-    });
+  return useQuery({
+    queryKey: id != null ? adminCustomRequestQk.detail(id) : ["admin-custom-requests", "detail", "none"],
+    queryFn: () => adminGetCustomRequestById(id!),
+    enabled: id != null,
+    staleTime: 10_000,
+  });
 }
-
 
 export function useAdminCustomRequestMutations(selectedId: number | null) {
   const qc = useQueryClient();
