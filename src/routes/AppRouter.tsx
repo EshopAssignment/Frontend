@@ -25,6 +25,7 @@ import Checkout from "@/components/Stripe/Checkout";
 import VerifyEmail from "@/pages/Auth/VerifyEmail";
 import ResetPassword from "@/pages/Auth/ResetPassword";
 import ForgotPasswordPage from "@/pages/Auth/ForgotPasswordPage";
+import AdminCustomRequests from "@/pages/Admin/AdminCustomRequests";
 
 
 
@@ -46,6 +47,7 @@ const AppRouter = () => {
           <Route index element={<AdminDash />} /> 
           <Route path="adminproducts" element={<AdminProducts />} />
           <Route path="admin-orders" element={<AdminOrders />} />
+          <Route path="admin-custom-requests" element={<AdminCustomRequests />} />
         </Route> 
       </Route>
 
