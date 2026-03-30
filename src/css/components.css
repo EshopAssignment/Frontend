@@ -939,7 +939,14 @@ button:hover{
         width: 100%;
     }
 }
-
+.auth-header{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--border);
+    margin:1rem 3rem;
+    max-height: 150px;
+}
 .auth-form{
     display: flex;
     flex-direction: column;
