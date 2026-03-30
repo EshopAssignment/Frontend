@@ -68,10 +68,6 @@ export default function CustomRequestDetails({
           <div className="admin-message-box">{data.message}</div>
         </div>
 
-        <div>
-          <h3>Intern anteckning</h3>
-          <p>{data.internalNote || "Ingen intern anteckning."}</p>
-        </div>
 
         {data.attachmentFileName && (
           <div>
@@ -89,17 +85,20 @@ export default function CustomRequestDetails({
             <div className="admin-quote-list">
               {data.quotes.map((quote) => (
                 <div key={quote.id} className="admin-quote-item">
-                  <div>
-                    <strong>{quote.title}</strong>
-                    <p>Status: {formatStatus(quote.status)}</p>
-                    <p>Skapad: {new Date(quote.createdAtUtc).toLocaleString("sv-SE")}</p>
-                    {quote.sentAtUtc && (
-                      <p>Skickad: {new Date(quote.sentAtUtc).toLocaleString("sv-SE")}</p>
-                    )}
-                    {quote.expiresAtUtc && (
-                      <p>Gäller till: {new Date(quote.expiresAtUtc).toLocaleDateString("sv-SE")}</p>
-                    )}
-                  </div>
+             <div>
+                  <strong>{quote.title}</strong>
+                  <p>Status: {formatStatus(quote.status)}</p>
+                  <p>Skapad: {new Date(quote.createdAtUtc).toLocaleString("sv-SE")}</p>
+                  {quote.sentAtUtc && (
+                    <p>Skickad: {new Date(quote.sentAtUtc).toLocaleString("sv-SE")}</p>
+                  )}
+                  {quote.expiresAtUtc && (
+                    <p>Gäller till: {new Date(quote.expiresAtUtc).toLocaleDateString("sv-SE")}</p>
+                  )}
+                  {quote.internalNote && (
+                    <p>Intern anteckning: {quote.internalNote}</p>
+                  )}
+              </div>
 
                   <div className="admin-quote-item__side">
                     <strong>{fmtSEK(Number(quote.totalIncVat ?? 0))}</strong>
