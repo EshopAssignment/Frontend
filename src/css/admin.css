@@ -474,7 +474,7 @@
 .admin-header {
   display: flex;
   align-items: center;
-  justify-content: end;
+  justify-content: space-between;
   width: 90%;
   margin: 0 auto;
   padding: 1rem 1rem 0.8rem 1rem;
@@ -1083,4 +1083,13 @@
   .admin-quote-row {
     grid-template-columns: 1fr;
   }
+}
+
+.admin-logo{
+  max-height: 50px;
+  max-width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: start;
 }
