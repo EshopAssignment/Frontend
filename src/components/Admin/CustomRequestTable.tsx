@@ -64,7 +64,7 @@ export default function CustomRequestTable({
               </div>
 
               <div className="custom-request-list__bottom">
-                <span>{new Date(item.createdAtUtc).toLocaleString("sv-SE")}</span>
+                <span>{new Date(item.updatedAtUtc).toLocaleString("sv-SE")}</span>
                 {item.hasAttachment && <span>Bilaga</span>}
               </div>
             </button>

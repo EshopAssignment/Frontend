@@ -66,6 +66,7 @@ export type AdminCustomQuoteListItemDto = {
     title: string;
     status: CustomQuoteStatus;
     totalIncVat: number | string;
+    internalNote: null | string;
     sentAtUtc: null | string;
     expiresAtUtc: null | string;
 };
@@ -87,6 +88,7 @@ export type AdminCustomRequestDetailsDto = {
 export type AdminCustomRequestListItemDto = {
     id: number | string;
     createdAtUtc: string;
+    updatedAtUtc: string;
     name: string;
     email: string;
     phone: null | string;
