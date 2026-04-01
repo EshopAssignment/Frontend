@@ -10,32 +10,33 @@ export type ReopenFulfillmentRequest = apiTypes.ReopenFulfillmentRequest;
 export type SetFulfillmentNoteRequest = apiTypes.SetFulfillmentNoteRequest;
 
 export async function listFulfillmentQueue(opts: {
-    page: number,
-    pageSize:number,
-    query?: string;
-    overdueOnly?:boolean;
-    fulfillmentStatus: FulfillmentStatus;
+  page: number;
+  pageSize: number;
+  query?: string;
+  overdueOnly?: boolean;
+  fulfillmentStatus?: FulfillmentStatus;
 }): Promise<AdminFulfillmentQueue> {
-    const res = await sdk.getApiAdminFulfillmentQueue({
-        client: api,
-        query: {
-            page:opts.page,
-            pageSize:opts.pageSize,
-            query:opts.query,
-            overdueOnly: opts.overdueOnly,
-            fulfillmentStatus: opts.fulfillmentStatus,
-        },
-    });
-    if (res.error) throw res.error;
+  const res = await sdk.getApiAdminFulfillmentQueue({
+    client: api,
+    query: {
+      page: opts.page,
+      pageSize: opts.pageSize,
+      query: opts.query,
+      overdueOnly: opts.overdueOnly,
+      fulfillmentStatus: opts.fulfillmentStatus,
+    },
+  });
 
-    return(
-        res.data?? {
-            items:[],
-            page:opts.page,
-            pageSize:opts.pageSize,
-            totalCount:0,
-        }
-    );
+  if (res.error) throw res.error;
+
+  return (
+    res.data ?? {
+      items: [],
+      page: opts.page,
+      pageSize: opts.pageSize,
+      totalCount: 0,
+    }
+  );
 }
 export async function getFulfillmentById(id:number): Promise<AdminFulfullmentOrder> {
     const res = await sdk.getApiAdminFulfillmentByOrderId({

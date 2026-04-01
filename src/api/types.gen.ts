@@ -306,7 +306,13 @@ export type ForgotPasswordDto = {
     email: string;
 };
 
-export type FulfillmentStatus = number;
+export const FulfillmentStatus = {
+    UNREVIEWED: 'Unreviewed',
+    READY: 'Ready',
+    FULFILLED: 'Fulfilled'
+} as const;
+
+export type FulfillmentStatus = typeof FulfillmentStatus[keyof typeof FulfillmentStatus];
 
 export type IFormFile = Blob | File;
 
