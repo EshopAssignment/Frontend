@@ -9,7 +9,7 @@ type Props = {
   onOverdueOnlyChange: (value: boolean) => void;
 };
 
-export function FulfillmentFilters({
+export function AdminFulfillmentFilters({
   query,
   fulfillmentStatus,
   overdueOnly,

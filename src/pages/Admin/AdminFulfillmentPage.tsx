@@ -6,9 +6,9 @@ import {
 } from "@/Services/adminFulfillmentService";
 
 import { Pagination } from "@/components/Admin/AdminPagination";
-import { FulfillmentFilters } from "@/components/Admin/AdminFulfillmentFilters";
+import { AdminFulfillmentFilters } from "@/components/Admin/AdminFulfillmentFilters";
 import { AdminFulfillmentTable } from "@/components/Admin/AdminFulfillmentTable";
-import { FulfillmentDetailsModal } from "@/components/Admin/AdminFulfillmentModal";
+import { AdminFulfillmentModal } from "@/components/Admin/AdminFulfillmentModal";
 import { useAdminFulfillmentDetails, useAdminFulfillmentList, useMarkFulfilled, useReopenFulfillment, useSetFulfillmentNote } from "@/hooks/useFulfillment";
 
 export default function AdminFulfillmentPage() {
@@ -34,7 +34,7 @@ export default function AdminFulfillmentPage() {
     <section>
       <h1 className="header-text">Fulfillment</h1>
 
-      <FulfillmentFilters
+      <AdminFulfillmentFilters
         query={query}
         fulfillmentStatus={fulfillmentStatus}
         overdueOnly={overdueOnly}
@@ -75,7 +75,7 @@ export default function AdminFulfillmentPage() {
       )}
 
       {selectedId !== null && details.data && (
-        <FulfillmentDetailsModal
+        <AdminFulfillmentModal
           order={details.data}
           orderId={selectedId}
           onClose={() => setSelectedId(null)}

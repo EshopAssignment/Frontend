@@ -12,91 +12,146 @@ type Props = {
   saving?: boolean;
 };
 
-export function FulfillmentDetailsModal({
+function getFulfillmentLabel(order: AdminFulfillmentOrder) {
+  return order.isOverdue ? "Overdue" : order.fulfillmentStatus;
+}
+
+function getFulfillmentBadgeClass(order: AdminFulfillmentOrder) {
+  if (order.isOverdue) return "status-badge status-badge--danger";
+
+  const status = String(order.fulfillmentStatus).toLowerCase();
+
+  if (status === "fulfilled") return "status-badge status-badge--success";
+  if (status === "ready") return "status-badge status-badge--warning";
+
+  return "status-badge";
+}
+
+export function AdminFulfillmentModal({
   order,
+  orderId,
   onClose,
   onSaveNote,
   onMarkFulfilled,
   onReopen,
   saving = false,
 }: Props) {
-  const [note, setNote] = useState(order.fulfillmentNote ?? "");
+  const [note, setNote] = useState("");
 
   useEffect(() => {
     setNote(order.fulfillmentNote ?? "");
-  }, [order.fulfillmentNote, order.id]);
+  }, [order.fulfillmentNote, orderId]);
 
+  const isFulfilled = String(order.fulfillmentStatus) === "Fulfilled";
   const fullName =
     [order.customerFirstName, order.customerLastName].filter(Boolean).join(" ") ||
     "Okänd kund";
 
-  const isFulfilled = String(order.fulfillmentStatus) === "Fulfilled";
-
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal" onMouseDown={onClose}>
       <div
-        className="modal-content"
-        onClick={(e) => e.stopPropagation()}
+        className="modal-panel admin-fulfillment-modal"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="fulfillment-modal-title"
+        aria-label={`Fulfillment ${order.orderNumber}`}
+        onMouseDown={(e) => e.stopPropagation()}
       >
-        <header className="admin-card-header">
-          <div>
-            <h2 id="fulfillment-modal-title">{order.orderNumber}</h2>
-            <p>{fullName}</p>
-          </div>
-          <button type="button" onClick={onClose}>
-            Stäng
-          </button>
-        </header>
-
-        <div className="admin-modal-section">
-          <p><strong>E-post:</strong> {order.customerEmail || "-"}</p>
-          <p><strong>Telefon:</strong> {order.customerPhoneNumber || "-"}</p>
-          <p><strong>Orderstatus:</strong> {order.orderStatus}</p>
-          <p><strong>Fulfillment:</strong> {order.isOverdue ? "Overdue" : order.fulfillmentStatus}</p>
-          <p><strong>Tracking:</strong> {order.trackingNumber || "-"}</p>
-          <p><strong>Summa:</strong> {fmtSEK(Number(order.grandTotal ?? 0))}</p>
-        </div>
-
-        <div className="admin-modal-section">
-          <label htmlFor="fulfillment-note">Intern anteckning</label>
-          <textarea
-            id="fulfillment-note"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            rows={6}
-          />
-        </div>
-
-        <footer className="admin-modal-actions">
+        <div className="details-btn">
           <button
             type="button"
-            onClick={() => onSaveNote(note.trim() || null)}
-            disabled={saving}
+            className="admin-close-btn"
+            autoFocus
+            onClick={onClose}
+            aria-label="Stäng"
           >
-            Spara anteckning
+            <i className="fa-regular fa-circle-xmark" />
           </button>
+        </div>
 
-          {!isFulfilled ? (
+        <div className="admin-fulfillment-details">
+          <h3>Order: {order.orderNumber}</h3>
+
+          <div className="admin-fulfillment-info">
+            <span>Kunduppgifter</span>
+            <p>
+              Namn: {fullName}
+            </p>
+            <p>
+              Kontakt: E-post: {order.customerEmail || "-"} | Telefonnummer:{" "}
+              {order.customerPhoneNumber || "-"}
+            </p>
+          </div>
+
+          <div className="admin-fulfillment-status">
+            <span>Fulfillment</span>
+            <p>
+              Fulfillmentstatus:{" "}
+              <span className={getFulfillmentBadgeClass(order)}>
+                {getFulfillmentLabel(order)}
+              </span>
+            </p>
+            <p>Orderstatus: {order.orderStatus}</p>
+            <p>Skapad: {order.createdAt}</p>
+            <p>Bekräftad: {order.confirmedAt || "-"}</p>
+            <p>Fulfilled: {order.fulfilledAt || "-"}</p>
+            <p>Trackingnummer: {order.trackingNumber || "-"}</p>
+          </div>
+
+          <div className="admin-fulfillment-totals">
+            <span>Ordervärden</span>
+            <p>Produkter: {fmtSEK(Number(order.productsSubtotal ?? 0))}</p>
+            <p>Frakt: {fmtSEK(Number(order.shippingCost ?? 0))}</p>
+            <p>Moms: {fmtSEK(Number(order.vatTotal ?? 0))}</p>
+            <p>
+              <strong>Totalt: {fmtSEK(Number(order.grandTotal ?? 0))}</strong>
+            </p>
+          </div>
+        </div>
+
+        <div className="admin-fulfillment-side">
+          <div className="admin-fulfillment-note">
+            <span>Intern anteckning</span>
+
+            <textarea
+              className="admin-textarea"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={10}
+              placeholder="Skriv intern anteckning för fulfillment..."
+            />
+          </div>
+
+          <div className="admin-fulfillment-actions">
             <button
               type="button"
-              onClick={() => onMarkFulfilled(note.trim() || null)}
+              className="btn"
+              onClick={() => onSaveNote(note.trim() || null)}
               disabled={saving}
             >
-              Markera som fulfilled
+              Spara anteckning
             </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => onReopen(note.trim() || null)}
-              disabled={saving}
-            >
-              Återöppna
-            </button>
-          )}
-        </footer>
+
+            {!isFulfilled ? (
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => onMarkFulfilled(note.trim() || null)}
+                disabled={saving}
+              >
+                Markera som fulfilled
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="btn"
+                onClick={() => onReopen(note.trim() || null)}
+                disabled={saving}
+              >
+                Återöppna
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
