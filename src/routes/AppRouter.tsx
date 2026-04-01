@@ -26,6 +26,7 @@ import VerifyEmail from "@/pages/Auth/VerifyEmail";
 import ResetPassword from "@/pages/Auth/ResetPassword";
 import ForgotPasswordPage from "@/pages/Auth/ForgotPasswordPage";
 import AdminCustomRequests from "@/pages/Admin/AdminCustomRequests";
+import AdminFulfillmentPage from "@/pages/Admin/AdminFulfillmentPage";
 
 
 
@@ -48,6 +49,7 @@ const AppRouter = () => {
           <Route path="admin-products" element={<AdminProducts />} />
           <Route path="admin-orders" element={<AdminOrders />} />
           <Route path="admin-request" element={<AdminCustomRequests />} />
+          <Route path="admin-fulfillment" element={<AdminFulfillmentPage />} />
         </Route> 
       </Route>
 

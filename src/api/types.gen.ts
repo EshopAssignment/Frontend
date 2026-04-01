@@ -119,6 +119,28 @@ export type AdminDashboardSummaryDto = {
     averageOrderValue: number | string;
 };
 
+export type AdminFulfillmentOrderDto = {
+    id: number | string;
+    orderNumber: string;
+    customerFirstName: string;
+    customerLastName: string;
+    customerEmail: null | string;
+    customerPhoneNumber: null | string;
+    createdAt: string;
+    confirmedAt: null | string;
+    orderStatus: OrderStatus;
+    fulfillmentStatus: FulfillmentStatus;
+    isOverdue: boolean;
+    fulfilledAt: null | string;
+    fulfillmentNote: null | string;
+    trackingNumber: null | string;
+    currency: string;
+    productsSubtotal: number | string;
+    shippingCost: number | string;
+    vatTotal: number | string;
+    grandTotal: number | string;
+};
+
 export type AdminOrderDetailsDto = {
     id: number | string;
     orderNumber: string;
@@ -284,11 +306,23 @@ export type ForgotPasswordDto = {
     email: string;
 };
 
+export const FulfillmentStatus = {
+    UNREVIEWED: 'Unreviewed',
+    READY: 'Ready',
+    FULFILLED: 'Fulfilled'
+} as const;
+
+export type FulfillmentStatus = typeof FulfillmentStatus[keyof typeof FulfillmentStatus];
+
 export type IFormFile = Blob | File;
 
 export type LoginDto = {
     email: string;
     password: string;
+};
+
+export type MarkOrderFulfillmentRequest = {
+    note: null | string;
 };
 
 export type MeDto = {
@@ -376,6 +410,13 @@ export const OrderStatus = {
 
 export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
 
+export type PagedResultDtoOfAdminFulfillmentOrderDto = {
+    items: Array<AdminFulfillmentOrderDto>;
+    page: number | string;
+    pageSize: number | string;
+    totalCount: number | string;
+};
+
 export type PagedResultOfAdminCustomRequestListItemDto = {
     page?: number | string;
     pageSize?: number | string;
@@ -462,6 +503,10 @@ export type RegisterDto = {
     password: string;
 };
 
+export type ReopenFulfillmentRequest = {
+    note: null | string;
+};
+
 export type RequestUploadDto = {
     fileName: string;
     contentType: string;
@@ -494,6 +539,10 @@ export type SetCartReservationDto = {
 
 export type SetDefaultAddressDto = {
     defaultShippingAddressId: null | number | string;
+};
+
+export type SetFulfillmentNoteRequest = {
+    note: null | string;
 };
 
 export type SetShippingSelectionDto = {
@@ -684,6 +733,136 @@ export type GetApiAdminDashboardResponses = {
 };
 
 export type GetApiAdminDashboardResponse = GetApiAdminDashboardResponses[keyof GetApiAdminDashboardResponses];
+
+export type GetApiAdminFulfillmentQueueData = {
+    body?: never;
+    path?: never;
+    query?: {
+        fulfillmentStatus?: FulfillmentStatus;
+        overdueOnly?: boolean;
+        query?: string;
+        page?: number | string;
+        pageSize?: number | string;
+    };
+    url: '/api/AdminFulfillment/queue';
+};
+
+export type GetApiAdminFulfillmentQueueResponses = {
+    /**
+     * OK
+     */
+    200: PagedResultDtoOfAdminFulfillmentOrderDto;
+};
+
+export type GetApiAdminFulfillmentQueueResponse = GetApiAdminFulfillmentQueueResponses[keyof GetApiAdminFulfillmentQueueResponses];
+
+export type GetApiAdminFulfillmentByOrderIdData = {
+    body?: never;
+    path: {
+        orderId: number;
+    };
+    query?: never;
+    url: '/api/AdminFulfillment/{orderId}';
+};
+
+export type GetApiAdminFulfillmentByOrderIdErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetApiAdminFulfillmentByOrderIdError = GetApiAdminFulfillmentByOrderIdErrors[keyof GetApiAdminFulfillmentByOrderIdErrors];
+
+export type GetApiAdminFulfillmentByOrderIdResponses = {
+    /**
+     * OK
+     */
+    200: AdminFulfillmentOrderDto;
+};
+
+export type GetApiAdminFulfillmentByOrderIdResponse = GetApiAdminFulfillmentByOrderIdResponses[keyof GetApiAdminFulfillmentByOrderIdResponses];
+
+export type PostApiAdminFulfillmentByOrderIdMarkFulfilledData = {
+    body: MarkOrderFulfillmentRequest;
+    path: {
+        orderId: number;
+    };
+    query?: never;
+    url: '/api/AdminFulfillment/{orderId}/mark-fulfilled';
+};
+
+export type PostApiAdminFulfillmentByOrderIdMarkFulfilledErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PostApiAdminFulfillmentByOrderIdMarkFulfilledError = PostApiAdminFulfillmentByOrderIdMarkFulfilledErrors[keyof PostApiAdminFulfillmentByOrderIdMarkFulfilledErrors];
+
+export type PostApiAdminFulfillmentByOrderIdMarkFulfilledResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type PostApiAdminFulfillmentByOrderIdMarkFulfilledResponse = PostApiAdminFulfillmentByOrderIdMarkFulfilledResponses[keyof PostApiAdminFulfillmentByOrderIdMarkFulfilledResponses];
+
+export type PostApiAdminFulfillmentByOrderIdReopenData = {
+    body: ReopenFulfillmentRequest;
+    path: {
+        orderId: number;
+    };
+    query?: never;
+    url: '/api/AdminFulfillment/{orderId}/reopen';
+};
+
+export type PostApiAdminFulfillmentByOrderIdReopenErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PostApiAdminFulfillmentByOrderIdReopenError = PostApiAdminFulfillmentByOrderIdReopenErrors[keyof PostApiAdminFulfillmentByOrderIdReopenErrors];
+
+export type PostApiAdminFulfillmentByOrderIdReopenResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type PostApiAdminFulfillmentByOrderIdReopenResponse = PostApiAdminFulfillmentByOrderIdReopenResponses[keyof PostApiAdminFulfillmentByOrderIdReopenResponses];
+
+export type PutApiAdminFulfillmentByOrderIdNoteData = {
+    body: SetFulfillmentNoteRequest;
+    path: {
+        orderId: number;
+    };
+    query?: never;
+    url: '/api/AdminFulfillment/{orderId}/note';
+};
+
+export type PutApiAdminFulfillmentByOrderIdNoteErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutApiAdminFulfillmentByOrderIdNoteError = PutApiAdminFulfillmentByOrderIdNoteErrors[keyof PutApiAdminFulfillmentByOrderIdNoteErrors];
+
+export type PutApiAdminFulfillmentByOrderIdNoteResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type PutApiAdminFulfillmentByOrderIdNoteResponse = PutApiAdminFulfillmentByOrderIdNoteResponses[keyof PutApiAdminFulfillmentByOrderIdNoteResponses];
 
 export type GetApiAdminOrdersData = {
     body?: never;

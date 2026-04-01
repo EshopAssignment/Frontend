@@ -47,3 +47,24 @@ export const adminCustomRequestQk = {
   list: (params: unknown) => ["admin-custom-requests", "list", params] as const,
   detail: (id: number) => ["admin-custom-requests", "detail", id] as const,
 };
+
+export const adminFulfillmentQk = {
+  all: ["admin-fulfillment"] as const,
+  list: (
+    page: number,
+    pageSize: number,
+    query: string,
+    overdueOnly: boolean,
+    fulfillmentStatus: string
+  ) =>
+    [
+      ...adminFulfillmentQk.all,
+      "list",
+      page,
+      pageSize,
+      query,
+      overdueOnly,
+      fulfillmentStatus,
+    ] as const,
+  detail: (id: number) => [...adminFulfillmentQk.all, "detail", id] as const,
+};

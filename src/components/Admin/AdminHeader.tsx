@@ -27,6 +27,7 @@ const AdminHeader = () => {
         <NavLink to="admin-request" className="admin-nav" end>Quotes</NavLink>
         <NavLink to="admin-products" className="admin-nav">Products</NavLink>
         <NavLink to="admin-orders" className="admin-nav">Orders</NavLink>
+        <NavLink to="admin-fulfillment" className="admin-nav">Fulfillemnts</NavLink>
         <button
         type="button"
         onClick={handleLogout}
