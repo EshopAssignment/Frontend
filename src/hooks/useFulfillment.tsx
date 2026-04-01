@@ -7,7 +7,7 @@ import {
   reopenFulfillment,
   setFulfillmentNote,
   type AdminFulfillmentQueue,
-  type AdminFulfullmentOrder,
+  type AdminFulfillmentOrder,
   type FulfillmentStatus,
 } from "@/Services/adminFulfillmentService";
 
@@ -42,7 +42,7 @@ export function useAdminFulfillmentList(
   });
 }
 export function useAdminFulfillmentDetails(orderId: number | null) {
-  return useQuery<AdminFulfullmentOrder>({
+  return useQuery<AdminFulfillmentOrder>({
     queryKey: orderId ? adminFulfillmentQk.detail(orderId) : ["admin-fulfillment", "details", "empty"],
     queryFn: () => getFulfillmentById(orderId!),
     enabled: orderId!== null,

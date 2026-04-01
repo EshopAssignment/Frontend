@@ -2,7 +2,7 @@ import { api } from "@/lib/http";
 import * as sdk from "@/api/sdk.gen"
 import type * as apiTypes from "@/api/types.gen"
 
-export type AdminFulfullmentOrder = apiTypes.AdminFulfillmentOrderDto;
+export type AdminFulfillmentOrder = apiTypes.AdminFulfillmentOrderDto;
 export type AdminFulfillmentQueue = apiTypes.PagedResultDtoOfAdminFulfillmentOrderDto;
 export type FulfillmentStatus = apiTypes.FulfillmentStatus;
 export type MarkOrderFulfilledRequest = apiTypes.MarkOrderFulfillmentRequest;
@@ -38,7 +38,7 @@ export async function listFulfillmentQueue(opts: {
     }
   );
 }
-export async function getFulfillmentById(id:number): Promise<AdminFulfullmentOrder> {
+export async function getFulfillmentById(id:number): Promise<AdminFulfillmentOrder> {
     const res = await sdk.getApiAdminFulfillmentByOrderId({
         client: api,
         path: {orderId: id},
