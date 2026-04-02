@@ -721,7 +721,11 @@ button:hover{
 }
 /*#endregion */ 
 /*#region profile */
-
+.clipboard{
+    align-self: center;
+    margin-left:1rem;
+    color:var(--accent)
+}
 .profile-btn{
   display:flex;
   align-items: center;
