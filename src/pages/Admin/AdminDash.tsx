@@ -1,6 +1,7 @@
 import { fmtSEK } from "@/helpers/orderFormat";
 import { useAdminDashboard } from "@/hooks/useAdminDashboard";
 import { useMemo, useState } from "react";
+import { NavLink } from "react-router-dom";
 import {
   BarChart,
   Bar,
@@ -101,6 +102,12 @@ const AdminDash = () => {
     [data]
   );
 
+  const fulfillment = {
+    readyCount: Number(data?.fulillmentSummary?.readyCount ?? 0),
+    overdueCount: Number(data?.fulillmentSummary?.overdueCount ?? 0),
+    fulfilledTodayCount: Number(data?.fulillmentSummary?.fulfilledTodayCount ?? 0),
+  };
+
   if (isLoading) {
     return (
       <section className="admin-dash">
@@ -188,6 +195,45 @@ const AdminDash = () => {
             <p className="admin-kpi-card__meta">Genomsnittlig ordersumma</p>
           </article>
         </div>
+
+        <article className="admin-table-card admin-fulfillment-summary-card">
+          <div className="admin-card-header admin-card-header--split">
+            <div>
+              <h2>Fulfillment</h2>
+              <p>Snabb översikt över intern hantering och ordrar som behöver kärlek.</p>
+            </div>
+
+            <NavLink to="/admin/admin-fulfillment" className="admin-nav-link-button">
+              Öppna fulfillment
+            </NavLink>
+          </div>
+
+          <div className="admin-fulfillment-summary-grid">
+            <div className="admin-fulfillment-summary-item">
+              <span className="admin-kpi-card__label">Ready</span>
+              <strong className="admin-kpi-card__value">
+                {fulfillment.readyCount}
+              </strong>
+              <p className="admin-kpi-card__meta">Redo att hanteras</p>
+            </div>
+
+            <div className="admin-fulfillment-summary-item admin-fulfillment-summary-item--danger">
+              <span className="admin-kpi-card__label">Overdue</span>
+              <strong className="admin-kpi-card__value">
+                {fulfillment.overdueCount}
+              </strong>
+              <p className="admin-kpi-card__meta">Behöver uppmärksamhet</p>
+            </div>
+
+            <div className="admin-fulfillment-summary-item">
+              <span className="admin-kpi-card__label">Fulfilled idag</span>
+              <strong className="admin-kpi-card__value">
+                {fulfillment.fulfilledTodayCount}
+              </strong>
+              <p className="admin-kpi-card__meta">Färdigbehandlade idag</p>
+            </div>
+          </div>
+        </article>
 
         <div className="dashboard-grid">
           <article className="admin-chart-card admin-chart-card--wide">
