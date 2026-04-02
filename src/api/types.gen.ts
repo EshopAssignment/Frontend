@@ -103,6 +103,7 @@ export type AdminDashboardDto = {
     topProductsByRevenue: Array<AdminTopProductDto>;
     statusBreakdown: Array<AdminOrderStatusCountDto>;
     recentOrders: Array<AdminOrderListItemDto>;
+    fulillmentSummary: AdminFulfillmentSummaryDto;
 };
 
 export type AdminDashboardSeriesPointDto = {
@@ -139,6 +140,12 @@ export type AdminFulfillmentOrderDto = {
     shippingCost: number | string;
     vatTotal: number | string;
     grandTotal: number | string;
+};
+
+export type AdminFulfillmentSummaryDto = {
+    readyCount: number | string;
+    overdueCount: number | string;
+    fulfilledTodayCount: number | string;
 };
 
 export type AdminOrderDetailsDto = {
