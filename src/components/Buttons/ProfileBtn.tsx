@@ -84,12 +84,6 @@ export default function ProfileBtn() {
 
         <MenuItem>
           <Link to="/profile" className="menu-item">
-            GDPR
-          </Link>
-        </MenuItem>
-
-        <MenuItem>
-          <Link to="/profile" className="menu-item">
             Hjälp
           </Link>
         </MenuItem>
