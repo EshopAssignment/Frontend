@@ -458,9 +458,15 @@
     }
 }
 .btn-return{
-    background: var(--accent);
-    padding:2rem;
-    border-radius: var(--radius4);
+    border:2px solid var(--border);
+    display: flex;
+    align-items: center;
+    border-radius: var(--radius2);
+}
+.btn-return:hover{
+    border:2px solid var(--accent);
+    color: var(--accent);
+    transition: .5s;
 }
 .btn-submit{
     display: flex;

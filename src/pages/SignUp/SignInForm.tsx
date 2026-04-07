@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import ReturnBtn from "@/components/Buttons/ReturnBtn";
 
 type FormValues = {
   email: string;
@@ -46,9 +47,7 @@ const onSubmit = async (data: FormValues) => {
   return (
     <div className="auth-form-container">
       <div className="form-header">
-        <Link className="btn-return" to={"/"}>
-          <i className="fa-solid fa-backward"></i>
-        </Link>
+        <ReturnBtn />
         <h1>Logga in</h1>
       </div>
 
