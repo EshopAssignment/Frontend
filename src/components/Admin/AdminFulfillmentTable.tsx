@@ -8,6 +8,16 @@ type Props = {
   onReopen: (id: number, note?: string | null) => void;
   disabled?: boolean;
 };
+async function copyToClipboard(text:string) {
+  try{
+    await navigator.clipboard.writeText(text)
+    import ("react-hot-toast").then(({default: toast}) => {
+      toast.success("Kopierat!")
+    });
+  } catch (err) {
+    console.error("Clipboard failed.", err);
+  }
+}
 
 function getFulfillmentBadgeClass(order: AdminFulfillmentOrder) {
   if (order.isOverdue) return "status-badge status-badge--danger";
@@ -58,6 +68,15 @@ export function AdminFulfillmentTable({
                   >
                     {order.orderNumber}
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(order.orderNumber)}
+                    title="Kopiera ordernummer."
+                    className="clipboard">
+                    <i className="fa-regular fa-clipboard"></i>
+                  </button>
+
                 </td>
                 <td>
                   {[order.customerFirstName, order.customerLastName]

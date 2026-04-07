@@ -42,14 +42,17 @@ export function AdminFulfillmentFilters({
         <option value="Fulfilled">Fulfilled</option>
       </select>
 
-      <label>
-        <input
-          type="checkbox"
-          checked={overdueOnly}
-          onChange={(e) => onOverdueOnlyChange(e.target.checked)}
-        />
-        Endast overdue
-      </label>
+        <div className="overdue">
+          <input
+          id="overdue-check"
+            type="checkbox"
+            checked={overdueOnly}
+            onChange={(e) => onOverdueOnlyChange(e.target.checked)}
+          />
+        <label htmlFor="overdue-check" className="overdue">
+          Endast overdue
+        </label>
+        </div>
     </div>
   );
 }

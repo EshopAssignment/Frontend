@@ -5,6 +5,7 @@ import { useLogin, useRegister } from "@/hooks/Auth/useAuth";
 import toast from "react-hot-toast";
 import { toFieldErrors } from "@/lib/FieldErrors";
 import { setRedirectToast } from "@/lib/redirectToast";
+import ReturnBtn from "@/components/Buttons/ReturnBtn";
 
 type FormValues = {
   displayName: string;
@@ -60,9 +61,7 @@ const onSubmit = async (data: FormValues) => {
   return (
     <div className="auth-form-container">
       <div className="form-header">
-        <Link className="btn-return" to={"/"}>
-          <i className="fa-solid fa-backward"></i>
-        </Link>
+        <ReturnBtn />
         <h1>Registrera dig</h1>
       </div>
 

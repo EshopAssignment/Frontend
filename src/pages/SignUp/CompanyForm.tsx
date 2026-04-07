@@ -1,3 +1,4 @@
+import ReturnBtn from "@/components/Buttons/ReturnBtn";
 import { Link } from "react-router-dom";
 
 const SignInForm = () => {
@@ -5,9 +6,7 @@ const SignInForm = () => {
     <>
         <div className="auth-form-container">
           <div className="form-header">
-            <Link className="btn-return" to={"/auth"}>
-              <i className="fa-solid fa-backward"></i>
-            </Link>
+            <ReturnBtn />
             <h1>Logga in Här!</h1>
           </div>
 
