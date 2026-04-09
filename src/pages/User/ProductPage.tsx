@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import loadingIcon from "../../images/loading.png";
+import loadingIcon from "@/images/loading.webp";
 import { useSearchParams } from "react-router-dom";
-import FilterBar from "../../components/FilterBar";
-import ItemCard from "../../components/Product/ItemCard";
-import RequestOrder from "../../components/Orders/RequestOrder";
+import FilterBar from "@/components/FilterBar";
+import ItemCard from "@/components/Product/ItemCard";
+import RequestOrder from "@/components/Orders/RequestOrder";
 import ViewModeBtn from "@/components/Buttons/ViewModeBtn";
 import ProductListView from "@/components/Product/ProductListView";
 

@@ -9,7 +9,11 @@ export function computeIncVat(priceExVat: unknown, vatRatePercent: unknown) {
 }
 
 type ProductImageLike = {
-  url?: unknown;
+  originalUrl?: unknown;
+  largeUrl?: unknown;
+  cardUrl?: unknown;
+  stackUrl?: unknown;
+  thumbUrl?: unknown;
   sortOrder?: unknown;
   isPrimary?: unknown;
   altText?: unknown;
@@ -34,13 +38,24 @@ export type ProductFormErrors = Partial<
   >
 >;
 
+function hasText(value: unknown) {
+  return String(value ?? "").trim().length > 0;
+}
+
 function normalizeImageList(input: unknown): ProductImageLike[] {
   if (!Array.isArray(input)) return [];
 
   return input
     .filter(Boolean)
     .map((img) => (img ?? {}) as ProductImageLike)
-    .filter((img) => String(img.url ?? "").trim().length > 0);
+    .filter(
+      (img) =>
+        hasText(img.originalUrl) &&
+        hasText(img.largeUrl) &&
+        hasText(img.cardUrl) &&
+        hasText(img.stackUrl) &&
+        hasText(img.thumbUrl)
+    );
 }
 
 export function validateProductForm(input: ProductFormLike): ProductFormErrors {
@@ -62,6 +77,8 @@ export function validateProductForm(input: ProductFormLike): ProductFormErrors {
   else if (name.length > 200) errors.name = "Namn är för långt (max 200).";
 
   if (!description) errors.description = "Beskrivning krävs.";
+  else if (description.length > 1000) errors.description = "Beskrivningen är för lång (max 1000).";
+
   if (!palletType) errors.palletType = "Välj palltyp.";
   if (!condition) errors.condition = "Välj skick.";
 
@@ -87,29 +104,5 @@ export function validateProductForm(input: ProductFormLike): ProductFormErrors {
 }
 
 export function hasMissingRequiredForActive(input: ProductFormLike) {
-  const name = String(input.name ?? "").trim();
-  const description = String(input.description ?? "").trim();
-  const palletType = String(input.palletType ?? "").trim();
-  const condition = String(input.condition ?? "").trim();
-
-  const priceExVat = asNum(input.priceExVat, NaN);
-  const onHand = asNum(input.onHand, NaN);
-  const vat = clampVatRatePercent(input.vatRatePercent, 25);
-
-  const images = normalizeImageList(input.images);
-  const primaryCount = images.filter((img) => Boolean(img.isPrimary)).length;
-
-  return (
-    !name ||
-    !description ||
-    !palletType ||
-    !condition ||
-    !Number.isFinite(priceExVat) ||
-    priceExVat < 0 ||
-    !Number.isFinite(onHand) ||
-    onHand < 0 ||
-    (vat !== 6 && vat !== 12 && vat !== 25) ||
-    images.length === 0 ||
-    primaryCount !== 1
-  );
+  return Object.keys(validateProductForm(input)).length > 0;
 }

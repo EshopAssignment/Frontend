@@ -206,7 +206,11 @@ export type AdminOrderStatusCountDto = {
 };
 
 export type AdminProductImageRequestDto = {
-    url: string;
+    originalUrl: string;
+    largeUrl: string;
+    cardUrl: string;
+    stackUrl: string;
+    thumbUrl: string;
     sortOrder: number | string;
     isPrimary: boolean;
     altText: null | string;
@@ -255,6 +259,7 @@ export type AuthSessionResponseDto = {
 export type BlobUploadRequestResponse = {
     uploadUrl: string;
     publicUrl: string;
+    blobName: string;
 };
 
 export type ConfirmEmailDto = {
@@ -307,6 +312,10 @@ export type EnumOptionDto = {
     value: string;
     label: string;
     intValue: number | string;
+};
+
+export type FinalizeBlobUploadDto = {
+    blobName: string;
 };
 
 export type ForgotPasswordDto = {
@@ -468,6 +477,14 @@ export type ProblemDetails = {
     instance?: null | string;
 };
 
+export type ProcessedImageDto = {
+    originalUrl: string;
+    largeUrl: string;
+    cardUrl: string;
+    stackUrl: string;
+    thumbUrl: string;
+};
+
 export type ProductDto = {
     id: number | string;
     name: string;
@@ -489,7 +506,11 @@ export type ProductDto = {
 
 export type ProductImageDto = {
     id: number | string;
-    url: string;
+    originalUrl: string;
+    largeUrl: string;
+    cardUrl: string;
+    stackUrl: string;
+    thumbUrl: string;
     sortOrder: number | string;
     isPrimary: boolean;
     altText: null | string;
@@ -1308,6 +1329,31 @@ export type PostApiBlobUploadRequestResponses = {
 };
 
 export type PostApiBlobUploadRequestResponse = PostApiBlobUploadRequestResponses[keyof PostApiBlobUploadRequestResponses];
+
+export type PostApiBlobUploadFinalizeData = {
+    body: FinalizeBlobUploadDto;
+    path?: never;
+    query?: never;
+    url: '/api/BlobUpload/finalize';
+};
+
+export type PostApiBlobUploadFinalizeErrors = {
+    /**
+     * Bad Request
+     */
+    400: string;
+};
+
+export type PostApiBlobUploadFinalizeError = PostApiBlobUploadFinalizeErrors[keyof PostApiBlobUploadFinalizeErrors];
+
+export type PostApiBlobUploadFinalizeResponses = {
+    /**
+     * OK
+     */
+    200: ProcessedImageDto;
+};
+
+export type PostApiBlobUploadFinalizeResponse = PostApiBlobUploadFinalizeResponses[keyof PostApiBlobUploadFinalizeResponses];
 
 export type PostApiCustomRequestsData = {
     body: {

@@ -5,26 +5,37 @@ import { useQuery } from "@tanstack/react-query";
 import { suggestProducts, type ProductSuggestionDto } from "../Services/productService";
 import { resolveImageUrl } from "../helpers/ImageHelpers";
 import placeholder from "../Images/placeholder.jpg";
-
-function toNumber(n: unknown): number | null {
-  if (typeof n === "number" && Number.isFinite(n)) return n;
-  if (typeof n === "string") {
-    const parsed = parseFloat(n.replace(",", "."));
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
-}
+import { asNum } from "@/helpers/money";
 
 function formatSEK(val: unknown): string {
-  const num = toNumber(val);
+  const num = asNum(val);
   if (num === null) return "—";
-  return num.toLocaleString("sv-SE", { style: "currency", currency: "SEK" });
+
+  return num.toLocaleString("sv-SE", {
+    style: "currency",
+    currency: "SEK",
+  });
+}
+
+function getSuggestionImage(item: ProductSuggestionDto): string {
+  const rawImage =
+    (item as any).thumbUrl ??
+    (item as any).primaryImgUrl ??
+    (item as any).imgUrl ??
+    "";
+
+  return resolveImageUrl(rawImage) || placeholder;
+}
+
+function getSuggestionProductRef(item: ProductSuggestionDto): string {
+  return item.sku ?? item.slug ?? `#${item.id}`;
 }
 
 const Searchbar = () => {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
+
   const debounced = useDebounce(query, 250);
   const nav = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
@@ -42,31 +53,49 @@ const Searchbar = () => {
 
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+      if (!ref.current?.contains(e.target as Node)) {
+        setOpen(false);
+      }
     };
+
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-  function goto(it: ProductSuggestionDto) {
+  function goto(item: ProductSuggestionDto) {
     const idNum =
-      typeof it.id === "number" && Number.isFinite(it.id)
-        ? it.id
-        : Number(String(it.id));
+      typeof item.id === "number" && Number.isFinite(item.id)
+        ? item.id
+        : Number(String(item.id));
 
     if (!Number.isFinite(idNum)) return;
 
     setOpen(false);
     setQuery("");
+    setActive(0);
     nav(`/product/${idNum}`);
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if ((e.key === "ArrowDown" || e.key === "ArrowUp") && !open) setOpen(true);
-    if (e.key === "ArrowDown") setActive((a) => Math.min(a + 1, Math.max(items.length - 1, 0)));
-    if (e.key === "ArrowUp") setActive((a) => Math.max(a - 1, 0));
-    if (e.key === "Enter" && open && items[active]) goto(items[active]);
-    if (e.key === "Escape") setOpen(false);
+    if ((e.key === "ArrowDown" || e.key === "ArrowUp") && !open) {
+      setOpen(true);
+    }
+
+    if (e.key === "ArrowDown") {
+      setActive((a) => Math.min(a + 1, Math.max(items.length - 1, 0)));
+    }
+
+    if (e.key === "ArrowUp") {
+      setActive((a) => Math.max(a - 1, 0));
+    }
+
+    if (e.key === "Enter" && open && items[active]) {
+      goto(items[active]);
+    }
+
+    if (e.key === "Escape") {
+      setOpen(false);
+    }
   }
 
   return (
@@ -110,13 +139,8 @@ const Searchbar = () => {
             items.length > 0 ? (
               <ul id="search-listbox" role="listbox" className="search-list">
                 {items.map((item, i) => {
-                  const rawImage =
-                    (item as any).primaryImgUrl ??
-                    (item as any).imgUrl ??
-                    "";
-
-                  const imgSrc = resolveImageUrl(rawImage) || placeholder;
-                  const skuOrSlug = item.sku ?? item.slug ?? `#${item.id}`;
+                  const imgSrc = getSuggestionImage(item);
+                  const skuOrSlug = getSuggestionProductRef(item);
 
                   return (
                     <li

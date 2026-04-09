@@ -43,9 +43,9 @@ const DetailsPage = () => {
     const mapped =
       Array.isArray(product.images) && product.images.length > 0
         ? product.images
-            .filter((img) => String(img?.url ?? "").trim())
+            .filter((img) => String(img?.largeUrl ?? "").trim())
             .map((img) => ({
-              url: String(img.url),
+              url: String(img.largeUrl),
               altText: img.altText ?? null,
               isPrimary: Boolean(img.isPrimary),
               sortOrder: Number(img.sortOrder ?? 0),

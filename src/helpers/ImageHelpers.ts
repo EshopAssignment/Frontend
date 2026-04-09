@@ -2,7 +2,11 @@ import { API_ORIGIN } from "@/config";
 import { asNum } from "./money";
 
 export type ImageLike = {
-  url: string;
+  originalUrl: string;
+  largeUrl: string;
+  cardUrl: string;
+  stackUrl: string;
+  thumbUrl: string;
   sortOrder?: number | string | null;
   isPrimary: boolean;
   altText?: string | null;
@@ -21,10 +25,14 @@ export function resolveImageUrl(raw?: string | null) {
 
 export function normalizeImages<T extends ImageLike>(list: T[]): T[] {
   const xs = (list ?? [])
-    .filter((x) => (x?.url ?? "").trim())
+    .filter((x) => (x?.originalUrl ?? "").trim())
     .map((x) => ({
       ...x,
-      url: String(x.url).trim(),
+      originalUrl: String(x.originalUrl ?? "").trim(),
+      largeUrl: String(x.largeUrl ?? "").trim(),
+      cardUrl: String(x.cardUrl ?? "").trim(),
+      stackUrl: String(x.stackUrl ?? "").trim(),
+      thumbUrl: String(x.thumbUrl ?? "").trim(),
       sortOrder: asNum(x.sortOrder, 0),
     }))
     .slice()
@@ -37,6 +45,7 @@ export function normalizeImages<T extends ImageLike>(list: T[]): T[] {
   if (xs.length > 0) {
     const idx = xs.findIndex((x) => x.isPrimary);
     const primaryIndex = idx >= 0 ? idx : 0;
+
     xs.forEach((x, i) => {
       x.isPrimary = i === primaryIndex;
     });
@@ -47,16 +56,21 @@ export function normalizeImages<T extends ImageLike>(list: T[]): T[] {
 
 export function addImage<T extends ImageLike>(
   list: T[],
-  url: string,
+  image: Pick<T, "originalUrl" | "largeUrl" | "cardUrl" | "stackUrl" | "thumbUrl">,
   opts?: { altText?: string | null; makePrimary?: boolean }
 ): T[] {
-  const cleanUrl = String(url ?? "").trim();
-  if (!cleanUrl) return normalizeImages(list ?? []);
+  const cleanOriginal = String(image?.originalUrl ?? "").trim();
+  if (!cleanOriginal) return normalizeImages(list ?? []);
 
   const next = [
     ...(list ?? []),
     {
-      url: cleanUrl,
+      ...image,
+      originalUrl: cleanOriginal,
+      largeUrl: String(image.largeUrl ?? "").trim(),
+      cardUrl: String(image.cardUrl ?? "").trim(),
+      stackUrl: String(image.stackUrl ?? "").trim(),
+      thumbUrl: String(image.thumbUrl ?? "").trim(),
       sortOrder: list?.length ?? 0,
       isPrimary: opts?.makePrimary ?? (list?.length ?? 0) === 0,
       altText: opts?.altText ?? null,
@@ -85,5 +99,17 @@ export function setAltText<T extends ImageLike>(list: T[], idx: number, altText:
 
 export function getPrimaryUrl<T extends ImageLike>(list: T[]): string {
   const xs = normalizeImages(list ?? []);
-  return xs.find((x) => x.isPrimary)?.url ?? xs[0]?.url ?? "";
+  return xs.find((x) => x.isPrimary)?.largeUrl ?? xs[0]?.largeUrl ?? "";
+}
+
+export function getCardUrl<T extends ImageLike>(img?: T | null): string {
+  return img?.cardUrl ?? "";
+}
+
+export function getThumbUrl<T extends ImageLike>(img?: T | null): string {
+  return img?.thumbUrl ?? "";
+}
+
+export function getStackUrl<T extends ImageLike>(img?: T | null): string {
+  return img?.stackUrl ?? "";
 }
