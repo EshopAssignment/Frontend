@@ -4,42 +4,22 @@ import { createOrderFromCart } from "../../Services/orderService";
 import { useNavigate } from "react-router-dom";
 import placeholder from "../../Images/Placeholder.jpg";
 import { lineIncVat, vatAmountFromEx } from "@/helpers/money";
+import { resolveImageUrl } from "@/helpers/ImageHelpers";
+import { fmtSEK } from "@/helpers/orderFormat";
 
 const Cart = () => {
-    const {state, cartId, removeOne, removeAll, clear} = useCart();
-    const navigate = useNavigate();
-    const [submitting, setSubmitting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [orderNumber, setOrderNumber] = useState<string | null>(null);
-    const [busyIds, setBusyIds] = useState<Record<number, boolean>>({});
+  const { state, cartId, removeOne, removeAll, clear } = useCart();
+  const navigate = useNavigate();
 
-    const setBusy = (productId:number, on:boolean) => 
-      setBusyIds((m) => ({...m, [productId]: on}));
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [busyIds, setBusyIds] = useState<Record<number, boolean>>({});
 
-    const isBusy =(productId: number) => !!busyIds[productId];
-    
-    const handleCheckout = async () => {
-      if (state.items.length === 0 || submitting) return;
+  const setBusy = (productId: number, on: boolean) =>
+    setBusyIds((m) => ({ ...m, [productId]: on }));
 
-      setSubmitting(true);
-      setError(null)
-      setOrderNumber(null);
-      try {
-        const result = await createOrderFromCart(state.items, cartId);
+  const isBusy = (productId: number) => !!busyIds[productId];
 
-        
-        navigate(`/checkout/${result.orderNumber}`, {
-          state: result,
-      });
-      } catch(err) {
-        console.error(err);
-        setError("could not create order.")
-      } finally {
-        setSubmitting(false);
-      }
-  };
-
-  
   const totalIncVat = useMemo(
     () =>
       state.items.reduce(
@@ -58,44 +38,68 @@ const Cart = () => {
     [state.items]
   );
 
+  async function handleCheckout() {
+    if (state.items.length === 0 || submitting) return;
 
-  const onRemoveOne = async (productId:number) => {
-    if (isBusy(productId)) return;
+    setSubmitting(true);
     setError(null);
-    
-    setBusy(productId, true);
-    try {
-      await removeOne(productId);
-    } catch (e) {
-      setError((e as Error)?.message ?? "Could not update cart");
-    } finally {
-      setBusy(productId, false);
-    }
-  };
 
-  const onRemoveAll = async (productId: number) => {
-    if (isBusy(productId)) return;
-    setError(null);
-    setBusy(productId, true);
     try {
-      await removeAll(productId);
-    } catch (e) {
-      setError((e as Error)?.message ?? "Could not update cart");
+      const result = await createOrderFromCart(state.items, cartId);
+
+      navigate(`/checkout/${result.orderNumber}`, {
+        state: result,
+      });
+    } catch (err) {
+      console.error(err);
+      setError("Kunde inte skapa order.");
     } finally {
-      setBusy (productId, false);
+      setSubmitting(false);
     }
   }
 
-  const onClear = () => {
+  async function onRemoveOne(productId: number) {
+    if (isBusy(productId)) return;
+
+    setError(null);
+    setBusy(productId, true);
+
+    try {
+      await removeOne(productId);
+    } catch (e) {
+      setError((e as Error)?.message ?? "Kunde inte uppdatera varukorgen.");
+    } finally {
+      setBusy(productId, false);
+    }
+  }
+
+  async function onRemoveAll(productId: number) {
+    if (isBusy(productId)) return;
+
+    setError(null);
+    setBusy(productId, true);
+
+    try {
+      await removeAll(productId);
+    } catch (e) {
+      setError((e as Error)?.message ?? "Kunde inte uppdatera varukorgen.");
+    } finally {
+      setBusy(productId, false);
+    }
+  }
+
+  function onClear() {
     setError(null);
     clear();
-  };
+  }
 
-  return(   
+  return (
     <div className="cart">
       <p>Varukorg</p>
 
-      {state.items.length === 0 && <p>Nothing in your cart! Get to the shopping!</p>}
+      {state.items.length === 0 && (
+        <p>Ingenting i varukorgen än. Dags att göra något åt det.</p>
+      )}
 
       {state.items.length > 0 && (
         <>
@@ -110,42 +114,57 @@ const Cart = () => {
             </thead>
 
             <tbody className="cart-body">
-              {state.items.map((item) => (
-                <tr key={item.productId}>
-                  <td className="table-img">
-                    <img
-                      className="cart-item-img"
-                      src={item.imgUrl || placeholder}
-                      alt={item.name}
-                      onError={(e) => (e.currentTarget.src = placeholder)}
-                    />
-                    <span>{item.name}</span>
-                  </td>
+              {state.items.map((item) => {
+                const imgSrc =
+                  resolveImageUrl(
+                    item.thumbUrl 
+                  ) || placeholder;
 
-                  <td>x {item.quantity}</td>
-                  <td>{item.priceExVat * item.quantity} kr</td>
+                const lineTotalIncVat = lineIncVat(
+                  item.priceExVat,
+                  item.vatRatePercent,
+                  item.quantity
+                );
 
-                  <td className="btn-cart">
-                    <button
-                      className="btn-subtract"
-                      onClick={() => void onRemoveOne(item.productId)}
-                      disabled={isBusy(item.productId) || submitting}
-                      title={isBusy(item.productId) ? "Uppdaterar..." : "Ta bort 1"}
-                    >
-                      -1
-                    </button>
+                return (
+                  <tr key={item.productId}>
+                    <td className="table-img">
+                      <img
+                        className="cart-item-img"
+                        src={imgSrc}
+                        alt={item.name}
+                        onError={(e) => {
+                          e.currentTarget.src = placeholder;
+                        }}
+                      />
+                      <span>{item.name}</span>
+                    </td>
 
-                    <button
-                      className="btn-trash"
-                      onClick={() => void onRemoveAll(item.productId)}
-                      disabled={isBusy(item.productId) || submitting}
-                      title={isBusy(item.productId) ? "Uppdaterar..." : "Ta bort alla"}
-                    >
-                      <i className="fa-solid fa-trash-can" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                    <td>x {item.quantity}</td>
+                    <td>{fmtSEK(lineTotalIncVat)}</td>
+
+                    <td className="btn-cart">
+                      <button
+                        className="btn-subtract"
+                        onClick={() => void onRemoveOne(item.productId)}
+                        disabled={isBusy(item.productId) || submitting}
+                        title={isBusy(item.productId) ? "Uppdaterar..." : "Ta bort 1"}
+                      >
+                        -1
+                      </button>
+
+                      <button
+                        className="btn-trash"
+                        onClick={() => void onRemoveAll(item.productId)}
+                        disabled={isBusy(item.productId) || submitting}
+                        title={isBusy(item.productId) ? "Uppdaterar..." : "Ta bort alla"}
+                      >
+                        <i className="fa-solid fa-trash-can" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
 
@@ -154,8 +173,8 @@ const Cart = () => {
           </button>
 
           <div className="checkout">
-            <p className="cart-total">Totalt: {totalIncVat} kr</p>
-            <p>Varav moms: {totalVat} kr</p>
+            <p className="cart-total">Totalt: {fmtSEK(totalIncVat)}</p>
+            <p>Varav moms: {fmtSEK(totalVat)}</p>
 
             <button className="btn-checkout" onClick={handleCheckout} disabled={submitting}>
               {submitting ? "Skickar order..." : <i className="fa-regular fa-credit-card" />}
@@ -164,7 +183,6 @@ const Cart = () => {
         </>
       )}
 
-      {orderNumber && <p>orderNumber: {orderNumber}</p>}
       {error && <p>{error}</p>}
     </div>
   );
