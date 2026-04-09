@@ -15,7 +15,7 @@ const AdminHeader = () => {
     <header className="admin-header">            
       <div className="admin-logo">
         <NavLink to="/">
-          <img src="./src/images/logo.png" alt="Logga" />
+          <img src="./src/images/logo.webp" alt="Logga" />
         </NavLink>
       </div>
 

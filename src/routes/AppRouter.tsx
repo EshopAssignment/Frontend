@@ -11,7 +11,6 @@ import MyProfile from "../pages/Profile/MyProfile";
 import ProfileLayout from "../layout/ProfileLayout";
 import Orders from "../pages/Profile/Orders";
 import Help from "../pages/Profile/Help";
-import Gdpr from "../pages/Profile/Gdpr";
 import SignupLayout from "../layout/SignupLayout";
 
 import SignUpForm from "../pages/SignUp/SignUpForm";
@@ -58,7 +57,6 @@ const AppRouter = () => {
           <Route index element={<MyProfile />} />
           <Route path="orders" element={<Orders />} />
           <Route path="help" element={<Help />} />
-          <Route path="gdpr" element={<Gdpr />} />
         </Route>
       </Route>
 
