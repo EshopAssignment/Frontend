@@ -1,6 +1,7 @@
 import { api } from "@/lib/http";
 import * as sdk from "@/api/sdk.gen";
 import type * as apiTypes from "@/api/types.gen";
+import type { ProcessedImageDto } from "@/api/types.gen";
 
 export type BlobUploadRequestResponse = apiTypes.BlobUploadRequestResponse;
 
@@ -14,6 +15,20 @@ export async function requestProductImageUpload(
   });
 
   if (res.error) throw res.error;
+  return res.data!;
+}
+
+export async function finalizeProductImageUpload(
+  blobName:string,
+  opts?: {signal?: AbortSignal}
+): Promise<apiTypes.ProcessedImageDto> {
+  const res= await sdk.postApiBlobUploadFinalize({
+    client: api,
+    body: {blobName},
+    signal: opts?.signal,
+  });
+
+  if(res.error) throw res.error;
   return res.data!;
 }
 
@@ -38,11 +53,13 @@ export async function uploadToBlob(
   }
 }
 
-export async function uploadImageAndGetPublicUrl(
+export async function uploadImageAndFinalize(
   file: File,
   opts?: { signal?: AbortSignal }
-): Promise<string> {
-  const { uploadUrl, publicUrl } = await requestProductImageUpload(file.name, file.type);
+): Promise<ProcessedImageDto> {
+  const { uploadUrl, blobName } = await requestProductImageUpload(file.name, file.type);
+
   await uploadToBlob(uploadUrl, file, opts);
-  return publicUrl;
+
+  return await finalizeProductImageUpload(blobName, opts);
 }
