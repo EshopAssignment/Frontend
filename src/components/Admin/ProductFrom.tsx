@@ -18,7 +18,7 @@ import {
 } from "@/lib/productValidation";
 
 import { asNum, clampVatRatePercent, round2 } from "@/helpers/money";
-import { uploadImageAndGetPublicUrl } from "@/Services/uploadService";
+import { uploadImageAndFinalize } from "@/Services/uploadService";
 
 import {
   addImage,
@@ -80,15 +80,19 @@ const { data: options } = useQuery({
   useEffect(() => {
     if (!isEdit || !data) return;
 
-    const incomingImages =
-      normalizeImages(
-        (data.images ?? []).map((x: any) => ({
-          url: x.url,
-          sortOrder: x.sortOrder,
-          isPrimary: x.isPrimary,
-          altText: x.altText ?? null,
-        }))
-      ) as any;
+  const incomingImages =
+    normalizeImages(
+      (data.images ?? []).map((x: any) => ({
+        originalUrl: x.originalUrl,
+        largeUrl: x.largeUrl,
+        cardUrl: x.cardUrl,
+        stackUrl: x.stackUrl,
+        thumbUrl: x.thumbUrl,
+        sortOrder: x.sortOrder,
+        isPrimary: x.isPrimary,
+        altText: x.altText ?? null,
+      }))
+    ) as any;
 
     setForm({
       name: data.name,
@@ -102,7 +106,7 @@ const { data: options } = useQuery({
       isActive: Boolean(data.isActive),
     });
 
-    setSelectedUrl(getPrimaryUrl(incomingImages) || incomingImages?.[0]?.url || "");
+    setSelectedUrl(getPrimaryUrl(incomingImages) || incomingImages?.[0]?.largeUrl || "");
     setErrors({});
     setTouched({});
     setLocalFile(null);
@@ -162,51 +166,60 @@ const { data: options } = useQuery({
     return nextErrors;
   }
 
-  async function onPickImage(file?: File) {
-    if (!file) return;
+async function onPickImage(file?: File) {
+  if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Endast bildfiler är tillåtna.");
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Bilden är för stor (max 5 MB).");
-      return;
-    }
-
-    uploadAbortRef.current?.abort();
-    uploadAbortRef.current = new AbortController();
-
-    setLocalFile(file);
-    setIsUploadingImage(true);
-
-    try {
-      const publicUrl = await uploadImageAndGetPublicUrl(file, { signal: uploadAbortRef.current.signal });
-
-      setForm((p) => {
-        const nextImages = addImage(p.images ?? [], publicUrl) as any;
-        setSelectedUrl(publicUrl);
-        return { ...p, images: nextImages };
-      });
-
-      setTouched((t) => ({ ...t, images: true as any }));
-      toast.success("Bild uppladdad.");
-    } catch (err: any) {
-      if (err?.name === "AbortError") return;
-      toast.error(String(err?.message ?? "Kunde inte ladda upp bilden."));
-    } finally {
-      setIsUploadingImage(false);
-      setLocalFile(null);
-    }
+  if (!file.type.startsWith("image/")) {
+    toast.error("Endast bildfiler är tillåtna.");
+    return;
   }
+
+  if (file.size > 5 * 1024 * 1024) {
+    toast.error("Bilden är för stor (max 5 MB).");
+    return;
+  }
+
+  uploadAbortRef.current?.abort();
+  uploadAbortRef.current = new AbortController();
+
+  setLocalFile(file);
+  setIsUploadingImage(true);
+
+  try {
+    const uploaded = await uploadImageAndFinalize(file, {
+      signal: uploadAbortRef.current.signal,
+    });
+
+    setForm((p) => {
+      const nextImages = addImage(p.images ?? [], {
+        originalUrl: uploaded.originalUrl,
+        largeUrl: uploaded.largeUrl,
+        cardUrl: uploaded.cardUrl,
+        stackUrl: uploaded.stackUrl,
+        thumbUrl: uploaded.thumbUrl,
+      }) as any;
+
+      setSelectedUrl(uploaded.largeUrl);
+      return { ...p, images: nextImages };
+    });
+
+    setTouched((t) => ({ ...t, images: true as any }));
+    toast.success("Bild uppladdad.");
+  } catch (err: any) {
+    if (err?.name === "AbortError") return;
+    toast.error(String(err?.message ?? "Kunde inte ladda upp bilden."));
+  } finally {
+    setIsUploadingImage(false);
+    setLocalFile(null);
+  }
+}
 
   function onRemoveImage(idx: number) {
     setForm((p) => {
       const nextImages = removeImageAt(p.images ?? [], idx) as any;
-      const nextSelected = selectedUrl && nextImages.some((x: any) => x.url === selectedUrl)
+      const nextSelected = selectedUrl && nextImages.some((x: any) => x.largeUrl === selectedUrl)
         ? selectedUrl
-        : getPrimaryUrl(nextImages) || nextImages?.[0]?.url || "";
+        : getPrimaryUrl(nextImages) || nextImages?.[0]?.largeUrl || "";
       setSelectedUrl(nextSelected);
       return { ...p, images: nextImages };
     });
@@ -508,19 +521,19 @@ const { data: options } = useQuery({
           {!!(form.images?.length ?? 0) ? (
             <div className="image-grid">
               {(form.images as any).map((img: any, idx: number) => {
-                const src = resolveImageUrl(img.url);
+                const src = resolveImageUrl(img.cardUrl || img.thumbUrl || img.largeUrl);
                 const isPrimary = Boolean(img.isPrimary);
 
                 return (
                   <div
-                    key={`${img.url}-${idx}`}
+                    key={`${img.originalUrl}-${idx}`}
                     className={`image-tile ${isPrimary ? "is-primary" : ""}`}
                   >
                     <div className="image-tile-media">
                       <button
                         type="button"
                         className="thumb"
-                        onClick={() => setSelectedUrl(img.url)}
+                        onClick={() => setSelectedUrl(img.largeUrl)}
                         aria-label={`Visa bild ${idx + 1}`}
                       >
                         <img
