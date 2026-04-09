@@ -13,7 +13,16 @@ interface Props {
 }
 
 const ProductListView = ({ product }: Props) => {
-  const imgSrc = resolveImageUrl(product.primaryImgUrl) || placeholder;
+
+  const primaryImg = 
+    product.images?.find(images => images.isPrimary) ?? 
+    product.images?.[0];
+
+   const imgSrc =
+    resolveImageUrl(primaryImg?.stackUrl) ||
+    resolveImageUrl(product.primaryImgUrl) ||
+    placeholder;
+
 
   const available = Number(product.available) || 0;
   const priceInc = priceIncVat(product.priceExVat, product.vatRatePercent);
