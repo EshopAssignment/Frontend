@@ -7,7 +7,7 @@ export type CartItem = {
   priceExVat: number;
   vatRatePercent: number;
   quantity: number;
-  imgUrl?: string;
+  thumbUrl?: string;
 };
 
 type CartState = {
@@ -24,7 +24,7 @@ type Action =
   | { type: "CLEAR" }
   | { type: "HYDRATE"; payload: CartState };
 
-const STORAGE_KEY = "pallshoppen:cart:v2";
+const STORAGE_KEY = "pallshoppen:cart:v3";
 
 function createCartId(): string {
   return crypto.randomUUID();
@@ -73,12 +73,13 @@ function coerceItem(i: Omit<CartItem, "quantity">): Omit<CartItem, "quantity"> {
   const productId = Number(i.productId);
   const priceExVat = Number(i.priceExVat);
   const vatRatePercent = Number((i as any).vatRatePercent);
+
   return {
     productId: Number.isFinite(productId) ? productId : 0,
     name: String((i as any).name ?? ""),
     priceExVat: Number.isFinite(priceExVat) ? priceExVat : 0,
     vatRatePercent: Number.isFinite(vatRatePercent) ? vatRatePercent : 25,
-    imgUrl: (i as any).imgUrl ? String((i as any).imgUrl) : undefined,
+    thumbUrl: (i as any).thumbUrl ? String((i as any).thumbUrl) : undefined,
   };
 }
 
@@ -90,9 +91,14 @@ function reducer(state: CartState, action: Action): CartState {
       const add = Math.max(1, Number(qty) || 1);
 
       const i = state.items.findIndex((x) => x.productId === safe.productId);
+
       if (i === -1) {
-        return { ...state, items: [...state.items, { ...safe, quantity: add }] };
+        return {
+          ...state,
+          items: [...state.items, { ...safe, quantity: add }],
+        };
       }
+
       const next = [...state.items];
       next[i] = { ...next[i], quantity: next[i].quantity + add };
       return { ...state, items: next };
@@ -101,7 +107,9 @@ function reducer(state: CartState, action: Action): CartState {
     case "ADD_ONE": {
       const { productId } = action.payload;
       const i = state.items.findIndex((x) => x.productId === productId);
+
       if (i === -1) return state;
+
       const next = [...state.items];
       next[i] = { ...next[i], quantity: next[i].quantity + 1 };
       return { ...state, items: next };
@@ -110,11 +118,17 @@ function reducer(state: CartState, action: Action): CartState {
     case "SET_QTY": {
       const { productId, quantity } = action.payload;
       const q = Math.max(0, Math.floor(Number(quantity) || 0));
+
       if (q === 0) {
-        return { ...state, items: state.items.filter((x) => x.productId !== productId) };
+        return {
+          ...state,
+          items: state.items.filter((x) => x.productId !== productId),
+        };
       }
+
       const i = state.items.findIndex((x) => x.productId === productId);
       if (i === -1) return state;
+
       const next = [...state.items];
       next[i] = { ...next[i], quantity: q };
       return { ...state, items: next };
@@ -125,11 +139,15 @@ function reducer(state: CartState, action: Action): CartState {
       const next = state.items
         .map((x) => (x.productId === productId ? { ...x, quantity: x.quantity - 1 } : x))
         .filter((x) => x.quantity > 0);
+
       return { ...state, items: next };
     }
 
     case "REMOVE_ALL":
-      return { ...state, items: state.items.filter((x) => x.productId !== action.payload.productId) };
+      return {
+        ...state,
+        items: state.items.filter((x) => x.productId !== action.payload.productId),
+      };
 
     case "CLEAR":
       return { ...state, items: [] };
@@ -152,35 +170,40 @@ const CartContext = createContext<{
   cartId: string;
   totalExVat: number;
   itemCount: number;
-
   addItem: (item: Omit<CartItem, "quantity">, qty?: number) => Promise<void>;
   addOne: (productId: number) => Promise<void>;
   setQuantity: (productId: number, quantity: number) => Promise<void>;
   removeOne: (productId: number) => Promise<void>;
   removeAll: (productId: number) => Promise<void>;
-
   clear: () => void;
 } | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
- const [state, dispatch] = useReducer(reducer, undefined, () => loadInitialState());
+  const [state, dispatch] = useReducer(reducer, undefined, () => loadInitialState());
 
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {}
+    } catch {
+    }
   }, [state]);
 
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
       if (e.key !== STORAGE_KEY) return;
+
       try {
-        const parsed = e.newValue ? JSON.parse(e.newValue) : { cartId: state.cartId, items: [] };
+        const parsed = e.newValue
+          ? JSON.parse(e.newValue)
+          : { cartId: state.cartId, items: [] };
+
         if (isValidState(parsed)) {
           dispatch({ type: "HYDRATE", payload: parsed });
         }
-      } catch {}
+      } catch {
+      }
     };
+
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
   }, [state.cartId]);
@@ -205,6 +228,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       addItem: async (item: Omit<CartItem, "quantity">, qty = 1) => {
         const safe = coerceItem(item);
         const add = Math.max(1, Number(qty) || 1);
+
         if (!safe.productId) throw new Error("PRODUCT_ID_INVALID");
 
         const current = getCurrentQty(state.items, safe.productId);
